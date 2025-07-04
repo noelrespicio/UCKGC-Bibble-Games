@@ -1,6 +1,5 @@
 // Supabase setup
 const SUPABASE_URL = ' 'https://wlthlwxcmltwescezjlk.supabase.co'; // ⬅️ Replace with your Supabase URL
-  
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
