@@ -4,13 +4,70 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>UCKGC Bible Games</title>
-  <link rel="stylesheet" href="index.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .logo {
+      width: 100px;
+      margin-bottom: 10px;
+    }
+
+    header h1 {
+      font-size: 2em;
+      color: #2c3e50;
+    }
+
+    .buttons {
+      margin: 20px 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      background: #2e86de;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1b4f72;
+    }
+
+    form {
+      background: #fff;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    input[type="email"], input[type="password"] {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <img src="481151198_1440757323568385_4474186236176026997_n-removebg-preview.png" alt="UCKGC Logo" class="logo">
+      <img src="logo.png" alt="UCKGC Logo" class="logo">
       <h1>UCKGC Bible Games</h1>
     </header>
 
@@ -22,6 +79,67 @@
     <div class="form-container" id="formContainer"></div>
   </div>
 
-  <script src="index.js"></script>
+  <script>
+    // Supabase setup
+    const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co'; // palitan mo ito
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // palitan mo rin ito
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Display Register Form
+    function showRegister() {
+      document.getElementById('formContainer').innerHTML = `
+        <form onsubmit="registerUser(event)">
+          <h3>Register</h3>
+          <input type="email" id="regEmail" placeholder="Email" required />
+          <input type="password" id="regPassword" placeholder="Password" required />
+          <button type="submit">Register</button>
+        </form>
+      `;
+    }
+
+    // Display Login Form
+    function showLogin() {
+      document.getElementById('formContainer').innerHTML = `
+        <form onsubmit="loginUser(event)">
+          <h3>Login</h3>
+          <input type="email" id="loginEmail" placeholder="Email" required />
+          <input type="password" id="loginPassword" placeholder="Password" required />
+          <button type="submit">Login</button>
+        </form>
+      `;
+    }
+
+    // Register User Function
+    async function registerUser(e) {
+      e.preventDefault();
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+
+      const { data, error } = await supabase.auth.signUp({ email, password });
+
+      if (error) {
+        alert('Registration error: ' + error.message);
+      } else {
+        alert('Check your email to confirm your registration.');
+      }
+    }
+
+    // Login User Function
+    async function loginUser(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        alert('Login error: ' + error.message);
+      } else {
+        alert('Welcome! Login successful.');
+        // Optional: redirect to dashboard.html
+        // window.location.href = "dashboard.html";
+      }
+    }
+  </script>
 </body>
 </html>
