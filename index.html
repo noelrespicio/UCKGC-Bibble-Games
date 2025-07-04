@@ -134,103 +134,106 @@
     <div id="formContainer"></div>
   </div>
 
-  <script>
-    // Supabase setup
+ <script>
+  // Supabase setup
   const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // make sure to use a secure key
-  
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // <-- Replace with your anon key
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Check if user is already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        window.location.href = "dashboard.html";
-      }
-    });
-
-    function showRegister() {
-      document.getElementById('formContainer').innerHTML = `
-        <form onsubmit="registerUser(event)">
-          <h3>Create an Account</h3>
-          <input type="text" id="fullName" placeholder="Full Name" required />
-          <input type="email" id="regEmail" placeholder="Email" required />
-          <input type="password" id="regPassword" placeholder="Password" required />
-          <button type="submit">Register</button>
-        </form>
-      `;
-    }
-
-    function showLogin() {
-      document.getElementById('formContainer').innerHTML = `
-        <form onsubmit="loginUser(event)">
-          <h3>Login</h3>
-          <input type="email" id="loginEmail" placeholder="Email" required />
-          <input type="password" id="loginPassword" placeholder="Password" required />
-          <button type="submit">Login</button>
-        </form>
-      `;
-    }
-
-    // Register User + Store in profiles
-  async function registerUser(e) {
-  e.preventDefault();
-  const fullName = document.getElementById('fullName').value;
-  const email = document.getElementById('regEmail').value;
-  const password = document.getElementById('regPassword').value;
-
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: {
-        full_name: fullName
-      }
+  // Auto-redirect if already logged in
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session) {
+      window.location.href = "dashboard.html";
     }
   });
 
-  if (error) {
-    console.error("Signup error:", error);
-    alert('Registration error: ' + error.message);
-    return;
+  // Register Form
+  function showRegister() {
+    document.getElementById('formContainer').innerHTML = `
+      <form id="registerForm">
+        <h3>Create an Account</h3>
+        <input type="text" id="fullName" placeholder="Full Name" required />
+        <input type="email" id="regEmail" placeholder="Email" required />
+        <input type="password" id="regPassword" placeholder="Password" required />
+        <button type="submit">Register</button>
+      </form>
+    `;
+    document.getElementById('registerForm').addEventListener('submit', registerUser);
   }
 
-  const userId = data?.user?.id;
-
-  if (!userId) {
-    alert("User registered, but confirmation is required. Check your email.");
-    return;
+  // Login Form
+  function showLogin() {
+    document.getElementById('formContainer').innerHTML = `
+      <form id="loginForm">
+        <h3>Login</h3>
+        <input type="email" id="loginEmail" placeholder="Email" required />
+        <input type="password" id="loginPassword" placeholder="Password" required />
+        <button type="submit">Login</button>
+      </form>
+    `;
+    document.getElementById('loginForm').addEventListener('submit', loginUser);
   }
 
-  // Insert into profiles table
-  const { error: insertError } = await supabase
-    .from('profiles')
-    .insert([{ id: userId, full_name: fullName, email: email }]);
+  // Register User Function
+  async function registerUser(e) {
+    e.preventDefault();
+    const fullName = document.getElementById('fullName').value;
+    const email = document.getElementById('regEmail').value;
+    const password = document.getElementById('regPassword').value;
 
-  if (insertError) {
-    console.error("Insert error:", insertError);
-    alert('Profile saving error: ' + insertError.message);
-  } else {
-    alert('Registration successful! Check your email to confirm.');
-  }
-}
-
-
-
-    // Login User + Redirect
-    async function loginUser(e) {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        alert('Login error: ' + error.message);
-      } else {
-        alert('Login successful! Redirecting...');
-        window.location.href = "dashboard.html";
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName
+        }
       }
+    });
+
+    if (error) {
+      alert('Registration error: ' + error.message);
+      return;
     }
-  </script>
+
+    const userId = data?.user?.id;
+
+    if (!userId) {
+      alert("Registration successful! Please check your email to confirm.");
+      return;
+    }
+
+    const { error: insertError } = await supabase
+      .from('profiles')
+      .insert([{ id: userId, full_name: fullName, email: email }]);
+
+    if (insertError) {
+      alert('Profile saving error: ' + insertError.message);
+    } else {
+      alert('Registration complete!');
+    }
+  }
+
+  // Login Function
+  async function loginUser(e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      alert('Login error: ' + error.message);
+    } else {
+      alert('Login successful!');
+      window.location.href = "dashboard.html";
+    }
+  }
+
+  // Attach functions to global scope (fixes the problem!)
+  window.showRegister = showRegister;
+  window.showLogin = showLogin;
+</script>
+
 </body>
 </html>
