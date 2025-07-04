@@ -137,7 +137,7 @@
  <script>
   // Supabase setup
   const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // <-- Replace with your anon key
+  const SUPABASE_KEY = 'process.env.SUPABASE_KEY'; // <-- Replace with your anon key
   const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   // Auto-redirect if already logged in
