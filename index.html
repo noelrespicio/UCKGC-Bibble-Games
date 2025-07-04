@@ -172,14 +172,21 @@
     }
 
     // Register User + Store in profiles
-   async function registerUser(e) {
+  async function registerUser(e) {
   e.preventDefault();
   const fullName = document.getElementById('fullName').value;
   const email = document.getElementById('regEmail').value;
   const password = document.getElementById('regPassword').value;
 
-  // 1. Sign up user
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName
+      }
+    }
+  });
 
   if (error) {
     console.error("Signup error:", error);
@@ -187,12 +194,17 @@
     return;
   }
 
-  const user = data.user;
+  const userId = data?.user?.id;
 
-  // 2. Insert into profiles table
+  if (!userId) {
+    alert("User registered, but confirmation is required. Check your email.");
+    return;
+  }
+
+  // Insert into profiles table
   const { error: insertError } = await supabase
     .from('profiles')
-    .insert([{ id: user.id, full_name: fullName, email: email }]);
+    .insert([{ id: userId, full_name: fullName, email: email }]);
 
   if (insertError) {
     console.error("Insert error:", insertError);
@@ -201,6 +213,7 @@
     alert('Registration successful! Check your email to confirm.');
   }
 }
+
 
 
     // Login User + Redirect
