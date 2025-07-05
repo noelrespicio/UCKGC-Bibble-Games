@@ -102,7 +102,7 @@
       const icon = document.getElementById(iconId);
       const isHidden = input.type === 'password';
       input.type = isHidden ? 'text' : 'password';
-      icon.textContent = isHidden ? '🙈' : '👁️';
+      icon.textContent = isHidden ? '👁️' : '🙈';
     };
 
     window.showRegister = function () {
@@ -114,12 +114,12 @@
 
           <div class="pw-group">
             <input type="password" id="regPassword" placeholder="Password" required />
-            <span class="toggle-icon" id="icon1" onclick="togglePassword('regPassword', 'icon1')">👁️</span>
+            <span class="toggle-icon" id="icon1" onclick="togglePassword('regPassword', 'icon1')">🙈</span>
           </div>
 
           <div class="pw-group">
             <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-            <span class="toggle-icon" id="icon2" onclick="togglePassword('confirmPassword', 'icon2')">👁️</span>
+            <span class="toggle-icon" id="icon2" onclick="togglePassword('confirmPassword', 'icon2')">🙈</span>
           </div>
 
           <button type="submit">Register</button>
@@ -136,7 +136,7 @@
 
           <div class="pw-group">
             <input type="password" id="loginPassword" placeholder="Password" required />
-            <span class="toggle-icon" id="icon3" onclick="togglePassword('loginPassword', 'icon3')">👁️</span>
+            <span class="toggle-icon" id="icon3" onclick="togglePassword('loginPassword', 'icon3')">🙈</span>
           </div>
 
           <button type="submit">Login</button>
@@ -233,7 +233,7 @@
     }
 
     .pw-group input {
-      padding-right: 20px;
+      padding-right: 18px;
     }
 
     .toggle-icon {
