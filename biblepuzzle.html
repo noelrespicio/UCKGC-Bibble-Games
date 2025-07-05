@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -144,6 +145,9 @@
     <a href="dashboard.html">🔙 Back to Dashboard</a>
   </div>
 
+  <audio id="correctSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_1f8b495a99.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_74e9f8f772.mp3" preload="auto"></audio>
+
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -160,8 +164,8 @@
     const userId = user.id;
     const fullName = user.user_metadata.full_name || user.email;
 
-    const puzzles = [
-      { word: "GENESIS", clue: "The first book of the Bible" },
+    const puzzles = [...[ // Shuffle the array
+    { word: "GENESIS", clue: "The first book of the Bible" },
       { word: "EXODUS", clue: "Story of Moses and the Israelites leaving Egypt" },
       { word: "FAITH", clue: "Believing without seeing" },
       { word: "PRAYER", clue: "Talking to God" },
@@ -213,26 +217,33 @@
       { word: "HEBREWS", clue: "Jesus is greater than all" },
       { word: "JAMES", clue: "Faith without works is dead" },
       { word: "PETER", clue: "A leading apostle" }
-    ];
+    ].sort(() => 0.5 - Math.random())];
 
+    let currentIndex = 0;
+    let score = 0;
     let puzzle = "";
     let clue = "";
-    let score = 0;
 
     const puzzleWordEl = document.getElementById("puzzleWord");
     const clueText = document.getElementById("clueText");
     const inputEl = document.getElementById("letterInput");
     const feedbackEl = document.getElementById("feedback");
-    const tryAgainBtn = document.getElementById("tryAgainBtn");
-    const retryFromResult = document.getElementById("retryFromResult");
     const submitBtn = document.getElementById("submitBtn");
     const resultBox = document.getElementById("resultBox");
     const gameBox = document.getElementById("gameBox");
     const finalScoreEl = document.getElementById("finalScore");
     const leaderboardEl = document.getElementById("leaderboard");
+    const retryFromResult = document.getElementById("retryFromResult");
+
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
 
     function startGame() {
-      const current = puzzles[Math.floor(Math.random() * puzzles.length)];
+      if (currentIndex >= puzzles.length) {
+        endGame();
+        return;
+      }
+      const current = puzzles[currentIndex++];
       puzzle = current.word;
       clue = current.clue;
       puzzleWordEl.textContent = "_ ".repeat(puzzle.length);
@@ -287,12 +298,14 @@
     submitBtn.onclick = () => {
       const guess = inputEl.value.trim().toUpperCase();
       if (guess === puzzle) {
+        correctSound.play();
         score++;
         feedbackEl.textContent = `🎉 Correct! The word was "${puzzle}"`;
         feedbackEl.className = "feedback correct";
         feedbackEl.classList.remove("hidden");
         setTimeout(startGame, 2000);
       } else {
+        wrongSound.play();
         feedbackEl.textContent = `❌ Wrong! Correct answer: ${puzzle}`;
         feedbackEl.className = "feedback wrong";
         feedbackEl.classList.remove("hidden");
@@ -300,16 +313,16 @@
       }
     };
 
-    function resetGame() {
+    retryFromResult.onclick = () => {
       score = 0;
+      currentIndex = 0;
       resultBox.classList.add("hidden");
       gameBox.classList.remove("hidden");
       startGame();
-    }
-
-    retryFromResult.onclick = resetGame;
+    };
 
     startGame();
   </script>
 </body>
 </html>
+
