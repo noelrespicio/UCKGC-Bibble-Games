@@ -19,10 +19,10 @@
       margin: 0;
       padding: 20px;
       text-align: center;
-      min-height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      min-height: 100vh;
     }
 
     .quiz-box, .result-box {
@@ -39,7 +39,13 @@
     h2 {
       color: var(--primary-dark);
       font-size: 1.5rem;
-      margin-bottom: 16px;
+      margin-bottom: 12px;
+    }
+
+    #timer {
+      font-weight: bold;
+      color: var(--danger);
+      margin-bottom: 10px;
     }
 
     .option-btn {
@@ -114,6 +120,7 @@
 
   <div class="quiz-box" id="quizBox">
     <h2 id="question">Loading...</h2>
+    <div id="timer">⏳ 15 seconds</div>
     <div id="options"></div>
     <p id="wrongAnswer" class="wrong-text" style="display: none;"></p>
   </div>
@@ -163,20 +170,38 @@
     let quizData = shuffle([...allQuestions]);
     let currentQuestion = 0;
     let score = 0;
+    let timer;
+    let timeLeft = 15;
 
     const questionEl = document.getElementById("question");
     const optionsEl = document.getElementById("options");
+    const timerEl = document.getElementById("timer");
     const quizBox = document.getElementById("quizBox");
     const resultBox = document.getElementById("resultBox");
     const leaderboardEl = document.getElementById("leaderboard");
     const wrongText = document.getElementById("wrongAnswer");
 
+    function startTimer() {
+      timeLeft = 15;
+      timerEl.textContent = `⏳ ${timeLeft} seconds`;
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `⏳ ${timeLeft} seconds`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          wrongText.innerHTML = `⏱️ Time's up!`;
+          wrongText.style.display = "block";
+          setTimeout(endQuiz, 2000);
+        }
+      }, 1000);
+    }
+
     function loadQuestion() {
+      clearInterval(timer);
       const q = quizData[currentQuestion];
       questionEl.textContent = `Q${currentQuestion + 1}: ${q.question}`;
       optionsEl.innerHTML = "";
       wrongText.style.display = "none";
-
       shuffle(q.options).forEach(option => {
         const btn = document.createElement("button");
         btn.textContent = option;
@@ -184,9 +209,11 @@
         btn.onclick = () => selectAnswer(option, q.answer);
         optionsEl.appendChild(btn);
       });
+      startTimer();
     }
 
     async function selectAnswer(selected, correct) {
+      clearInterval(timer);
       if (selected === correct) {
         score++;
         currentQuestion++;
@@ -196,13 +223,14 @@
           await endQuiz();
         }
       } else {
-        wrongText.innerHTML = `❌ Wrong! The correct answer was: <span style="color:var(--primary-dark);">${correct}</span>`;
+        wrongText.innerHTML = `❌ Wrong! Correct: <span style="color:var(--primary-dark);">${correct}</span>`;
         wrongText.style.display = "block";
         setTimeout(endQuiz, 2000);
       }
     }
 
     async function endQuiz() {
+      clearInterval(timer);
       quizBox.style.display = "none";
       resultBox.style.display = "block";
       document.getElementById("finalScore").textContent = `You scored ${score} out of ${quizData.length}`;
