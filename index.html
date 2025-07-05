@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UCKGC Bible Games</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
       --primary: #2e86de;
@@ -13,9 +13,7 @@
       --text: #2c3e50;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -72,9 +70,7 @@
       transition: 0.3s ease;
     }
 
-    button:hover {
-      background: var(--primary-dark);
-    }
+    button:hover { background: var(--primary-dark); }
 
     form {
       background: #f9fafb;
@@ -98,23 +94,10 @@
     }
 
     @media (max-width: 480px) {
-      h1 {
-        font-size: 1.4rem;
-      }
-
-      .logo {
-        width: 70px;
-        height: 70px;
-      }
-
-      button {
-        font-size: 0.95rem;
-        padding: 10px;
-      }
-
-      input {
-        font-size: 0.95rem;
-      }
+      h1 { font-size: 1.4rem; }
+      .logo { width: 70px; height: 70px; }
+      button { font-size: 0.95rem; padding: 10px; }
+      input { font-size: 0.95rem; }
     }
   </style>
 </head>
@@ -134,13 +117,15 @@
   </div>
 
   <script>
-    // ✅ Supabase Setup (with real API Key — you should keep this in environment variable if possible)
+    // ✅ Supabase Setup (v2 compatible)
     const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // ← replace this with your real anon key from Supabase dashboard
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
+
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     // Redirect if already logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabaseClient.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         window.location.href = "dashboard.html";
       }
@@ -180,7 +165,7 @@
       const email = document.getElementById('regEmail').value;
       const password = document.getElementById('regPassword').value;
 
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await supabaseClient.auth.signUp({
         email,
         password,
         options: {
@@ -202,7 +187,7 @@
       }
 
       // Insert into 'profiles' table
-      const { error: insertError } = await supabase
+      const { error: insertError } = await supabaseClient
         .from('profiles')
         .insert([{ id: userId, full_name: fullName, email }]);
 
@@ -219,7 +204,7 @@
       const email = document.getElementById('loginEmail').value;
       const password = document.getElementById('loginPassword').value;
 
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
         email,
         password
       });
@@ -232,7 +217,7 @@
       }
     }
 
-    // Attach functions globally
+    // Expose functions
     window.showRegister = showRegister;
     window.showLogin = showLogin;
   </script>
