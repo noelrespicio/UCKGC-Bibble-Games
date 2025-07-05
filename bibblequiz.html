@@ -135,7 +135,7 @@
   </div>
 
   <!-- Audio elements -->
-  <audio id="bgMusic" src="bg-music.mp3" loop></audio>
+  <audio id="bgMusic" src="backroudmusic" loop></audio>
   <audio id="correctSound" src="audio/correct.mp3"></audio>
   <audio id="wrongSound" src="audio/wrong.mp3"></audio>
   <audio id="timesUpSound" src="audio/timesup.mp3"></audio>
@@ -168,16 +168,38 @@
     });
 
     const allQuestions = [
-      { question: "Who built the ark?", options: ["Moses", "Noah", "Abraham", "David"], answer: "Noah" },
+    { question: "Who built the ark?", options: ["Moses", "Noah", "Abraham", "David"], answer: "Noah" },
+        { question: "What is the first commandment?", options: ["Love your neighbor", "Do not steal", "Have no other gods", "Honor your parents"], answer: "Have no other gods" },
+        { question: "What is the first book of the Bible?", options: ["Genesis", "Exodus", "Leviticus", "Numbers"], answer: "Genesis" },
+        { question: "What is the first miracle of Jesus?", options: ["Walking on water", "Feeding the 5000", "Turning water into wine", "Healing the blind"], answer: "Turning water into wine" },
+        { question: "What did God create on the seventh day?", options: ["Light", "Darkness", "Rest", "Animals"], answer: "Rest" }, 
       { question: "How many disciples did Jesus have?", options: ["10", "12", "7", "3"], answer: "12" },
       { question: "Where was Jesus born?", options: ["Nazareth", "Jerusalem", "Bethlehem", "Egypt"], answer: "Bethlehem" },
+        { question: "What is the last book of the Old Testament?", options: ["Malachi", "Zechariah", "Haggai", "Zephaniah"], answer: "Malachi" },
+        { question: "What is the last book of the Bible?", options: ["Revelation", "Genesis", "Exodus", "Psalms"], answer: "Revelation" },
       { question: "Who was swallowed by a big fish?", options: ["Jonah", "Elijah", "Daniel", "Peter"], answer: "Jonah" },
-      { question: "What is the first book of the Bible?", options: ["Exodus", "Genesis", "Leviticus", "Numbers"], answer: "Genesis" },
+        { question: "What is the shortest book in the New Testament?", options: ["2 John", "3 John", "Philemon", "Jude"], answer: "2 John" },
+        { question: "What is the fruit of the Spirit?", options: ["Love", "Hate", "Fear", "Anger"], answer: "Love" },
       { question: "Who was the strongest man in the Bible?", options: ["Samson", "David", "Goliath", "Saul"], answer: "Samson" },
       { question: "What river was Jesus baptized in?", options: ["Nile", "Jordan", "Euphrates", "Tigris"], answer: "Jordan" },
+        { question: "What is the longest book in the Bible?", options: ["Psalms", "Genesis", "Isaiah", "Exodus"], answer: "Psalms" },
+        { question: "What is the shortest verse in the Bible?", options: ["Jesus wept.", "God is love.", "Pray without ceasing.", "Love your neighbor."], answer: "Jesus wept." },
+        { question: "What is the longest chapter in the Bible?", options: ["Psalm 119", "Psalm 23", "Genesis 1", "Exodus 20"], answer: "Psalm 119" },
       { question: "Who led the Israelites out of Egypt?", options: ["Moses", "Aaron", "Joseph", "Joshua"], answer: "Moses" },
+        { question: "What is the first commandment?", options: ["Love your neighbor", "Do not steal", "Have no other gods", "Honor your parents"], answer: "Have no other gods" },
+        { question: "What is the last book of the Old Testament?", options: ["Malachi", "Zechariah", "Haggai", "Zephaniah"], answer: "Malachi" },
+        { question: "What is the first book of the New Testament?", options: ["Matthew", "Mark", "Luke", "John"], answer: "Matthew" },
+        { question: "What is the last book of the Bible?", options: ["Revelation", "Acts", "Hebrews", "James"], answer: "Revelation" },
+        { question: "What is the last book of the Old Testament?", options: ["Malachi", "Zechariah", "Haggai", "Zephaniah"], answer: "Malachi" },  
+        { question: "What did God create on the first day?", options: ["Land", "Animals", "Light", "Plants"], answer: "Light" },
       { question: "How many days did Jesus fast in the wilderness?", options: ["30", "40", "50", "7"], answer: "40" },
       { question: "Who was the mother of Jesus?", options: ["Mary", "Martha", "Sarah", "Elizabeth"], answer: "Mary" },
+        { question: "What is the longest book in the Bible?", options: ["Psalms", "Genesis", "Isaiah", "Exodus"], answer: "Psalms" },
+        { question: "What is the last book of the New Testament?", options: ["Revelation", "Acts", "Hebrews", "James"], answer: "Revelation" },
+        { question: "Who betrayed Jesus for 30 pieces of silver?", options: ["Peter", "Judas", "John", "Thomas"], answer: "Judas" },
+        { question: "What miracle did Jesus perform at a wedding in Cana?", options: ["Healing the sick", "Turning water into wine", "Feeding the 5000", "Walking on water"], answer: "Turning water into wine" },
+        { question: "Who was thrown into a lion's den?", options: ["Daniel", "David", "Joseph", "Solomon"], answer: "Daniel" }, 
+        { question: "What is the shortest verse in the Bible?", options: ["Jesus wept.", "God is love.", "Pray without ceasing.", "Love your neighbor."], answer: "Jesus wept." },
     ];
 
     function shuffle(array) {
