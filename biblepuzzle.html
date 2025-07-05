@@ -149,6 +149,7 @@
 
   <div class="puzzle-box" id="gameBox">
     <h2>Bible Puzzle</h2>
+    <audio id="bgMusic" src="bg-music.mp3" autoplay loop preload="auto"></audio>
     <p class="clue" id="clueText">Clue will appear here</p>
     <p class="puzzle-word" id="puzzleWord">Loading...</p>
     <input type="text" id="letterInput" class="letter-input" maxlength="20" placeholder="Enter your answer...">
@@ -485,6 +486,14 @@
         requestAnimationFrame(frame);
       })();
     }
+window.toggleMusic = () => {
+  const music = document.getElementById('bgMusic');
+  if (music.paused) {
+    music.play();
+  } else {
+    music.pause();
+  }
+};
 
     shufflePuzzles();
     startGame();
