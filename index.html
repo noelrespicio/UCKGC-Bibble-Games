@@ -7,10 +7,9 @@
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-    
-    const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
 
+    const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // replace this with your actual anon key
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const { data: sessionData } = await supabase.auth.getSession();
@@ -48,6 +47,7 @@
         email,
         password,
         options: {
+          emailRedirectTo: null, // no redirection or confirmation
           data: { full_name: fullName }
         }
       });
@@ -64,7 +64,7 @@
           .insert([{ id: user.id, full_name: fullName, email }]);
       }
 
-      alert("✅ Registration successful! You can now login.");
+      alert("✅ Registration successful! You can now log in.");
       showLogin();
     };
 
@@ -81,18 +81,15 @@
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        if (error.message.toLowerCase().includes("invalid login credentials")) {
-          const { data: exists } = await supabase
-            .from('profiles')
-            .select('email')
-            .eq('email', email);
-          if (!exists || exists.length === 0) {
-            alert("📧 Email not registered.");
-          } else {
-            alert("🔒 Wrong password. Try again.");
-          }
+        const { data: exists } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('email', email);
+
+        if (!exists || exists.length === 0) {
+          alert("📧 Email not registered.");
         } else {
-          alert("⚠️ Login error: " + error.message);
+          alert("🔒 Wrong password. Try again.");
         }
         return;
       }
@@ -140,7 +137,6 @@
     :root {
       --primary: #2e86de;
       --primary-dark: #1b4f72;
-      --bg: #f0f4f8;
       --text: #2c3e50;
     }
 
@@ -168,7 +164,6 @@
     .logo {
       width: 90px;
       height: 90px;
-      object-fit: contain;
       margin-bottom: 10px;
     }
 
@@ -208,11 +203,6 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     }
 
-    form h3 {
-      margin-bottom: 15px;
-      color: var(--text);
-    }
-
     input {
       width: 100%;
       padding: 14px;
@@ -228,13 +218,6 @@
       margin-top: -8px;
       margin-bottom: 12px;
       text-align: left;
-    }
-
-    @media (max-width: 480px) {
-      h1 { font-size: 1.4rem; }
-      .logo { width: 70px; height: 70px; }
-      button { font-size: 0.95rem; padding: 10px; }
-      input { font-size: 0.95rem; }
     }
   </style>
 </head>
