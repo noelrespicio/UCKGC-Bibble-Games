@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UCKGC Dashboard</title>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabase = createClient(
+      'https://wlthlwxcmltwescezjlk.supabase.co',
+      'your_anon_key_here'
+    );
+
+    // Check auth session
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (!sessionData.session) {
+      window.location.href = "index.html";
+    }
+
+    // Logout handler
+    window.logout = async () => {
+      await supabase.auth.signOut();
+      alert("👋 Logged out successfully!");
+      window.location.href = "index.html";
+    };
+  </script>
+
+  <style>
+    :root {
+      --primary: #2e86de;
+      --primary-dark: #1b4f72;
+      --bg: #f0f9ff;
+      --text: #2c3e50;
+      --card-bg: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: var(--bg);
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    header h2 {
+      color: var(--text);
+      font-size: 1.5rem;
+    }
+
+    .logout-btn {
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .logout-btn:hover {
+      background: #cc0000;
+    }
+
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h3 {
+      color: var(--primary-dark);
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    @media (max-width: 480px) {
+      header h2 {
+        font-size: 1.2rem;
+      }
+
+      .logout-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+      }
+
+      .card h3 {
+        font-size: 1rem;
+      }
+
+      .card p {
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>👋 Welcome to UCKGC Bible Games</h2>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <section class="games-grid">
+    <div class="card" onclick="alert('Coming Soon: Bible Quiz!')">
+      <h3>Bible Quiz</h3>
+      <p>Test your knowledge of the Scriptures!</p>
+    </div>
+    <div class="card" onclick="alert('Coming Soon: Memory Verse Match!')">
+      <h3>Verse Match</h3>
+      <p>Match Bible verses with references.</p>
+    </div>
+    <div class="card" onclick="alert('Coming Soon: Bible Puzzle!')">
+      <h3>Bible Puzzle</h3>
+      <p>Arrange the puzzle pieces to reveal a verse.</p>
+    </div>
+    <div class="card" onclick="alert('Coming Soon: Books of the Bible Game!')">
+      <h3>Books Order</h3>
+      <p>Put the books of the Bible in order.</p>
+    </div>
+  </section>
+</body>
+</html>
