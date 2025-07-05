@@ -149,7 +149,7 @@
 
   <div class="puzzle-box" id="gameBox">
     <h2>Bible Puzzle</h2>
-    <audio id="bgMusic" src="worship-130839.mp3" autoplay loop preload="auto"></audio>
+   
     <p class="clue" id="clueText">Clue will appear here</p>
     <p class="puzzle-word" id="puzzleWord">Loading...</p>
     <input type="text" id="letterInput" class="letter-input" maxlength="20" placeholder="Enter your answer...">
@@ -172,7 +172,8 @@
 
   <audio id="correctSound" src="correct.mp4" preload="auto"></audio>
   <audio id="wrongSound" src="gameover.mp4" preload="auto"></audio>
-
+ <audio id="bgMusic" src="worship-130839.mp3" autoplay loop preload="auto"></audio>
+  
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
@@ -188,7 +189,13 @@
     const user = session.user;
     const userId = user.id;
     const fullName = user.user_metadata.full_name || user.email;
+  const bgMusic = document.getElementById("bgMusic");
 
+    // Try autoplay or trigger on user interaction
+    bgMusic.volume = 0.3;
+    bgMusic.play().catch(() => {
+      document.body.addEventListener("click", () => bgMusic.play(), { once: true });
+    });
     let puzzles = [];
     let currentIndex = 0;
     let score = 0;
