@@ -8,57 +8,81 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
-
+    const SUPABASE_KEY = 'your_anon_key_here';
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Redirect if logged in
     const { data: sessionData } = await supabase.auth.getSession();
-    if (sessionData.session) {
-      window.location.href = "dashboard.html";
-    }
+    if (sessionData.session) window.location.href = "dashboard.html";
 
-    // Register user
+    // Register User
     window.registerUser = async function (e) {
       e.preventDefault();
-      const fullName = document.getElementById('fullName').value;
-      const email = document.getElementById('regEmail').value;
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (!fullName || !email || !password || !confirmPassword) {
+        alert("❗ All fields are required.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert("❗ Passwords do not match.");
+        return;
+      }
 
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            full_name: fullName
-          }
+          data: { full_name: fullName }
         }
       });
 
       if (error) {
-        alert('Registration error: ' + error.message);
+        alert('❌ Registration error: ' + error.message);
       } else {
-        alert('Registration successful! Please check your email to confirm.');
+        alert('✅ Registration successful! Please check your email to confirm.');
       }
     };
 
-    // Login user
+    // Login User
     window.loginUser = async function (e) {
       e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
+      const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        alert("❗ Both email and password are required.");
+        return;
+      }
 
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        alert('Login error: ' + error.message);
+        if (error.message.toLowerCase().includes("invalid login credentials")) {
+          // Check if email exists to give custom error
+          const { data: users } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('email', email);
+
+          if (!users || users.length === 0) {
+            alert("📧 Email not registered.");
+          } else {
+            alert("🔒 Wrong password. Please try again.");
+          }
+        } else {
+          alert("⚠️ Login error: " + error.message);
+        }
       } else {
-        alert('Login successful!');
+        alert('✅ Login successful!');
         window.location.href = "dashboard.html";
       }
     };
 
-    // Show register form
+    // Show Registration Form
     window.showRegister = function () {
       document.getElementById('formContainer').innerHTML = `
         <form id="registerForm">
@@ -66,13 +90,14 @@
           <input type="text" id="fullName" placeholder="Full Name" required />
           <input type="email" id="regEmail" placeholder="Email" required />
           <input type="password" id="regPassword" placeholder="Password" required />
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
           <button type="submit">Register</button>
         </form>
       `;
       document.getElementById('registerForm').addEventListener('submit', registerUser);
     };
 
-    // Show login form
+    // Show Login Form
     window.showLogin = function () {
       document.getElementById('formContainer').innerHTML = `
         <form id="loginForm">
@@ -85,6 +110,7 @@
       document.getElementById('loginForm').addEventListener('submit', loginUser);
     };
   </script>
+
   <style>
     :root {
       --primary: #2e86de;
