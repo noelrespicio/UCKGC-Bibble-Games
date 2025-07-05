@@ -108,6 +108,11 @@
       margin: 6px 0;
     }
 
+    @keyframes fall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
     @media (max-width: 480px) {
       body {
         padding: 10px;
@@ -346,6 +351,7 @@
   { word: "COMMANDMENTS", clue: "Ten laws from God" },
   { word: "HOLYSPIRIT", clue: "Helper and guide from God" },
   { word: "MISSION", clue: "Sharing the Gospel" }
+
       ].sort(() => 0.5 - Math.random())];
       currentIndex = 0;
     }
@@ -414,9 +420,17 @@
         }
       });
 
+      let position = 1;
       leaderboardEl.innerHTML = "";
-      [...uniqueUsers.entries()].slice(0, 5).forEach(([name, score]) => {
-        leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+      [...uniqueUsers.entries()].slice(0, 5).forEach(([name, scoreVal]) => {
+        const isCurrentUser = name === fullName;
+        const crown = isCurrentUser && position === 1 ? "👑 " : "";
+        leaderboardEl.innerHTML += `<li style="${isCurrentUser ? 'color: var(--primary); font-weight: bold;' : ''}">
+          ${crown}<strong>${name}</strong>: ${scoreVal}
+        </li>`;
+
+        if (isCurrentUser && position === 1) triggerConfetti();
+        position++;
       });
     }
 
@@ -440,11 +454,37 @@
 
     retryFromResult.onclick = () => {
       score = 0;
-      shufflePuzzles(); // reshuffle puzzles
+      shufflePuzzles();
       resultBox.classList.add("hidden");
       gameBox.classList.remove("hidden");
       startGame();
     };
+
+    function triggerConfetti() {
+      const duration = 2000;
+      const animationEnd = Date.now() + duration;
+      const colors = ['#2e86de', '#1abc9c', '#f39c12', '#e74c3c', '#9b59b6'];
+
+      (function frame() {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return;
+
+        const particle = document.createElement('div');
+        particle.style.position = 'fixed';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.width = '12px';
+        particle.style.height = '12px';
+        particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.borderRadius = '50%';
+        particle.style.zIndex = 9999;
+        particle.style.animation = 'fall 1s linear forwards';
+        document.body.appendChild(particle);
+
+        setTimeout(() => particle.remove(), 1000);
+        requestAnimationFrame(frame);
+      })();
+    }
 
     shufflePuzzles();
     startGame();
