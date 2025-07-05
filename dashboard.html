@@ -8,6 +8,26 @@
   <!-- Lucide Icons CDN -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabase = createClient(
+      'https://wlthlwxcmltwescezjlk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+    );
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+
+    if (!session) {
+      window.location.href = "index.html";
+    } else {
+      const user = session.user;
+      document.getElementById('userName').textContent =
+        user.user_metadata?.full_name || user.email;
+    }
+  </script>
+
   <style>
     :root {
       --primary: #2e86de;
@@ -166,38 +186,17 @@
 
   <script>
     lucide.createIcons();
-  </script>
 
-  <!-- ✅ Supabase Module Script -->
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-    const supabase = createClient(
-      'https://wlthlwxcmltwescezjlk.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-    );
-
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
-
-    if (!session) {
+    async function logout() {
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+      const supabase = createClient(
+        'https://wlthlwxcmltwescezjlk.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+      );
+      await supabase.auth.signOut();
+      alert("👋 Logged out successfully!");
       window.location.href = "index.html";
-    } else {
-      const user = session.user;
-      document.getElementById('userName').textContent =
-        user.user_metadata?.full_name || user.email;
     }
-
-    // ✅ Expose logout function globally
-    window.logout = async () => {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        alert("Logout failed: " + error.message);
-      } else {
-        alert("👋 Logged out successfully!");
-        window.location.href = "index.html";
-      }
-    };
   </script>
 </body>
 </html>
