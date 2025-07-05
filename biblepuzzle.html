@@ -87,12 +87,15 @@
       display: none;
     }
 
-    #tryAgainBtn, a {
+    #tryAgainBtn, .try-again-link {
       display: inline-block;
       margin-top: 20px;
       font-weight: bold;
       text-decoration: none;
       color: var(--primary);
+      background: none;
+      border: none;
+      cursor: pointer;
     }
 
     ul {
@@ -127,7 +130,6 @@
     <br>
     <button class="submit-btn" id="submitBtn">Submit</button>
     <p id="feedback" class="feedback hidden"></p>
-    <button id="tryAgainBtn" class="letter-btn hidden">🔁 Try Again</button>
     <br>
     <a href="dashboard.html">🔙 Back to Dashboard</a>
   </div>
@@ -137,6 +139,8 @@
     <p id="finalScore"></p>
     <h3>🏆 Leaderboard</h3>
     <ul id="leaderboard"></ul>
+    <button class="try-again-link" id="retryFromResult">🔁 Try Again</button>
+    <br>
     <a href="dashboard.html">🔙 Back to Dashboard</a>
   </div>
 
@@ -163,7 +167,52 @@
       { word: "PRAYER", clue: "Talking to God" },
       { word: "GRACE", clue: "Unmerited favor from God" },
       { word: "CHRIST", clue: "The Messiah" },
-      { word: "DISCIPLE", clue: "A follower of Jesus" }
+      { word: "DISCIPLE", clue: "A follower of Jesus" },
+      { word: "PSALM", clue: "A song or poem in the Bible" },
+      { word: "HOPE", clue: "Confident expectation in God's promises" },
+      { word: "LOVE", clue: "Greatest commandment according to Jesus" },
+      { word: "BAPTISM", clue: "Christian initiation with water" },
+      { word: "REVELATION", clue: "Last book of the Bible" },
+      { word: "ACTS", clue: "Book about early church growth" },
+      { word: "PROVERBS", clue: "Book of wisdom sayings" },
+      { word: "COVENANT", clue: "Sacred promise from God" },
+      { word: "MIRACLE", clue: "Supernatural act by God" },
+      { word: "RESURRECTION", clue: "Rising from the dead" },
+      { word: "REDEEM", clue: "To buy back or save" },
+      { word: "SALVATION", clue: "Deliverance from sin" },
+      { word: "TRINITY", clue: "Father, Son, Holy Spirit" },
+      { word: "TENCOMMANDMENTS", clue: "Laws given to Moses" },
+      { word: "NOAH", clue: "Built an ark" },
+      { word: "DAVID", clue: "Defeated Goliath" },
+      { word: "GOLGOTHA", clue: "Place where Jesus was crucified" },
+      { word: "JORDAN", clue: "River where Jesus was baptized" },
+      { word: "PHILIPPIANS", clue: "Letter of joy from Paul" },
+      { word: "GOSPEL", clue: "Good news of Jesus Christ" },
+      { word: "DISCIPLINE", clue: "Training to grow spiritually" },
+      { word: "MERCY", clue: "Not receiving deserved punishment" },
+      { word: "TRUTH", clue: "What sets us free" },
+      { word: "SABBATH", clue: "Day of rest" },
+      { word: "ISRAEL", clue: "God's chosen nation" },
+      { word: "MOSES", clue: "Led Israelites out of Egypt" },
+      { word: "ABRAHAM", clue: "Father of many nations" },
+      { word: "ISAIAH", clue: "Major Old Testament prophet" },
+      { word: "JEREMIAH", clue: "Weeping prophet" },
+      { word: "DANIEL", clue: "Survived lion's den" },
+      { word: "ESTHER", clue: "Queen who saved her people" },
+      { word: "JOB", clue: "Suffered greatly yet remained faithful" },
+      { word: "NAZARETH", clue: "Hometown of Jesus" },
+      { word: "BETHLEHEM", clue: "Birthplace of Jesus" },
+      { word: "ROMANS", clue: "Paul's letter about faith and grace" },
+      { word: "CORINTHIANS", clue: "Paul's letters to a church in Greece" },
+      { word: "EPHESIANS", clue: "Paul's letter on unity in Christ" },
+      { word: "COLOSSIANS", clue: "Letter emphasizing Christ's supremacy" },
+      { word: "THESSALONIANS", clue: "Encouragement to stay faithful" },
+      { word: "TIMOTHY", clue: "Young pastor mentored by Paul" },
+      { word: "TITUS", clue: "Church leader in Crete" },
+      { word: "PHILEMON", clue: "Letter about forgiveness and love" },
+      { word: "HEBREWS", clue: "Jesus is greater than all" },
+      { word: "JAMES", clue: "Faith without works is dead" },
+      { word: "PETER", clue: "A leading apostle" }
     ];
 
     let puzzle = "";
@@ -175,6 +224,7 @@
     const inputEl = document.getElementById("letterInput");
     const feedbackEl = document.getElementById("feedback");
     const tryAgainBtn = document.getElementById("tryAgainBtn");
+    const retryFromResult = document.getElementById("retryFromResult");
     const submitBtn = document.getElementById("submitBtn");
     const resultBox = document.getElementById("resultBox");
     const gameBox = document.getElementById("gameBox");
@@ -190,7 +240,6 @@
       inputEl.value = "";
       inputEl.focus();
       feedbackEl.classList.add("hidden");
-      tryAgainBtn.classList.add("hidden");
     }
 
     async function endGame() {
@@ -251,12 +300,14 @@
       }
     };
 
-    tryAgainBtn.onclick = () => {
+    function resetGame() {
       score = 0;
       resultBox.classList.add("hidden");
       gameBox.classList.remove("hidden");
       startGame();
-    };
+    }
+
+    retryFromResult.onclick = resetGame;
 
     startGame();
   </script>
