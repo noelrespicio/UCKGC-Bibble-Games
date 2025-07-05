@@ -149,6 +149,14 @@
       .card h3 { font-size: 1rem; }
       .card p { font-size: 0.85rem; }
     }
+    .card {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.card:hover {
+  transform: scale(1.03);
+}
+
   </style>
 </head>
 <body>
@@ -158,12 +166,13 @@
     <div class="welcome">Welcome, <strong id="userName">Loading...</strong>!</div>
   </header>
 
-  <section class="games-grid">
-    <div class="card" onclick="alert(bibblequiz.html)">
-      <div class="icon" data-lucide="book-open"></div>
-      <h3>Bible Quiz</h3>
-      <p>Test your knowledge of the Scriptures!</p>
-    </div>
+<section class="games-grid">
+  <div class="card" onclick="window.location.href='biblequiz.html'">
+    <div class="icon" data-lucide="book-open"></div>
+    <h3>Bible Quiz</h3>
+    <p>Test your knowledge of the Scriptures!</p>
+  </div>
+</section>
     <div class="card" onclick="alert('Coming Soon: Verse Match!')">
       <div class="icon" data-lucide="link-2"></div>
       <h3>Verse Match</h3>
