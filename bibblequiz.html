@@ -2,46 +2,120 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bible Quiz | UCKGC</title>
   <style>
+    :root {
+      --primary: #2e86de;
+      --primary-dark: #1b4f72;
+      --background: #f0f8ff;
+      --card-bg: #ffffff;
+      --danger: #ff4d4d;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f8ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--background);
       margin: 0;
       padding: 20px;
       text-align: center;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
+
     .quiz-box, .result-box {
+      background: var(--card-bg);
       max-width: 500px;
+      width: 100%;
       margin: 0 auto;
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
     }
-    h2 { color: #2e86de; }
+
+    h2 {
+      color: var(--primary-dark);
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+    }
+
     .option-btn {
-      display: block;
+      background: var(--primary);
+      color: #fff;
+      border: none;
       width: 100%;
       margin: 10px 0;
-      padding: 12px;
-      border: none;
-      background: #2e86de;
-      color: white;
-      border-radius: 8px;
+      padding: 14px;
       font-size: 1rem;
+      border-radius: 10px;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
-    .option-btn:hover { background: #1b4f72; }
-    ul { list-style: none; padding: 0; }
-    li { margin: 5px 0; font-weight: bold; }
+
+    .option-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .wrong-text {
+      color: var(--danger);
+      font-weight: bold;
+      margin-top: 12px;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      margin: 6px 0;
+      font-weight: bold;
+    }
+
+    .btn-try-again {
+      margin-top: 16px;
+      background: #ffa600;
+      color: #fff;
+    }
+
+    .btn-try-again:hover {
+      background: #cc8400;
+    }
+
+    a {
+      margin-top: 14px;
+      display: inline-block;
+      text-decoration: none;
+      color: var(--primary-dark);
+      font-weight: bold;
+    }
+
+    @media (max-width: 480px) {
+      .quiz-box, .result-box {
+        padding: 16px;
+        border-radius: 12px;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+      }
+
+      .option-btn {
+        font-size: 0.95rem;
+        padding: 12px;
+      }
+    }
   </style>
 </head>
 <body>
+
   <div class="quiz-box" id="quizBox">
     <h2 id="question">Loading...</h2>
     <div id="options"></div>
+    <p id="wrongAnswer" class="wrong-text" style="display: none;"></p>
   </div>
 
   <div class="result-box" id="resultBox" style="display:none;">
@@ -49,8 +123,8 @@
     <p id="finalScore"></p>
     <h3>🏆 Leaderboard</h3>
     <ul id="leaderboard"></ul>
-    <button id="tryAgainBtn" class="option-btn" style="margin-top: 10px;">🔁 Try Again</button>
-    <a href="dashboard.html" style="text-decoration:none; display:inline-block; margin-top:10px; color:#2e86de;">🔙 Back to Dashboard</a>
+    <button id="tryAgainBtn" class="option-btn btn-try-again">🔁 Try Again</button>
+    <a href="dashboard.html">🔙 Back to Dashboard</a>
   </div>
 
   <script type="module">
@@ -80,11 +154,6 @@
       { question: "Who led the Israelites out of Egypt?", options: ["Moses", "Aaron", "Joseph", "Joshua"], answer: "Moses" },
       { question: "How many days did Jesus fast in the wilderness?", options: ["30", "40", "50", "7"], answer: "40" },
       { question: "Who was the mother of Jesus?", options: ["Mary", "Martha", "Sarah", "Elizabeth"], answer: "Mary" },
-      { question: "What is the last book of the Bible?", options: ["Revelation", "Malachi", "Acts", "Judges"], answer: "Revelation" },
-      { question: "Who denied Jesus three times?", options: ["Peter", "John", "Judas", "Thomas"], answer: "Peter" },
-      { question: "What is the shortest verse in the Bible?", options: ["Jesus wept", "God is love", "Love one another", "Pray always"], answer: "Jesus wept" },
-      { question: "What did Jesus feed the 5,000 with?", options: ["Loaves and fishes", "Bread only", "Fish only", "Water"], answer: "Loaves and fishes" },
-      { question: "What mountain did Moses receive the 10 Commandments?", options: ["Mount Sinai", "Mount Zion", "Mount Carmel", "Mount Nebo"], answer: "Mount Sinai" },
     ];
 
     function shuffle(array) {
@@ -100,11 +169,14 @@
     const quizBox = document.getElementById("quizBox");
     const resultBox = document.getElementById("resultBox");
     const leaderboardEl = document.getElementById("leaderboard");
+    const wrongText = document.getElementById("wrongAnswer");
 
     function loadQuestion() {
       const q = quizData[currentQuestion];
       questionEl.textContent = `Q${currentQuestion + 1}: ${q.question}`;
       optionsEl.innerHTML = "";
+      wrongText.style.display = "none";
+
       shuffle(q.options).forEach(option => {
         const btn = document.createElement("button");
         btn.textContent = option;
@@ -124,7 +196,8 @@
           await endQuiz();
         }
       } else {
-        optionsEl.innerHTML = `<p style="color:red;font-weight:bold;">❌ Wrong! The correct answer was: <span style="color:#2e86de;">${correct}</span></p>`;
+        wrongText.innerHTML = `❌ Wrong! The correct answer was: <span style="color:var(--primary-dark);">${correct}</span>`;
+        wrongText.style.display = "block";
         setTimeout(endQuiz, 2000);
       }
     }
@@ -173,16 +246,14 @@
         });
     }
 
-    document.getElementById("tryAgainBtn").addEventListener("click", resetQuiz);
-
-    function resetQuiz() {
+    document.getElementById("tryAgainBtn").addEventListener("click", () => {
       currentQuestion = 0;
       score = 0;
       quizData = shuffle([...allQuestions]);
       quizBox.style.display = "block";
       resultBox.style.display = "none";
       loadQuestion();
-    }
+    });
 
     loadQuestion();
   </script>
