@@ -134,6 +134,12 @@
     <a href="dashboard.html">🔙 Back to Dashboard</a>
   </div>
 
+  <!-- Audio elements -->
+  <audio id="bgMusic" src="bg-music.mp3" loop></audio>
+  <audio id="correctSound" src="audio/correct.mp3"></audio>
+  <audio id="wrongSound" src="audio/wrong.mp3"></audio>
+  <audio id="timesUpSound" src="audio/timesup.mp3"></audio>
+
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -149,6 +155,17 @@
     const user = session.user;
     const userId = user.id;
     const fullName = user.user_metadata.full_name || user.email;
+
+    const bgMusic = document.getElementById("bgMusic");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const timesUpSound = document.getElementById("timesUpSound");
+
+    // Try autoplay or trigger on user interaction
+    bgMusic.volume = 0.3;
+    bgMusic.play().catch(() => {
+      document.body.addEventListener("click", () => bgMusic.play(), { once: true });
+    });
 
     const allQuestions = [
       { question: "Who built the ark?", options: ["Moses", "Noah", "Abraham", "David"], answer: "Noah" },
@@ -189,6 +206,7 @@
         timerEl.textContent = `⏳ ${timeLeft} seconds`;
         if (timeLeft <= 0) {
           clearInterval(timer);
+          timesUpSound.play();
           wrongText.innerHTML = `⏱️ Time's up!`;
           wrongText.style.display = "block";
           setTimeout(endQuiz, 2000);
@@ -215,6 +233,7 @@
     async function selectAnswer(selected, correct) {
       clearInterval(timer);
       if (selected === correct) {
+        correctSound.play();
         score++;
         currentQuestion++;
         if (currentQuestion < quizData.length) {
@@ -223,6 +242,7 @@
           await endQuiz();
         }
       } else {
+        wrongSound.play();
         wrongText.innerHTML = `❌ Wrong! Correct: <span style="color:var(--primary-dark);">${correct}</span>`;
         wrongText.style.display = "block";
         setTimeout(endQuiz, 2000);
