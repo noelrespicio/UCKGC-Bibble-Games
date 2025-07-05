@@ -8,12 +8,25 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-    const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // replace with actual anon key
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = createClient(
+      'https://wlthlwxcmltwescezjlk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+    );
 
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData.session) window.location.href = "dashboard.html";
+
+    window.togglePassword = function (inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        icon.textContent = '👁️';
+      }
+    };
 
     window.registerUser = async function (e) {
       e.preventDefault();
@@ -39,31 +52,25 @@
         .maybeSingle();
 
       if (existingUser) {
-        alert("📧 Email already registered. Try logging in.");
+        alert("📧 Email already registered.");
         return;
       }
 
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: { full_name: fullName }
-        }
+        options: { data: { full_name: fullName } }
       });
 
-      if (error) {
-        alert("❌ Registration failed: " + error.message);
-        return;
+      if (error) return alert("❌ " + error.message);
+
+      if (data.user) {
+        await supabase.from('profiles').insert([
+          { id: data.user.id, full_name: fullName, email }
+        ]);
       }
 
-      const user = data.user;
-      if (user) {
-        await supabase
-          .from('profiles')
-          .insert([{ id: user.id, full_name: fullName, email }]);
-      }
-
-      alert("✅ Registration successful! You can now log in.");
+      alert("✅ Registered! You can now login.");
       showLogin();
     };
 
@@ -73,23 +80,14 @@
       const password = document.getElementById('loginPassword').value;
 
       if (!email || !password) {
-        alert("❗ Email and password are required.");
+        alert("❗ Email and password required.");
         return;
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        const { data: exists } = await supabase
-          .from('profiles')
-          .select('email')
-          .eq('email', email);
-
-        if (!exists || exists.length === 0) {
-          alert("📧 Email not registered.");
-        } else {
-          alert("🔒 Wrong password. Try again.");
-        }
+        alert("❌ " + error.message);
         return;
       }
 
@@ -97,35 +95,20 @@
       window.location.href = "dashboard.html";
     };
 
-    window.togglePassword = function (id, iconId) {
-      const input = document.getElementById(id);
-      const icon = document.getElementById(iconId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.textContent = '🙈';
-      } else {
-        input.type = 'password';
-        icon.textContent = '👁️';
-      }
-    };
-
     window.showRegister = function () {
       document.getElementById('formContainer').innerHTML = `
         <form id="registerForm">
-          <h3>Create an Account</h3>
+          <h3>Register</h3>
           <input type="text" id="fullName" placeholder="Full Name" required />
           <input type="email" id="regEmail" placeholder="Email" required />
-
           <div class="password-wrapper">
             <input type="password" id="regPassword" placeholder="Password" required />
-            <span class="toggle-icon" id="icon1" onclick="togglePassword('regPassword', 'icon1')">👁️</span>
+            <span class="toggle-icon" id="icon1" onclick="togglePassword('regPassword','icon1')">👁️</span>
           </div>
-
           <div class="password-wrapper">
             <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-            <span class="toggle-icon" id="icon2" onclick="togglePassword('confirmPassword', 'icon2')">👁️</span>
+            <span class="toggle-icon" id="icon2" onclick="togglePassword('confirmPassword','icon2')">👁️</span>
           </div>
-
           <button type="submit">Register</button>
         </form>
       `;
@@ -137,12 +120,10 @@
         <form id="loginForm">
           <h3>Login</h3>
           <input type="email" id="loginEmail" placeholder="Email" required />
-
           <div class="password-wrapper">
             <input type="password" id="loginPassword" placeholder="Password" required />
-            <span class="toggle-icon" id="icon3" onclick="togglePassword('loginPassword', 'icon3')">👁️</span>
+            <span class="toggle-icon" id="icon3" onclick="togglePassword('loginPassword','icon3')">👁️</span>
           </div>
-
           <button type="submit">Login</button>
         </form>
       `;
@@ -153,80 +134,79 @@
   <style>
     :root {
       --primary: #2e86de;
-      --primary-dark: #1b4f72;
+      --dark: #1b4f72;
       --text: #2c3e50;
     }
 
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(to right, #e0f2fe, #f0f9ff);
-      min-height: 100vh;
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(to right, #e0f7ff, #f0f9ff);
       display: flex;
       align-items: center;
       justify-content: center;
+      min-height: 100vh;
       padding: 20px;
     }
 
     .container {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-      padding: 30px 20px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
       width: 100%;
-      max-width: 400px;
+      max-width: 420px;
+      padding: 30px;
       text-align: center;
     }
 
     .logo {
-      width: 90px;
-      height: 90px;
+      width: 80px;
       margin-bottom: 10px;
     }
 
     h1 {
+      margin-bottom: 20px;
       font-size: 1.8rem;
+      color: var(--text);
+    }
+
+    h3 {
       color: var(--text);
       margin-bottom: 20px;
     }
 
     .buttons {
       display: flex;
-      justify-content: center;
       gap: 10px;
+      justify-content: center;
       margin-bottom: 20px;
-      flex-wrap: wrap;
     }
 
-    button {
+    .buttons button {
       flex: 1;
-      min-width: 120px;
       padding: 12px;
       font-size: 1rem;
       background: var(--primary);
-      color: white;
+      color: #fff;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.3s ease;
+      transition: 0.3s;
     }
 
-    button:hover {
-      background: var(--primary-dark);
+    .buttons button:hover {
+      background: var(--dark);
     }
 
     form {
-      background: #f9fafb;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      text-align: left;
     }
 
     input {
       width: 100%;
       padding: 14px;
-      margin: 10px 0;
       font-size: 1rem;
+      margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 8px;
     }
@@ -246,31 +226,34 @@
       transform: translateY(-50%);
       cursor: pointer;
       font-size: 1.2rem;
-      user-select: none;
+      color: #777;
     }
 
-    label {
-      display: block;
-      font-size: 0.9rem;
-      margin-top: -8px;
-      margin-bottom: 12px;
-      text-align: left;
+    form button {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    form button:hover {
+      background: var(--dark);
     }
 
     @media (max-width: 480px) {
-      h1 { font-size: 1.4rem; }
-      .logo { width: 70px; height: 70px; }
-      button { font-size: 0.95rem; padding: 10px; }
-      input { font-size: 0.95rem; }
+      h1 { font-size: 1.5rem; }
+      .logo { width: 60px; }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <img src="logo.png" alt="UCKGC Logo" class="logo" />
-      <h1>UCKGC Bible Games</h1>
-    </header>
+    <img src="logo.png" class="logo" alt="UCKGC Logo" />
+    <h1>UCKGC Bible Games</h1>
 
     <div class="buttons">
       <button onclick="showRegister()">Register</button>
