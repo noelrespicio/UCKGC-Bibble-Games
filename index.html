@@ -9,7 +9,7 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'your-supabase-key-here'; // replace with actual anon key
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // replace with your actual anon key
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const { data: sessionData } = await supabase.auth.getSession();
@@ -97,16 +97,12 @@
       window.location.href = "dashboard.html";
     };
 
-    window.togglePassword = function (id, iconId) {
-      const input = document.getElementById(id);
+    window.togglePassword = function (inputId, iconId) {
+      const input = document.getElementById(inputId);
       const icon = document.getElementById(iconId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.textContent = '🙈';
-      } else {
-        input.type = 'password';
-        icon.textContent = '👁️';
-      }
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      icon.textContent = isHidden ? '🙈' : '👁️';
     };
 
     window.showRegister = function () {
@@ -148,6 +144,11 @@
       `;
       document.getElementById('loginForm').addEventListener('submit', loginUser);
     };
+
+    // Show login form by default
+    window.addEventListener('DOMContentLoaded', () => {
+      showLogin();
+    });
   </script>
 
   <style>
@@ -245,8 +246,9 @@
       right: 12px;
       transform: translateY(-50%);
       cursor: pointer;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       user-select: none;
+      color: #444;
     }
 
     label {
