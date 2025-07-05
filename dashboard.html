@@ -9,13 +9,18 @@
 
     const supabase = createClient(
       'https://wlthlwxcmltwescezjlk.supabase.co',
-      'your_anon_key_here'
+      'your_anon_key_here' // 🔁 Replace with your actual anon key
     );
 
-    // Check auth session
+    // Auth check and show user info
     const { data: sessionData } = await supabase.auth.getSession();
-    if (!sessionData.session) {
+    const session = sessionData.session;
+
+    if (!session) {
       window.location.href = "index.html";
+    } else {
+      const user = session.user;
+      document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
     }
 
     // Logout handler
@@ -51,15 +56,26 @@
     }
 
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      text-align: center;
       margin-bottom: 20px;
     }
 
-    header h2 {
-      color: var(--text);
+    .logo {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    h2 {
       font-size: 1.5rem;
+      color: var(--text);
+    }
+
+    .welcome {
+      margin-top: 8px;
+      font-size: 1rem;
+      color: #555;
     }
 
     .logout-btn {
@@ -70,6 +86,8 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
+      margin: 20px auto;
+      display: block;
     }
 
     .logout-btn:hover {
@@ -109,29 +127,18 @@
     }
 
     @media (max-width: 480px) {
-      header h2 {
-        font-size: 1.2rem;
-      }
-
-      .logout-btn {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-      }
-
-      .card h3 {
-        font-size: 1rem;
-      }
-
-      .card p {
-        font-size: 0.85rem;
-      }
+      h2 { font-size: 1.2rem; }
+      .logout-btn { font-size: 0.9rem; padding: 8px 12px; }
+      .card h3 { font-size: 1rem; }
+      .card p { font-size: 0.85rem; }
     }
   </style>
 </head>
 <body>
   <header>
-    <h2>👋 Welcome to UCKGC Bible Games</h2>
-    <button class="logout-btn" onclick="logout()">Logout</button>
+    <img src="logo.png" alt="UCKGC Logo" class="logo" />
+    <h2>UCKGC Bible Games</h2>
+    <div class="welcome">Welcome, <strong id="userName">Loading...</strong>!</div>
   </header>
 
   <section class="games-grid">
@@ -145,12 +152,14 @@
     </div>
     <div class="card" onclick="alert('Coming Soon: Bible Puzzle!')">
       <h3>Bible Puzzle</h3>
-      <p>Arrange the puzzle pieces to reveal a verse.</p>
+      <p>Arrange puzzle pieces to reveal verses.</p>
     </div>
-    <div class="card" onclick="alert('Coming Soon: Books of the Bible Game!')">
+    <div class="card" onclick="alert('Coming Soon: Books of the Bible!')">
       <h3>Books Order</h3>
-      <p>Put the books of the Bible in order.</p>
+      <p>Put the Bible books in correct order.</p>
     </div>
   </section>
+
+  <button class="logout-btn" onclick="logout()">Logout</button>
 </body>
 </html>
