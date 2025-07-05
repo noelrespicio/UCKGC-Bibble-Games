@@ -37,6 +37,12 @@
       --card-bg: #ffffff;
     }
 
+    [data-theme='dark'] {
+      --bg: #1e1e2f;
+      --text: #e4e4e4;
+      --card-bg: #2e2e3f;
+    }
+
     * {
       box-sizing: border-box;
       margin: 0;
@@ -50,6 +56,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
     header {
@@ -115,7 +122,8 @@
       color: #555;
     }
 
-    .logout-btn {
+    .logout-btn,
+    .theme-btn {
       background: #ff4d4d;
       color: white;
       border: none;
@@ -123,12 +131,49 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
-      margin: 0 auto 20px;
+      margin: 0 auto 10px;
       display: block;
+    }
+
+    .theme-btn {
+      background: #2e86de;
     }
 
     .logout-btn:hover {
       background: #cc0000;
+    }
+
+    .theme-btn:hover {
+      background: #1b4f72;
+    }
+
+    .verse-card {
+      background: var(--card-bg);
+      border-left: 6px solid var(--primary);
+      padding: 20px;
+      border-radius: 12px;
+      margin: 0 auto 30px;
+      max-width: 600px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+      text-align: center;
+    }
+
+    .verse-card h3 {
+      color: var(--primary-dark);
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+    }
+
+    .verse-card blockquote {
+      font-style: italic;
+      color: var(--text);
+      font-size: 1.05rem;
+      margin-bottom: 10px;
+    }
+
+    .verse-card p {
+      font-weight: bold;
+      color: #666;
     }
 
     footer {
@@ -139,7 +184,7 @@
 
     @media (max-width: 480px) {
       h2 { font-size: 1.2rem; }
-      .logout-btn { font-size: 0.9rem; padding: 8px 12px; }
+      .logout-btn, .theme-btn { font-size: 0.9rem; padding: 8px 12px; }
       .card h3 { font-size: 1rem; }
       .card p { font-size: 0.85rem; }
     }
@@ -159,13 +204,13 @@
       <p>Test your knowledge of the Scriptures!</p>
     </div>
 
-   <div class="card" onclick="window.location.href='versematch.html'">
+    <div class="card" onclick="window.location.href='versematch.html'">
       <div class="icon" data-lucide="link-2"></div>
       <h3>Verse Match</h3>
       <p>Match Bible verses with references.</p>
     </div>
 
-       <div class="card" onclick="window.location.href='biblepuzzle.html'">
+    <div class="card" onclick="window.location.href='biblepuzzle.html'">
       <div class="icon" data-lucide="puzzle"></div>
       <h3>Bible Puzzle</h3>
       <p>Arrange puzzle pieces to reveal verses.</p>
@@ -178,6 +223,14 @@
     </div>
   </section>
 
+  <!-- 📖 Bible Verse of the Day Section -->
+  <section id="verseOfDay" class="verse-card">
+    <h3>📖 Bible Verse of the Day</h3>
+    <blockquote id="verseText">Loading...</blockquote>
+    <p id="verseReference"></p>
+  </section>
+
+  <button class="theme-btn" onclick="toggleTheme()">🌗 Toggle Theme</button>
   <button class="logout-btn" onclick="logout()">Logout</button>
 
   <footer>
@@ -191,12 +244,49 @@
       const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
       const supabase = createClient(
         'https://wlthlwxcmltwescezjlk.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+        'YOUR_SUPABASE_PUBLIC_ANON_KEY'
       );
       await supabase.auth.signOut();
       alert("👋 Logged out successfully!");
       window.location.href = "index.html";
     }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
+    }
+
+    // Random Bible Verse
+    const verses = [
+      {
+        text: "I can do all things through Christ who strengthens me.",
+        reference: "Philippians 4:13"
+      },
+      {
+        text: "For I know the plans I have for you, declares the Lord...",
+        reference: "Jeremiah 29:11"
+      },
+      {
+        text: "Trust in the Lord with all your heart...",
+        reference: "Proverbs 3:5"
+      },
+      {
+        text: "The Lord is my shepherd; I shall not want.",
+        reference: "Psalm 23:1"
+      },
+      {
+        text: "Be strong and courageous. Do not be afraid...",
+        reference: "Joshua 1:9"
+      }
+    ];
+
+    function showRandomVerse() {
+      const randomVerse = verses[Math.floor(Math.random() * verses.length)];
+      document.getElementById('verseText').textContent = `"${randomVerse.text}"`;
+      document.getElementById('verseReference').textContent = `— ${randomVerse.reference}`;
+    }
+
+    showRandomVerse();
   </script>
 </body>
 </html>
