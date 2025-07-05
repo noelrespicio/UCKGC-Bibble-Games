@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bible Puzzle | UCKGC</title>
+  <style>
+    :root {
+      --primary: #2e86de;
+      --primary-dark: #1b4f72;
+      --bg: #f0f8ff;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .puzzle-box, .result-box {
+      background: #fff;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+
+    .puzzle-word {
+      font-size: 2rem;
+      letter-spacing: 8px;
+      margin: 20px 0;
+    }
+
+    .letter-btn {
+      margin: 4px;
+      padding: 10px 14px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: var(--primary);
+      color: white;
+      transition: 0.3s;
+    }
+
+    .letter-btn:hover {
+      background: var(--primary-dark);
+    }
+
+    .feedback {
+      font-weight: bold;
+      margin: 16px 0;
+    }
+
+    .correct {
+      color: green;
+    }
+
+    .wrong {
+      color: red;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #tryAgainBtn, a {
+      display: inline-block;
+      margin-top: 20px;
+      font-weight: bold;
+      text-decoration: none;
+      color: var(--primary);
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    li {
+      font-weight: bold;
+      margin: 6px 0;
+    }
+
+    @media (max-width: 480px) {
+      .puzzle-word {
+        font-size: 1.6rem;
+        letter-spacing: 6px;
+      }
+
+      .letter-btn {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="puzzle-box" id="gameBox">
+    <h2>Bible Puzzle</h2>
+    <p class="puzzle-word" id="puzzleWord">Loading...</p>
+    <div id="letterButtons"></div>
+    <p id="feedback" class="feedback hidden"></p>
+    <button id="tryAgainBtn" class="letter-btn hidden">🔁 Try Again</button>
+    <br>
+    <a href="dashboard.html">🔙 Back to Dashboard</a>
+  </div>
+
+  <div class="result-box hidden" id="resultBox">
+    <h2>🎉 Game Over!</h2>
+    <p id="finalScore"></p>
+    <h3>🏆 Leaderboard</h3>
+    <ul id="leaderboard"></ul>
+    <a href="dashboard.html">🔙 Back to Dashboard</a>
+  </div>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+    const supabase = createClient(
+      "https://wlthlwxcmltwescezjlk.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o"
+    );
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    if (!session) window.location.href = "index.html";
+
+    const user = session.user;
+    const userId = user.id;
+    const fullName = user.user_metadata.full_name || user.email;
+
+    const puzzles = [
+      "GENESIS", "EXODUS", "JESUS", "FAITH", "GRACE", "HEAVEN", "DISCIPLE",
+      "PRAYER", "BAPTISM", "LOVE", "CHRIST", "PSALM", "HOPE", "ANGEL"
+    ];
+
+    let puzzle = "";
+    let guessed = [];
+    let remainingLetters = 0;
+    let score = 0;
+
+    const puzzleWordEl = document.getElementById("puzzleWord");
+    const letterButtonsEl = document.getElementById("letterButtons");
+    const feedbackEl = document.getElementById("feedback");
+    const tryAgainBtn = document.getElementById("tryAgainBtn");
+    const resultBox = document.getElementById("resultBox");
+    const gameBox = document.getElementById("gameBox");
+    const finalScoreEl = document.getElementById("finalScore");
+    const leaderboardEl = document.getElementById("leaderboard");
+
+    function startGame() {
+      puzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
+      guessed = Array(puzzle.length).fill("_");
+      remainingLetters = puzzle.length;
+      feedbackEl.classList.add("hidden");
+      tryAgainBtn.classList.add("hidden");
+      resultBox.classList.add("hidden");
+      gameBox.classList.remove("hidden");
+      renderPuzzle();
+      createLetterButtons();
+    }
+
+    function renderPuzzle() {
+      puzzleWordEl.textContent = guessed.join(" ");
+    }
+
+    function createLetterButtons() {
+      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      letterButtonsEl.innerHTML = "";
+      alphabet.split("").forEach(letter => {
+        const btn = document.createElement("button");
+        btn.className = "letter-btn";
+        btn.textContent = letter;
+        btn.onclick = () => handleGuess(letter, btn);
+        letterButtonsEl.appendChild(btn);
+      });
+    }
+
+    function handleGuess(letter, btn) {
+      btn.disabled = true;
+      let found = false;
+      for (let i = 0; i < puzzle.length; i++) {
+        if (puzzle[i] === letter && guessed[i] === "_") {
+          guessed[i] = letter;
+          remainingLetters--;
+          found = true;
+        }
+      }
+
+      renderPuzzle();
+
+      if (found) {
+        feedbackEl.textContent = "✅ Correct!";
+        feedbackEl.className = "feedback correct";
+      } else {
+        feedbackEl.textContent = "❌ Wrong!";
+        feedbackEl.className = "feedback wrong";
+      }
+
+      feedbackEl.classList.remove("hidden");
+
+      if (remainingLetters === 0) {
+        score++;
+        feedbackEl.textContent = `🎉 Correct! The word was "${puzzle}"`;
+        tryAgainBtn.classList.remove("hidden");
+        disableAllButtons();
+        setTimeout(() => startGame(), 2000); // Auto next puzzle
+      }
+
+      if (score >= 5) {
+        endGame();
+      }
+    }
+
+    function disableAllButtons() {
+      document.querySelectorAll(".letter-btn").forEach(btn => {
+        btn.disabled = true;
+      });
+    }
+
+    async function endGame() {
+      gameBox.classList.add("hidden");
+      resultBox.classList.remove("hidden");
+      finalScoreEl.textContent = `You solved ${score} puzzle${score > 1 ? "s" : ""}!`;
+
+      // Save score
+      const { data: existing } = await supabase
+        .from("biblepuzzle_leaderboard")
+        .select("id, score")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (existing) {
+        if (score > existing.score) {
+          await supabase
+            .from("biblepuzzle_leaderboard")
+            .update({ score })
+            .eq("id", existing.id);
+        }
+      } else {
+        await supabase
+          .from("biblepuzzle_leaderboard")
+          .insert([{ user_id: userId, name: fullName, score }]);
+      }
+
+      // Show leaderboard
+      const { data: topScores } = await supabase
+        .from("biblepuzzle_leaderboard")
+        .select("name, score")
+        .order("score", { ascending: false });
+
+      const uniqueUsers = new Map();
+      topScores.forEach(row => {
+        if (!uniqueUsers.has(row.name)) {
+          uniqueUsers.set(row.name, row.score);
+        }
+      });
+
+      leaderboardEl.innerHTML = "";
+      [...uniqueUsers.entries()].slice(0, 5).forEach(([name, score]) => {
+        leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+      });
+    }
+
+    tryAgainBtn.onclick = startGame;
+    startGame();
+  </script>
+
+</body>
+</html>
