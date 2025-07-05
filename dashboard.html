@@ -26,12 +26,6 @@
       document.getElementById('userName').textContent =
         user.user_metadata?.full_name || user.email;
     }
-
-    window.logout = async () => {
-      await supabase.auth.signOut();
-      alert("👋 Logged out successfully!");
-      window.location.href = "index.html";
-    };
   </script>
 
   <style>
@@ -192,6 +186,17 @@
 
   <script>
     lucide.createIcons();
+
+    async function logout() {
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+      const supabase = createClient(
+        'https://wlthlwxcmltwescezjlk.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+      );
+      await supabase.auth.signOut();
+      alert("👋 Logged out successfully!");
+      window.location.href = "index.html";
+    }
   </script>
 </body>
 </html>
