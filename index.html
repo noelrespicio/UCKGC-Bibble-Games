@@ -8,11 +8,9 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'your-anon-key-here'; // 🔁 replace with your actual anon key
-
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // Check if already logged in
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData.session) window.location.href = "dashboard.html";
 
@@ -34,31 +32,18 @@
         return;
       }
 
-      // Check if email already exists
-      const { data: existing, error: fetchError } = await supabase
-        .from('profiles') // optional — only if you save to profiles
-        .select('email')
-        .eq('email', email)
-        .maybeSingle();
-
-      if (existing) {
-        alert("📧 Email is already registered. Try logging in.");
-        return;
-      }
-
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { full_name: fullName },
-          emailRedirectTo: 'https://your-site.com/dashboard.html' // optional: redirect after confirming email
+          data: { full_name: fullName }
         }
       });
 
       if (error) {
-        alert('❌ Registration failed: ' + error.message);
+        alert('❌ Registration error: ' + error.message);
       } else {
-        alert('✅ Registration successful! Please check your email to confirm before logging in.');
+        alert('✅ Registration successful! Please check your email to confirm.');
       }
     };
 
@@ -76,10 +61,18 @@
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        if (error.message.toLowerCase().includes("email not confirmed")) {
-          alert("📧 Please confirm your email before logging in.");
-        } else if (error.message.toLowerCase().includes("invalid login credentials")) {
-          alert("❌ Incorrect email or password.");
+        if (error.message.toLowerCase().includes("invalid login credentials")) {
+          // Check if email exists to give custom error
+          const { data: users } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('email', email);
+
+          if (!users || users.length === 0) {
+            alert("📧 Email not registered.");
+          } else {
+            alert("🔒 Wrong password. Please try again.");
+          }
         } else {
           alert("⚠️ Login error: " + error.message);
         }
@@ -89,7 +82,7 @@
       }
     };
 
-    // Show Register Form
+    // Show Registration Form
     window.showRegister = function () {
       document.getElementById('formContainer').innerHTML = 
         <form id="registerForm">
