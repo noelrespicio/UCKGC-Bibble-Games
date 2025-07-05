@@ -124,9 +124,8 @@
         await endQuiz();
       }
     } else {
-      // Wrong answer - game over
-      optionsEl.innerHTML = `<p style="color:red;font-weight:bold;">Wrong! The correct answer was: ${correct}</p>`;
-      setTimeout(endQuiz, 2000); // wait 2 sec then end quiz
+      optionsEl.innerHTML = `<p style="color:red;font-weight:bold;">❌ Wrong! The correct answer was: <span style="color:#2e86de;">${correct}</span></p>`;
+      setTimeout(endQuiz, 2000);
     }
   }
 
@@ -135,7 +134,6 @@
     resultBox.style.display = "block";
     document.getElementById("finalScore").textContent = `You scored ${score} out of ${quizData.length}`;
 
-    // Check if user already exists in leaderboard
     const { data: existing } = await supabase
       .from("biblequiz_leaderboard")
       .select("id, score")
@@ -155,15 +153,25 @@
         .insert([{ user_id: userId, name: fullName, score: score }]);
     }
 
-    const { data } = await supabase
+    const { data: topScores } = await supabase
       .from("biblequiz_leaderboard")
       .select("name, score")
-      .order("score", { ascending: false })
-      .limit(5);
+      .order("score", { ascending: false });
 
-    leaderboardEl.innerHTML = data
-      .map(row => `<li><strong>${row.name}</strong>: ${row.score}</li>`)
-      .join("");
+    // Show only the highest score per name
+    const uniqueUsers = new Map();
+    topScores.forEach(row => {
+      if (!uniqueUsers.has(row.name)) {
+        uniqueUsers.set(row.name, row.score);
+      }
+    });
+
+    leaderboardEl.innerHTML = "";
+    [...uniqueUsers.entries()]
+      .slice(0, 5)
+      .forEach(([name, score]) => {
+        leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+      });
   }
 
   loadQuestion();
