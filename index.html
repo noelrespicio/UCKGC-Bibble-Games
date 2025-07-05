@@ -8,25 +8,12 @@
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-    const supabase = createClient(
-      'https://wlthlwxcmltwescezjlk.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-    );
+    const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // replace this with your actual anon key
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData.session) window.location.href = "dashboard.html";
-
-    window.togglePassword = function (inputId, iconId) {
-      const input = document.getElementById(inputId);
-      const icon = document.getElementById(iconId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        icon.textContent = '🙈';
-      } else {
-        input.type = 'password';
-        icon.textContent = '👁️';
-      }
-    };
 
     window.registerUser = async function (e) {
       e.preventDefault();
@@ -52,25 +39,32 @@
         .maybeSingle();
 
       if (existingUser) {
-        alert("📧 Email already registered.");
+        alert("📧 Email already registered. Try logging in.");
         return;
       }
 
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { full_name: fullName } }
+        options: {
+          emailRedirectTo: null, // no redirection or confirmation
+          data: { full_name: fullName }
+        }
       });
 
-      if (error) return alert("❌ " + error.message);
-
-      if (data.user) {
-        await supabase.from('profiles').insert([
-          { id: data.user.id, full_name: fullName, email }
-        ]);
+      if (error) {
+        alert("❌ Registration failed: " + error.message);
+        return;
       }
 
-      alert("✅ Registered! You can now login.");
+      const user = data.user;
+      if (user) {
+        await supabase
+          .from('profiles')
+          .insert([{ id: user.id, full_name: fullName, email }]);
+      }
+
+      alert("✅ Registration successful! You can now log in.");
       showLogin();
     };
 
@@ -80,14 +74,23 @@
       const password = document.getElementById('loginPassword').value;
 
       if (!email || !password) {
-        alert("❗ Email and password required.");
+        alert("❗ Email and password are required.");
         return;
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        alert("❌ " + error.message);
+        const { data: exists } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('email', email);
+
+        if (!exists || exists.length === 0) {
+          alert("📧 Email not registered.");
+        } else {
+          alert("🔒 Wrong password. Try again.");
+        }
         return;
       }
 
@@ -95,38 +98,37 @@
       window.location.href = "dashboard.html";
     };
 
+    window.togglePassword = function (id) {
+      const input = document.getElementById(id);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    };
+
     window.showRegister = function () {
-      document.getElementById('formContainer').innerHTML = `
+      document.getElementById('formContainer').innerHTML = 
         <form id="registerForm">
-          <h3>Register</h3>
+          <h3>Create an Account</h3>
           <input type="text" id="fullName" placeholder="Full Name" required />
           <input type="email" id="regEmail" placeholder="Email" required />
-          <div class="password-wrapper">
-            <input type="password" id="regPassword" placeholder="Password" required />
-            <span class="toggle-icon" id="icon1" onclick="togglePassword('regPassword','icon1')">👁️</span>
-          </div>
-          <div class="password-wrapper">
-            <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-            <span class="toggle-icon" id="icon2" onclick="togglePassword('confirmPassword','icon2')">👁️</span>
-          </div>
+          <input type="password" id="regPassword" placeholder="Password" required />
+          <label><input type="checkbox" onclick="togglePassword('regPassword')"> Show Password</label>
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+          <label><input type="checkbox" onclick="togglePassword('confirmPassword')"> Show Password</label>
           <button type="submit">Register</button>
         </form>
-      `;
+      ;
       document.getElementById('registerForm').addEventListener('submit', registerUser);
     };
 
     window.showLogin = function () {
-      document.getElementById('formContainer').innerHTML = `
+      document.getElementById('formContainer').innerHTML = 
         <form id="loginForm">
           <h3>Login</h3>
           <input type="email" id="loginEmail" placeholder="Email" required />
-          <div class="password-wrapper">
-            <input type="password" id="loginPassword" placeholder="Password" required />
-            <span class="toggle-icon" id="icon3" onclick="togglePassword('loginPassword','icon3')">👁️</span>
-          </div>
+          <input type="password" id="loginPassword" placeholder="Password" required />
+          <label><input type="checkbox" onclick="togglePassword('loginPassword')"> Show Password</label>
           <button type="submit">Login</button>
         </form>
-      `;
+      ;
       document.getElementById('loginForm').addEventListener('submit', loginUser);
     };
   </script>
@@ -134,126 +136,97 @@
   <style>
     :root {
       --primary: #2e86de;
-      --dark: #1b4f72;
+      --primary-dark: #1b4f72;
       --text: #2c3e50;
     }
 
     body {
       margin: 0;
-      font-family: "Segoe UI", sans-serif;
-      background: linear-gradient(to right, #e0f7ff, #f0f9ff);
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(to right, #e0f2fe, #f0f9ff);
+      min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
       padding: 20px;
     }
 
     .container {
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px 20px;
       width: 100%;
-      max-width: 420px;
-      padding: 30px;
+      max-width: 400px;
       text-align: center;
     }
 
     .logo {
-      width: 80px;
+      width: 90px;
+      height: 90px;
       margin-bottom: 10px;
     }
 
     h1 {
-      margin-bottom: 20px;
       font-size: 1.8rem;
-      color: var(--text);
-    }
-
-    h3 {
       color: var(--text);
       margin-bottom: 20px;
     }
 
     .buttons {
       display: flex;
-      gap: 10px;
       justify-content: center;
+      gap: 10px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    .buttons button {
+    button {
       flex: 1;
+      min-width: 120px;
       padding: 12px;
       font-size: 1rem;
       background: var(--primary);
-      color: #fff;
+      color: white;
       border: none;
       border-radius: 8px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: 0.3s ease;
     }
 
-    .buttons button:hover {
-      background: var(--dark);
-    }
+    button:hover { background: var(--primary-dark); }
 
     form {
-      text-align: left;
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     }
 
     input {
       width: 100%;
       padding: 14px;
+      margin: 10px 0;
       font-size: 1rem;
-      margin-bottom: 15px;
       border: 1px solid #ccc;
       border-radius: 8px;
     }
 
-    .password-wrapper {
-      position: relative;
-    }
-
-    .password-wrapper input {
-      padding-right: 40px;
-    }
-
-    .toggle-icon {
-      position: absolute;
-      top: 50%;
-      right: 12px;
-      transform: translateY(-50%);
-      cursor: pointer;
-      font-size: 1.2rem;
-      color: #777;
-    }
-
-    form button {
-      width: 100%;
-      background: var(--primary);
-      color: #fff;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-
-    form button:hover {
-      background: var(--dark);
-    }
-
-    @media (max-width: 480px) {
-      h1 { font-size: 1.5rem; }
-      .logo { width: 60px; }
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-top: -8px;
+      margin-bottom: 12px;
+      text-align: left;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <img src="logo.png" class="logo" alt="UCKGC Logo" />
-    <h1>UCKGC Bible Games</h1>
+    <header>
+      <img src="logo.png" alt="UCKGC Logo" class="logo" />
+      <h1>UCKGC Bible Games</h1>
+    </header>
 
     <div class="buttons">
       <button onclick="showRegister()">Register</button>
