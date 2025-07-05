@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verse Match | UCKGC</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f8ff;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .game-box, .result-box {
+      background: #fff;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #2e86de;
+      margin-bottom: 20px;
+    }
+    #verse {
+      font-size: 1.2rem;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+    .option-btn {
+      background: #2e86de;
+      color: #fff;
+      border: none;
+      width: 100%;
+      margin: 8px 0;
+      padding: 14px;
+      font-size: 1rem;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .option-btn:hover {
+      background: #1b4f72;
+    }
+    .feedback-text {
+      font-weight: bold;
+      margin-top: 16px;
+    }
+    .correct-text {
+      color: green;
+    }
+    .wrong-text {
+      color: red;
+    }
+    .hidden {
+      display: none;
+    }
+    ul {
+      padding: 0;
+      list-style: none;
+    }
+    li {
+      font-weight: bold;
+      margin: 4px 0;
+    }
+    a {
+      margin-top: 20px;
+      display: inline-block;
+      font-weight: bold;
+      color: #2e86de;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-box" id="gameBox">
+    <h2>Verse Match</h2>
+    <div id="verse">Loading...</div>
+    <div id="options"></div>
+    <p id="feedbackText" class="feedback-text hidden"></p>
+  </div>
+
+  <div class="result-box" id="resultBox" style="display: none;">
+    <h2>🎉 Game Over!</h2>
+    <p id="finalScore"></p>
+    <h3>🏆 Leaderboard</h3>
+    <ul id="leaderboard"></ul>
+    <a href="dashboard.html">🔙 Back to Dashboard</a>
+  </div>
+
+  <!-- Audio -->
+  <audio id="correctSound" src="audio/correct.mp3"></audio>
+  <audio id="wrongSound" src="audio/wrong.mp3"></audio>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabase = createClient(
+      'https://wlthlwxcmltwescezjlk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+    );
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    if (!session) window.location.href = "index.html";
+
+    const user = session.user;
+    const userId = user.id;
+    const fullName = user.user_metadata.full_name || user.email;
+
+    const verseData = [
+     { verse: "I can do all things through Christ who strengthens me", reference: "Philippians 4:13" },
+  { verse: "The Lord is my shepherd I shall not want", reference: "Psalm 23:1" },
+  { verse: "Trust in the Lord with all your heart and lean not on your own understanding", reference: "Proverbs 3:5" },
+  { verse: "In the beginning God created the heavens and the earth", reference: "Genesis 1:1" },
+  { verse: "Jesus wept", reference: "John 11:35" },
+  { verse: "Be still and know that I am God", reference: "Psalm 46:10" },
+  { verse: "Do not be afraid for I am with you", reference: "Isaiah 41:10" },
+  { verse: "Love your neighbor as yourself", reference: "Mark 12:31" },
+  { verse: "Give thanks to the Lord for he is good", reference: "Psalm 107:1" },
+  { verse: "The joy of the Lord is your strength", reference: "Nehemiah 8:10" },
+  { verse: "God is our refuge and strength", reference: "Psalm 46:1" },
+  { verse: "Walk by faith not by sight", reference: "2 Corinthians 5:7" },
+  { verse: "Cast all your anxiety on him because he cares for you", reference: "1 Peter 5:7" },
+  { verse: "Blessed are the peacemakers", reference: "Matthew 5:9" },
+  { verse: "Let everything that has breath praise the Lord", reference: "Psalm 150:6" },
+  { verse: "The Lord is my light and my salvation", reference: "Psalm 27:1" },
+  { verse: "Do not let your hearts be troubled", reference: "John 14:1" },
+  { verse: "Commit to the Lord whatever you do", reference: "Proverbs 16:3" },
+  { verse: "Rejoice always pray continually", reference: "1 Thessalonians 5:16-17" },
+  { verse: "Even though I walk through the valley of the shadow of death, I will fear no evil", reference: "Psalm 23:4" },
+  { verse: "Come to me, all you who are weary and burdened, and I will give you rest", reference: "Matthew 11:28" },
+  { verse: "The Lord will fight for you; you need only to be still", reference: "Exodus 14:14" },
+  { verse: "He heals the brokenhearted and binds up their wounds", reference: "Psalm 147:3" },
+  { verse: "My grace is sufficient for you, for my power is made perfect in weakness", reference: "2 Corinthians 12:9" },
+  { verse: "This is the day the Lord has made; let us rejoice and be glad in it", reference: "Psalm 118:24" },
+  { verse: "You are the light of the world", reference: "Matthew 5:14" },
+  { verse: "Do everything in love", reference: "1 Corinthians 16:14" },
+  { verse: "Create in me a pure heart, O God", reference: "Psalm 51:10" },
+  { verse: "He will never leave you nor forsake you", reference: "Deuteronomy 31:6" },
+  { verse: "Let your light shine before others", reference: "Matthew 5:16" },
+  { verse: "A cheerful heart is good medicine", reference: "Proverbs 17:22" },
+  { verse: "The name of the Lord is a strong tower", reference: "Proverbs 18:10" },
+  { verse: "I have loved you with an everlasting love", reference: "Jeremiah 31:3" },
+  { verse: "Blessed are those who hunger and thirst for righteousness", reference: "Matthew 5:6" },
+  { verse: "Delight yourself in the Lord and he will give you the desires of your heart", reference: "Psalm 37:4" },
+  { verse: "The Lord is close to the brokenhearted", reference: "Psalm 34:18" },
+  { verse: "Faith comes from hearing the message", reference: "Romans 10:17" },
+  { verse: "I am the way and the truth and the life", reference: "John 14:6" },
+  { verse: "Your word is a lamp for my feet, a light on my path", reference: "Psalm 119:105" },
+  { verse: "Blessed is the one who perseveres under trial", reference: "James 1:12" },
+  { verse: "God is love", reference: "1 John 4:8" },
+  { verse: "The Lord is good, a refuge in times of trouble", reference: "Nahum 1:7" },
+  { verse: "He has made everything beautiful in its time", reference: "Ecclesiastes 3:11" },
+  { verse: "The Lord your God is with you wherever you go", reference: "Joshua 1:9" },
+  { verse: "Whatever you do, do it all for the glory of God", reference: "1 Corinthians 10:31" },
+  { verse: "Therefore, if anyone is in Christ, the new creation has come", reference: "2 Corinthians 5:17" },
+  { verse: "The righteous cry out, and the Lord hears them", reference: "Psalm 34:17" },
+  { verse: "He who began a good work in you will carry it on to completion", reference: "Philippians 1:6" },
+  { verse: "Be strong and courageous", reference: "Joshua 1:9" },
+  { verse: "Taste and see that the Lord is good", reference: "Psalm 34:8" },
+  { verse: "The Lord is compassionate and gracious", reference: "Psalm 103:8" },
+  { verse: "Let us not become weary in doing good", reference: "Galatians 6:9" },
+  { verse: "Do not conform to the pattern of this world", reference: "Romans 12:2" },
+  { verse: "Love is patient, love is kind", reference: "1 Corinthians 13:4" },
+  { verse: "There is a time for everything", reference: "Ecclesiastes 3:1" },
+  { verse: "Be kind and compassionate to one another", reference: "Ephesians 4:32" },
+  { verse: "The Lord is gracious and righteous", reference: "Psalm 116:5" },
+  { verse: "Let the peace of Christ rule in your hearts", reference: "Colossians 3:15" },
+  { verse: "As for me and my house, we will serve the Lord", reference: "Joshua 24:15" },
+  { verse: "Wait for the Lord; be strong and take heart", reference: "Psalm 27:14" },
+  { verse: "I sought the Lord, and he answered me", reference: "Psalm 34:4" },
+  { verse: "He gives strength to the weary", reference: "Isaiah 40:29" },
+  { verse: "God is not unjust", reference: "Hebrews 6:10" },
+  { verse: "Let love and faithfulness never leave you", reference: "Proverbs 3:3" },
+  { verse: "In all your ways submit to him", reference: "Proverbs 3:6" },
+  { verse: "We love because he first loved us", reference: "1 John 4:19" },
+  { verse: "My help comes from the Lord", reference: "Psalm 121:2" },
+  { verse: "Your grace is sufficient for me", reference: "2 Corinthians 12:9" },
+  { verse: "Be devoted to one another in love", reference: "Romans 12:10" },
+  { verse: "The Lord bless you and keep you", reference: "Numbers 6:24" },
+  { verse: "We walk by faith, not by sight", reference: "2 Corinthians 5:7" },
+  { verse: "He will cover you with his feathers", reference: "Psalm 91:4" },
+  { verse: "May the God of hope fill you with all joy", reference: "Romans 15:13" },
+  { verse: "God works for the good of those who love him", reference: "Romans 8:28" },
+  { verse: "Fear not, for I have redeemed you", reference: "Isaiah 43:1" },
+  { verse: "You are my hiding place", reference: "Psalm 32:7" },
+  { verse: "The Lord is my strength and my song", reference: "Exodus 15:2" },
+  { verse: "Whoever believes in him shall not perish", reference: "John 3:16" },
+  { verse: "The Lord upholds all who fall", reference: "Psalm 145:14" },
+  { verse: "I will never leave you nor forsake you", reference: "Hebrews 13:5" },
+  { verse: "Keep your eyes on Jesus", reference: "Hebrews 12:2" },
+  { verse: "God is faithful", reference: "1 Corinthians 10:13" },
+  { verse: "Praise the Lord, my soul", reference: "Psalm 103:1" },
+  { verse: "You are fearfully and wonderfully made", reference: "Psalm 139:14" },
+  { verse: "Do not be anxious about anything", reference: "Philippians 4:6" },
+  { verse: "Every good and perfect gift is from above", reference: "James 1:17" },
+  { verse: "Speak the truth in love", reference: "Ephesians 4:15" },
+  { verse: "His mercies are new every morning", reference: "Lamentations 3:23" },
+  { verse: "Put on the full armor of God", reference: "Ephesians 6:11" },
+  { verse: "Set your minds on things above", reference: "Colossians 3:2" },
+  { verse: "Call to me and I will answer you", reference: "Jeremiah 33:3" },
+  { verse: "He will wipe every tear from their eyes", reference: "Revelation 21:4" },
+  { verse: "The Lord is good to those whose hope is in him", reference: "Lamentations 3:25" },
+  { verse: "Be strong and do not give up", reference: "2 Chronicles 15:7" },
+  { verse: "The Lord gives wisdom", reference: "Proverbs 2:6" },
+  { verse: "Whatever is true, noble, right, pure, lovely—think about such things", reference: "Philippians 4:8" },
+  { verse: "Draw near to God and He will draw near to you", reference: "James 4:8" }
+    ];
+
+    const verseEl = document.getElementById("verse");
+    const optionsEl = document.getElementById("options");
+    const feedbackText = document.getElementById("feedbackText");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const resultBox = document.getElementById("resultBox");
+    const gameBox = document.getElementById("gameBox");
+    const leaderboardEl = document.getElementById("leaderboard");
+    const finalScoreEl = document.getElementById("finalScore");
+
+    let currentIndex = 0;
+    let isVerseShown = true;
+    let shuffled = shuffle([...verseData]);
+    let score = 0;
+
+    function shuffle(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
+
+    function loadItem() {
+      feedbackText.classList.add("hidden");
+      const item = shuffled[currentIndex];
+
+      isVerseShown = Math.random() < 0.5;
+      verseEl.textContent = isVerseShown ? `"${item.verse}"` : item.reference;
+
+      const options = shuffle([
+        isVerseShown ? item.reference : item.verse,
+        ...shuffle(verseData.filter(v => v !== item)).slice(0, 3).map(v => isVerseShown ? v.reference : v.verse)
+      ]);
+
+      optionsEl.innerHTML = "";
+      options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.className = "option-btn";
+        btn.onclick = () => handleSelect(opt, item);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function handleSelect(selected, item) {
+      const correct = isVerseShown ? item.reference : item.verse;
+      if (selected === correct) {
+        correctSound.play();
+        feedbackText.textContent = "✅ Correct!";
+        feedbackText.className = "feedback-text correct-text";
+        feedbackText.classList.remove("hidden");
+        score++;
+        currentIndex++;
+        if (currentIndex < shuffled.length) {
+          setTimeout(loadItem, 1000);
+        } else {
+          setTimeout(() => endGame(), 1000);
+        }
+      } else {
+        wrongSound.play();
+        feedbackText.innerHTML = `❌ Wrong! Correct: <strong>${correct}</strong>`;
+        feedbackText.className = "feedback-text wrong-text";
+        feedbackText.classList.remove("hidden");
+        setTimeout(() => endGame(), 2000);
+      }
+    }
+
+    async function endGame() {
+      gameBox.style.display = "none";
+      resultBox.style.display = "block";
+      finalScoreEl.textContent = `You scored ${score} out of ${shuffled.length}`;
+
+      // Save score
+      const { data: existing } = await supabase
+        .from("versematch_leaderboard")
+        .select("id, score")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (existing) {
+        if (score > existing.score) {
+          await supabase
+            .from("versematch_leaderboard")
+            .update({ score })
+            .eq("id", existing.id);
+        }
+      } else {
+        await supabase
+          .from("versematch_leaderboard")
+          .insert([{ user_id: userId, name: fullName, score }]);
+      }
+
+      // Show leaderboard
+      const { data: topScores } = await supabase
+        .from("versematch_leaderboard")
+        .select("name, score")
+        .order("score", { ascending: false });
+
+      const uniqueUsers = new Map();
+      topScores.forEach(row => {
+        if (!uniqueUsers.has(row.name)) {
+          uniqueUsers.set(row.name, row.score);
+        }
+      });
+
+      leaderboardEl.innerHTML = "";
+      [...uniqueUsers.entries()]
+        .slice(0, 5)
+        .forEach(([name, score]) => {
+          leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+        });
+    }
+
+    loadItem();
+  </script>
+
+</body>
+</html>
