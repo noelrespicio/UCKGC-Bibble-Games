@@ -4,7 +4,87 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UCKGC Bible Games</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // Redirect if logged in
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData.session) {
+      window.location.href = "dashboard.html";
+    }
+
+    // Register user
+    window.registerUser = async function (e) {
+      e.preventDefault();
+      const fullName = document.getElementById('fullName').value;
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName
+          }
+        }
+      });
+
+      if (error) {
+        alert('Registration error: ' + error.message);
+      } else {
+        alert('Registration successful! Please check your email to confirm.');
+      }
+    };
+
+    // Login user
+    window.loginUser = async function (e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        alert('Login error: ' + error.message);
+      } else {
+        alert('Login successful!');
+        window.location.href = "dashboard.html";
+      }
+    };
+
+    // Show register form
+    window.showRegister = function () {
+      document.getElementById('formContainer').innerHTML = `
+        <form id="registerForm">
+          <h3>Create an Account</h3>
+          <input type="text" id="fullName" placeholder="Full Name" required />
+          <input type="email" id="regEmail" placeholder="Email" required />
+          <input type="password" id="regPassword" placeholder="Password" required />
+          <button type="submit">Register</button>
+        </form>
+      `;
+      document.getElementById('registerForm').addEventListener('submit', registerUser);
+    };
+
+    // Show login form
+    window.showLogin = function () {
+      document.getElementById('formContainer').innerHTML = `
+        <form id="loginForm">
+          <h3>Login</h3>
+          <input type="email" id="loginEmail" placeholder="Email" required />
+          <input type="password" id="loginPassword" placeholder="Password" required />
+          <button type="submit">Login</button>
+        </form>
+      `;
+      document.getElementById('loginForm').addEventListener('submit', loginUser);
+    };
+  </script>
   <style>
     :root {
       --primary: #2e86de;
@@ -115,111 +195,5 @@
 
     <div id="formContainer"></div>
   </div>
-
-  <script>
-    // ✅ Supabase Setup (v2 compatible)
-    const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
-
-    const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // Redirect if already logged in
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        window.location.href = "dashboard.html";
-      }
-    });
-
-    // Show Register Form
-    function showRegister() {
-      document.getElementById('formContainer').innerHTML = `
-        <form id="registerForm">
-          <h3>Create an Account</h3>
-          <input type="text" id="fullName" placeholder="Full Name" required />
-          <input type="email" id="regEmail" placeholder="Email" required />
-          <input type="password" id="regPassword" placeholder="Password" required />
-          <button type="submit">Register</button>
-        </form>
-      `;
-      document.getElementById('registerForm').addEventListener('submit', registerUser);
-    }
-
-    // Show Login Form
-    function showLogin() {
-      document.getElementById('formContainer').innerHTML = `
-        <form id="loginForm">
-          <h3>Login</h3>
-          <input type="email" id="loginEmail" placeholder="Email" required />
-          <input type="password" id="loginPassword" placeholder="Password" required />
-          <button type="submit">Login</button>
-        </form>
-      `;
-      document.getElementById('loginForm').addEventListener('submit', loginUser);
-    }
-
-    // Register Function
-    async function registerUser(e) {
-      e.preventDefault();
-      const fullName = document.getElementById('fullName').value;
-      const email = document.getElementById('regEmail').value;
-      const password = document.getElementById('regPassword').value;
-
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName
-          }
-        }
-      });
-
-      if (error) {
-        alert('Registration error: ' + error.message);
-        return;
-      }
-
-      const userId = data?.user?.id;
-      if (!userId) {
-        alert("Registration successful! Please check your email to confirm.");
-        return;
-      }
-
-      // Insert into 'profiles' table
-      const { error: insertError } = await supabaseClient
-        .from('profiles')
-        .insert([{ id: userId, full_name: fullName, email }]);
-
-      if (insertError) {
-        alert('Profile saving error: ' + insertError.message);
-      } else {
-        alert('Registration complete!');
-      }
-    }
-
-    // Login Function
-    async function loginUser(e) {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value;
-      const password = document.getElementById('loginPassword').value;
-
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        alert('Login error: ' + error.message);
-      } else {
-        alert('Login successful!');
-        window.location.href = "dashboard.html";
-      }
-    }
-
-    // Expose functions
-    window.showRegister = showRegister;
-    window.showLogin = showLogin;
-  </script>
 </body>
 </html>
