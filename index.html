@@ -9,7 +9,7 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // replace this with your actual anon key
+    const SUPABASE_KEY = 'your-supabase-key-here'; // replace with actual anon key
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const { data: sessionData } = await supabase.auth.getSession();
@@ -47,7 +47,6 @@
         email,
         password,
         options: {
-          emailRedirectTo: null, // no redirection or confirmation
           data: { full_name: fullName }
         }
       });
@@ -98,37 +97,55 @@
       window.location.href = "dashboard.html";
     };
 
-    window.togglePassword = function (id) {
+    window.togglePassword = function (id, iconId) {
       const input = document.getElementById(id);
-      input.type = input.type === 'password' ? 'text' : 'password';
+      const icon = document.getElementById(iconId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        icon.textContent = '👁️';
+      }
     };
 
     window.showRegister = function () {
-      document.getElementById('formContainer').innerHTML = 
+      document.getElementById('formContainer').innerHTML = `
         <form id="registerForm">
           <h3>Create an Account</h3>
           <input type="text" id="fullName" placeholder="Full Name" required />
           <input type="email" id="regEmail" placeholder="Email" required />
-          <input type="password" id="regPassword" placeholder="Password" required />
-          <label><input type="checkbox" onclick="togglePassword('regPassword')"> Show Password</label>
-          <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-          <label><input type="checkbox" onclick="togglePassword('confirmPassword')"> Show Password</label>
+
+          <div class="password-wrapper">
+            <input type="password" id="regPassword" placeholder="Password" required />
+            <span class="toggle-icon" id="icon1" onclick="togglePassword('regPassword', 'icon1')">👁️</span>
+          </div>
+
+          <div class="password-wrapper">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+            <span class="toggle-icon" id="icon2" onclick="togglePassword('confirmPassword', 'icon2')">👁️</span>
+          </div>
+
           <button type="submit">Register</button>
         </form>
-      ;
+      `;
       document.getElementById('registerForm').addEventListener('submit', registerUser);
     };
 
     window.showLogin = function () {
-      document.getElementById('formContainer').innerHTML = 
+      document.getElementById('formContainer').innerHTML = `
         <form id="loginForm">
           <h3>Login</h3>
           <input type="email" id="loginEmail" placeholder="Email" required />
-          <input type="password" id="loginPassword" placeholder="Password" required />
-          <label><input type="checkbox" onclick="togglePassword('loginPassword')"> Show Password</label>
+
+          <div class="password-wrapper">
+            <input type="password" id="loginPassword" placeholder="Password" required />
+            <span class="toggle-icon" id="icon3" onclick="togglePassword('loginPassword', 'icon3')">👁️</span>
+          </div>
+
           <button type="submit">Login</button>
         </form>
-      ;
+      `;
       document.getElementById('loginForm').addEventListener('submit', loginUser);
     };
   </script>
@@ -194,7 +211,9 @@
       transition: 0.3s ease;
     }
 
-    button:hover { background: var(--primary-dark); }
+    button:hover {
+      background: var(--primary-dark);
+    }
 
     form {
       background: #f9fafb;
@@ -212,12 +231,37 @@
       border-radius: 8px;
     }
 
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper input {
+      padding-right: 40px;
+    }
+
+    .toggle-icon {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      font-size: 1.2rem;
+      user-select: none;
+    }
+
     label {
       display: block;
       font-size: 0.9rem;
       margin-top: -8px;
       margin-bottom: 12px;
       text-align: left;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.4rem; }
+      .logo { width: 70px; height: 70px; }
+      button { font-size: 0.95rem; padding: 10px; }
+      input { font-size: 0.95rem; }
     }
   </style>
 </head>
