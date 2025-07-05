@@ -4,11 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>UCKGC Bible Games</title>
+
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
     const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // 🔁 Replace with your Supabase anon key
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // your full anon key
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const { data: sessionData } = await supabase.auth.getSession();
@@ -46,8 +46,7 @@
         email,
         password,
         options: {
-          data: { full_name: fullName },
-          emailRedirectTo: 'https://your-site.com/dashboard.html' // Replace with your actual redirect URL
+          data: { full_name: fullName }
         }
       });
 
@@ -58,12 +57,11 @@
 
       const user = data.user;
       if (user) {
-        await supabase
-          .from('profiles')
-          .insert([{ id: user.id, full_name: fullName, email }]);
+        await supabase.from('profiles').insert([{ id: user.id, full_name: fullName, email }]);
       }
 
-      alert("✅ Registration successful! Please check your email to confirm before logging in.");
+      alert("✅ Registration successful! You can now login.");
+      showLogin(); // auto-show login after successful register
     };
 
     window.loginUser = async function (e) {
@@ -79,18 +77,12 @@
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        if (error.message.toLowerCase().includes("email not confirmed")) {
-          alert("📧 Please confirm your email first.");
-        } else if (error.message.toLowerCase().includes("invalid login credentials")) {
-          const { data: exists } = await supabase
-            .from('profiles')
-            .select('email')
-            .eq('email', email);
-
+        if (error.message.toLowerCase().includes("invalid login credentials")) {
+          const { data: exists } = await supabase.from('profiles').select('email').eq('email', email);
           if (!exists || exists.length === 0) {
             alert("📧 Email not registered.");
           } else {
-            alert("🔒 Wrong password. Please try again.");
+            alert("🔒 Wrong password. Try again.");
           }
         } else {
           alert("⚠️ Login error: " + error.message);
@@ -102,6 +94,11 @@
       window.location.href = "dashboard.html";
     };
 
+    window.togglePassword = function (id) {
+      const input = document.getElementById(id);
+      input.type = input.type === 'password' ? 'text' : 'password';
+    };
+
     window.showRegister = function () {
       document.getElementById('formContainer').innerHTML = `
         <form id="registerForm">
@@ -109,7 +106,9 @@
           <input type="text" id="fullName" placeholder="Full Name" required />
           <input type="email" id="regEmail" placeholder="Email" required />
           <input type="password" id="regPassword" placeholder="Password" required />
+          <label><input type="checkbox" onclick="togglePassword('regPassword')"> Show Password</label>
           <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+          <label><input type="checkbox" onclick="togglePassword('confirmPassword')"> Show Password</label>
           <button type="submit">Register</button>
         </form>
       `;
@@ -122,6 +121,7 @@
           <h3>Login</h3>
           <input type="email" id="loginEmail" placeholder="Email" required />
           <input type="password" id="loginPassword" placeholder="Password" required />
+          <label><input type="checkbox" onclick="togglePassword('loginPassword')"> Show Password</label>
           <button type="submit">Login</button>
         </form>
       `;
@@ -136,8 +136,6 @@
       --bg: #f0f4f8;
       --text: #2c3e50;
     }
-
-    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -176,9 +174,9 @@
     .buttons {
       display: flex;
       justify-content: center;
-      flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
     button {
@@ -194,9 +192,7 @@
       transition: 0.3s ease;
     }
 
-    button:hover {
-      background: var(--primary-dark);
-    }
+    button:hover { background: var(--primary-dark); }
 
     form {
       background: #f9fafb;
@@ -217,6 +213,14 @@
       font-size: 1rem;
       border: 1px solid #ccc;
       border-radius: 8px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-top: -8px;
+      margin-bottom: 12px;
+      text-align: left;
     }
 
     @media (max-width: 480px) {
@@ -240,6 +244,6 @@
     </div>
 
     <div id="formContainer"></div>
-</div>
+  </div>
 </body>
 </html>
