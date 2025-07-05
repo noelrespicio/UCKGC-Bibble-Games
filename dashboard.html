@@ -37,12 +37,6 @@
       --card-bg: #ffffff;
     }
 
-    [data-theme='dark'] {
-      --bg: #1e1e2f;
-      --text: #e4e4e4;
-      --card-bg: #2e2e3f;
-    }
-
     * {
       box-sizing: border-box;
       margin: 0;
@@ -56,7 +50,6 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      transition: background 0.3s ease, color 0.3s ease;
     }
 
     header {
@@ -122,8 +115,7 @@
       color: #555;
     }
 
-    .logout-btn,
-    .theme-btn {
+    .logout-btn {
       background: #ff4d4d;
       color: white;
       border: none;
@@ -131,20 +123,12 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
-      margin: 0 auto 10px;
+      margin: 0 auto 20px;
       display: block;
-    }
-
-    .theme-btn {
-      background: #2e86de;
     }
 
     .logout-btn:hover {
       background: #cc0000;
-    }
-
-    .theme-btn:hover {
-      background: #1b4f72;
     }
 
     footer {
@@ -155,7 +139,7 @@
 
     @media (max-width: 480px) {
       h2 { font-size: 1.2rem; }
-      .logout-btn, .theme-btn { font-size: 0.9rem; padding: 8px 12px; }
+      .logout-btn { font-size: 0.9rem; padding: 8px 12px; }
       .card h3 { font-size: 1rem; }
       .card p { font-size: 0.85rem; }
     }
@@ -175,13 +159,13 @@
       <p>Test your knowledge of the Scriptures!</p>
     </div>
 
-    <div class="card" onclick="window.location.href='versematch.html'">
+   <div class="card" onclick="window.location.href='versematch.html'">
       <div class="icon" data-lucide="link-2"></div>
       <h3>Verse Match</h3>
       <p>Match Bible verses with references.</p>
     </div>
 
-    <div class="card" onclick="window.location.href='biblepuzzle.html'">
+       <div class="card" onclick="window.location.href='biblepuzzle.html'">
       <div class="icon" data-lucide="puzzle"></div>
       <h3>Bible Puzzle</h3>
       <p>Arrange puzzle pieces to reveal verses.</p>
@@ -194,7 +178,6 @@
     </div>
   </section>
 
-  <button class="theme-btn" onclick="toggleTheme()">🌗 Toggle Theme</button>
   <button class="logout-btn" onclick="logout()">Logout</button>
 
   <footer>
@@ -208,48 +191,12 @@
       const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
       const supabase = createClient(
         'https://wlthlwxcmltwescezjlk.supabase.co',
-        'YOUR_SUPABASE_PUBLIC_ANON_KEY'
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
       );
       await supabase.auth.signOut();
       alert("👋 Logged out successfully!");
       window.location.href = "index.html";
     }
-
-    function toggleTheme() {
-      const currentTheme = document.documentElement.getAttribute('data-theme');
-      document.documentElement.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
-    }
   </script>
-
-  <!-- ===========================
-       📌 DEVELOPER NOTES SECTION
-       ===========================
-
-1. 🔐 Supabase Auth Check:
-   - Checks if the user is logged in using Supabase.
-   - If not logged in, redirects to `index.html`.
-
-2. 👤 Display Logged-in User:
-   - Shows full name (if available) or email using `user_metadata`.
-
-3. 🎮 Dashboard Cards:
-   - Bible Quiz, Verse Match, Puzzle Game, and a placeholder for Books Order.
-   - Clicking a card redirects to a game or shows "Coming Soon".
-
-4. 🔘 Buttons:
-   - "Logout" calls Supabase `signOut()` and redirects to login.
-   - "Toggle Theme" switches between light and dark UI using `data-theme`.
-
-5. 🎨 Styles:
-   - Uses CSS variables for consistent theming.
-   - Responsive design for mobile users.
-
-6. 🌐 Lucide Icons:
-   - Uses modern vector icons via CDN and `data-lucide` attributes.
-
-Replace `YOUR_SUPABASE_PUBLIC_ANON_KEY` with your actual public anon key.
-
-Enjoy building your faith-based game dashboard! 🙏🎮
--->
 </body>
 </html>
