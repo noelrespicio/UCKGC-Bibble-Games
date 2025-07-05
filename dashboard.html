@@ -13,7 +13,7 @@
 
     const supabase = createClient(
       'https://wlthlwxcmltwescezjlk.supabase.co',
-      'your_anon_key_here' // Replace this with your actual anon key
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o' // Replace this with your actual anon key
     );
 
     const { data: sessionData } = await supabase.auth.getSession();
