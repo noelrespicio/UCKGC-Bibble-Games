@@ -39,7 +39,22 @@
       margin: 20px 0;
     }
 
-    .letter-btn {
+    .clue {
+      font-style: italic;
+      color: #555;
+      margin-bottom: 16px;
+    }
+
+    .letter-input {
+      font-size: 1.2rem;
+      padding: 8px 14px;
+      width: 80%;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .letter-btn, .submit-btn {
       margin: 4px;
       padding: 10px 14px;
       font-size: 1rem;
@@ -51,7 +66,7 @@
       transition: 0.3s;
     }
 
-    .letter-btn:hover {
+    .letter-btn:hover, .submit-btn:hover {
       background: var(--primary-dark);
     }
 
@@ -96,9 +111,8 @@
         letter-spacing: 6px;
       }
 
-      .letter-btn {
-        padding: 8px 10px;
-        font-size: 0.9rem;
+      .letter-input {
+        width: 100%;
       }
     }
   </style>
@@ -107,8 +121,11 @@
 
   <div class="puzzle-box" id="gameBox">
     <h2>Bible Puzzle</h2>
+    <p class="clue" id="clueText">Clue will appear here</p>
     <p class="puzzle-word" id="puzzleWord">Loading...</p>
-    <div id="letterButtons"></div>
+    <input type="text" id="letterInput" class="letter-input" maxlength="20" placeholder="Enter your answer...">
+    <br>
+    <button class="submit-btn" id="submitBtn">Submit</button>
     <p id="feedback" class="feedback hidden"></p>
     <button id="tryAgainBtn" class="letter-btn hidden">🔁 Try Again</button>
     <br>
@@ -140,92 +157,40 @@
     const fullName = user.user_metadata.full_name || user.email;
 
     const puzzles = [
-      "GENESIS", "EXODUS", "JESUS", "FAITH", "GRACE", "HEAVEN", "DISCIPLE",
-      "PRAYER", "BAPTISM", "LOVE", "CHRIST", "PSALM", "HOPE", "ANGEL"
+      { word: "GENESIS", clue: "The first book of the Bible" },
+      { word: "EXODUS", clue: "Story of Moses and the Israelites leaving Egypt" },
+      { word: "FAITH", clue: "Believing without seeing" },
+      { word: "PRAYER", clue: "Talking to God" },
+      { word: "GRACE", clue: "Unmerited favor from God" },
+      { word: "CHRIST", clue: "The Messiah" },
+      { word: "DISCIPLE", clue: "A follower of Jesus" }
     ];
 
     let puzzle = "";
-    let guessed = [];
-    let remainingLetters = 0;
+    let clue = "";
     let score = 0;
 
     const puzzleWordEl = document.getElementById("puzzleWord");
-    const letterButtonsEl = document.getElementById("letterButtons");
+    const clueText = document.getElementById("clueText");
+    const inputEl = document.getElementById("letterInput");
     const feedbackEl = document.getElementById("feedback");
     const tryAgainBtn = document.getElementById("tryAgainBtn");
+    const submitBtn = document.getElementById("submitBtn");
     const resultBox = document.getElementById("resultBox");
     const gameBox = document.getElementById("gameBox");
     const finalScoreEl = document.getElementById("finalScore");
     const leaderboardEl = document.getElementById("leaderboard");
 
     function startGame() {
-      puzzle = puzzles[Math.floor(Math.random() * puzzles.length)];
-      guessed = Array(puzzle.length).fill("_");
-      remainingLetters = puzzle.length;
+      const current = puzzles[Math.floor(Math.random() * puzzles.length)];
+      puzzle = current.word;
+      clue = current.clue;
+      puzzleWordEl.textContent = "_ ".repeat(puzzle.length);
+      clueText.textContent = `📖 Clue: ${clue}`;
+      inputEl.value = "";
+      inputEl.focus();
       feedbackEl.classList.add("hidden");
       tryAgainBtn.classList.add("hidden");
-      resultBox.classList.add("hidden");
-      gameBox.classList.remove("hidden");
-      renderPuzzle();
-      createLetterButtons();
-    }
-
-    function renderPuzzle() {
-      puzzleWordEl.textContent = guessed.join(" ");
-    }
-
-    function createLetterButtons() {
-      const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-      letterButtonsEl.innerHTML = "";
-      alphabet.split("").forEach(letter => {
-        const btn = document.createElement("button");
-        btn.className = "letter-btn";
-        btn.textContent = letter;
-        btn.onclick = () => handleGuess(letter, btn);
-        letterButtonsEl.appendChild(btn);
-      });
-    }
-
-    function handleGuess(letter, btn) {
-      btn.disabled = true;
-      let found = false;
-      for (let i = 0; i < puzzle.length; i++) {
-        if (puzzle[i] === letter && guessed[i] === "_") {
-          guessed[i] = letter;
-          remainingLetters--;
-          found = true;
-        }
-      }
-
-      renderPuzzle();
-
-      if (found) {
-        feedbackEl.textContent = "✅ Correct!";
-        feedbackEl.className = "feedback correct";
-      } else {
-        feedbackEl.textContent = "❌ Wrong!";
-        feedbackEl.className = "feedback wrong";
-      }
-
-      feedbackEl.classList.remove("hidden");
-
-      if (remainingLetters === 0) {
-        score++;
-        feedbackEl.textContent = `🎉 Correct! The word was "${puzzle}"`;
-        tryAgainBtn.classList.remove("hidden");
-        disableAllButtons();
-        setTimeout(() => startGame(), 2000); // Auto next puzzle
-      }
-
-      if (score >= 5) {
-        endGame();
-      }
-    }
-
-    function disableAllButtons() {
-      document.querySelectorAll(".letter-btn").forEach(btn => {
-        btn.disabled = true;
-      });
     }
 
     async function endGame() {
@@ -233,7 +198,6 @@
       resultBox.classList.remove("hidden");
       finalScoreEl.textContent = `You solved ${score} puzzle${score > 1 ? "s" : ""}!`;
 
-      // Save score
       const { data: existing } = await supabase
         .from("biblepuzzle_leaderboard")
         .select("id, score")
@@ -253,7 +217,6 @@
           .insert([{ user_id: userId, name: fullName, score }]);
       }
 
-      // Show leaderboard
       const { data: topScores } = await supabase
         .from("biblepuzzle_leaderboard")
         .select("name, score")
@@ -272,9 +235,30 @@
       });
     }
 
-    tryAgainBtn.onclick = startGame;
+    submitBtn.onclick = () => {
+      const guess = inputEl.value.trim().toUpperCase();
+      if (guess === puzzle) {
+        score++;
+        feedbackEl.textContent = `🎉 Correct! The word was "${puzzle}"`;
+        feedbackEl.className = "feedback correct";
+        feedbackEl.classList.remove("hidden");
+        setTimeout(startGame, 2000);
+      } else {
+        feedbackEl.textContent = `❌ Wrong! Correct answer: ${puzzle}`;
+        feedbackEl.className = "feedback wrong";
+        feedbackEl.classList.remove("hidden");
+        setTimeout(endGame, 2000);
+      }
+    };
+
+    tryAgainBtn.onclick = () => {
+      score = 0;
+      resultBox.classList.add("hidden");
+      gameBox.classList.remove("hidden");
+      startGame();
+    };
+
     startGame();
   </script>
-
 </body>
 </html>
