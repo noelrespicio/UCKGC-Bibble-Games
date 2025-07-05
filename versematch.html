@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,36 +6,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Verse Match | UCKGC</title>
   <style>
+    :root {
+      --primary: #2e86de;
+      --primary-dark: #1b4f72;
+      --bg: #f0f8ff;
+    }
+
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: #f0f8ff;
+      background: var(--bg);
       margin: 0;
-      padding: 20px;
+      padding: 16px;
       text-align: center;
       display: flex;
       flex-direction: column;
       justify-content: center;
       min-height: 100vh;
     }
+
     .game-box, .result-box {
       background: #fff;
       max-width: 600px;
+      width: 100%;
       margin: 0 auto;
       padding: 24px;
       border-radius: 16px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     }
+
     h2 {
-      color: #2e86de;
-      margin-bottom: 20px;
+      color: var(--primary);
+      margin-bottom: 16px;
     }
+
     #verse {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       margin-bottom: 20px;
       font-style: italic;
     }
+
     .option-btn {
-      background: #2e86de;
+      background: var(--primary);
       color: #fff;
       border: none;
       width: 100%;
@@ -45,36 +57,59 @@
       cursor: pointer;
       transition: background 0.3s ease;
     }
+
     .option-btn:hover {
-      background: #1b4f72;
+      background: var(--primary-dark);
     }
+
     .feedback-text {
       font-weight: bold;
       margin-top: 16px;
     }
+
     .correct-text {
       color: green;
     }
+
     .wrong-text {
       color: red;
     }
+
     .hidden {
       display: none;
     }
+
     ul {
       padding: 0;
       list-style: none;
     }
+
     li {
       font-weight: bold;
       margin: 4px 0;
     }
+
     a {
-      margin-top: 20px;
+      margin-top: 16px;
       display: inline-block;
       font-weight: bold;
-      color: #2e86de;
+      color: var(--primary);
       text-decoration: none;
+    }
+
+    @media (max-width: 480px) {
+      .game-box, .result-box {
+        padding: 20px;
+      }
+
+      #verse {
+        font-size: 1rem;
+      }
+
+      .option-btn {
+        font-size: 0.95rem;
+        padding: 12px;
+      }
     }
   </style>
 </head>
@@ -92,12 +127,13 @@
     <p id="finalScore"></p>
     <h3>🏆 Leaderboard</h3>
     <ul id="leaderboard"></ul>
+    <button id="tryAgainBtn" class="option-btn">🔁 Try Again</button>
     <a href="dashboard.html">🔙 Back to Dashboard</a>
   </div>
 
   <!-- Audio -->
   <audio id="correctSound" src="audio/correct.mp3"></audio>
-  <audio id="wrongSound" src="agameover.mp4"></audio>
+  <audio id="wrongSound" src="gameover.mp4"></audio>
 
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
@@ -115,8 +151,7 @@
     const userId = user.id;
     const fullName = user.user_metadata.full_name || user.email;
 
-    const verseData = [
-     { verse: "I can do all things through Christ who strengthens me", reference: "Philippians 4:13" },
+    const verseData = [  { verse: "I can do all things through Christ who strengthens me", reference: "Philippians 4:13" },
   { verse: "The Lord is my shepherd I shall not want", reference: "Psalm 23:1" },
   { verse: "Trust in the Lord with all your heart and lean not on your own understanding", reference: "Proverbs 3:5" },
   { verse: "In the beginning God created the heavens and the earth", reference: "Genesis 1:1" },
@@ -212,8 +247,7 @@
   { verse: "Be strong and do not give up", reference: "2 Chronicles 15:7" },
   { verse: "The Lord gives wisdom", reference: "Proverbs 2:6" },
   { verse: "Whatever is true, noble, right, pure, lovely—think about such things", reference: "Philippians 4:8" },
-  { verse: "Draw near to God and He will draw near to you", reference: "James 4:8" }
-    ];
+  { verse: "Draw near to God and He will draw near to you", reference: "James 4:8" }]; // keep your full verseData array here
 
     const verseEl = document.getElementById("verse");
     const optionsEl = document.getElementById("options");
@@ -224,6 +258,7 @@
     const gameBox = document.getElementById("gameBox");
     const leaderboardEl = document.getElementById("leaderboard");
     const finalScoreEl = document.getElementById("finalScore");
+    const tryAgainBtn = document.getElementById("tryAgainBtn");
 
     let currentIndex = 0;
     let isVerseShown = true;
@@ -268,14 +303,14 @@
         if (currentIndex < shuffled.length) {
           setTimeout(loadItem, 1000);
         } else {
-          setTimeout(() => endGame(), 1000);
+          setTimeout(endGame, 1000);
         }
       } else {
         wrongSound.play();
         feedbackText.innerHTML = `❌ Wrong! Correct: <strong>${correct}</strong>`;
         feedbackText.className = "feedback-text wrong-text";
         feedbackText.classList.remove("hidden");
-        setTimeout(() => endGame(), 2000);
+        setTimeout(endGame, 2000);
       }
     }
 
@@ -284,7 +319,6 @@
       resultBox.style.display = "block";
       finalScoreEl.textContent = `You scored ${score} out of ${shuffled.length}`;
 
-      // Save score
       const { data: existing } = await supabase
         .from("versematch_leaderboard")
         .select("id, score")
@@ -304,7 +338,6 @@
           .insert([{ user_id: userId, name: fullName, score }]);
       }
 
-      // Show leaderboard
       const { data: topScores } = await supabase
         .from("versematch_leaderboard")
         .select("name, score")
@@ -318,12 +351,21 @@
       });
 
       leaderboardEl.innerHTML = "";
-      [...uniqueUsers.entries()]
-        .slice(0, 5)
-        .forEach(([name, score]) => {
-          leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
-        });
+      [...uniqueUsers.entries()].slice(0, 5).forEach(([name, score]) => {
+        leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+      });
     }
+
+    function resetGame() {
+      currentIndex = 0;
+      score = 0;
+      shuffled = shuffle([...verseData]);
+      resultBox.style.display = "none";
+      gameBox.style.display = "block";
+      loadItem();
+    }
+
+    tryAgainBtn.addEventListener("click", resetGame);
 
     loadItem();
   </script>
