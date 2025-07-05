@@ -118,7 +118,37 @@
       .letter-input {
         width: 100%;
       }
-    }
+    }@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  .puzzle-box, .result-box {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .puzzle-word {
+    font-size: 1.5rem;
+    letter-spacing: 5px;
+  }
+
+  .letter-input {
+    width: 100%;
+    font-size: 1.1rem;
+  }
+
+  .submit-btn, .try-again-link {
+    width: 100%;
+    font-size: 1rem;
+    padding: 12px;
+  }
+
+  h2, h3 {
+    font-size: 1.4rem;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -313,13 +343,14 @@
       }
     };
 
-    retryFromResult.onclick = () => {
-      score = 0;
-      currentIndex = 0;
-      resultBox.classList.add("hidden");
-      gameBox.classList.remove("hidden");
-      startGame();
-    };
+  retryFromResult.onclick = () => {
+  score = 0;
+  shufflePuzzles(); // reshuffle on retry
+  resultBox.classList.add("hidden");
+  gameBox.classList.remove("hidden");
+  startGame();
+};
+
 
     startGame();
   </script>
