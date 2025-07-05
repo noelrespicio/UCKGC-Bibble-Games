@@ -320,24 +320,30 @@
       startTimer();
     }
 
-    async function selectAnswer(selected, correct) {
-      clearInterval(timer);
-      if (selected === correct) {
-        correctSound.play();
-        score++;
-        currentQuestion++;
-        if (currentQuestion < quizData.length) {
-          loadQuestion();
-        } else {
-          await endQuiz();
-        }
-      } else {
-        wrongSound.play();
-        wrongText.innerHTML = `❌ Wrong! Correct: <span style="color:var(--primary-dark);">${correct}</span>`;
-        wrongText.style.display = "block";
-        setTimeout(endQuiz, 2000);
-      }
+   async function selectAnswer(selected, correct) {
+  clearInterval(timer);
+  if (selected === correct) {
+    correctSound.play();
+    wrongText.innerHTML = `✅ Correct!`;
+    wrongText.style.display = "block";
+    score++;
+    currentQuestion++;
+    if (currentQuestion < quizData.length) {
+      setTimeout(() => {
+        wrongText.style.display = "none";
+        loadQuestion();
+      }, 1000); // Wait 1 second before next question
+    } else {
+      setTimeout(endQuiz, 1000);
     }
+  } else {
+    wrongSound.play();
+    wrongText.innerHTML = `❌ Wrong! Correct: <span style="color:var(--primary-dark);">${correct}</span>`;
+    wrongText.style.display = "block";
+    setTimeout(endQuiz, 2000);
+  }
+}
+
 
     async function endQuiz() {
       clearInterval(timer);
