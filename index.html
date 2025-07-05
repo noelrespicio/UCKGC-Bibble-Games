@@ -8,13 +8,12 @@
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // 🔁 Replace with your Supabase anon key
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const { data: sessionData } = await supabase.auth.getSession();
     if (sessionData.session) window.location.href = "dashboard.html";
 
-    // Register User
     window.registerUser = async function (e) {
       e.preventDefault();
       const fullName = document.getElementById('fullName').value.trim();
@@ -32,43 +31,63 @@
         return;
       }
 
+      const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (existingUser) {
+        alert("📧 Email already registered. Try logging in.");
+        return;
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: { full_name: fullName }
+          data: { full_name: fullName },
+          emailRedirectTo: 'https://your-site.com/dashboard.html' // Replace with your actual redirect URL
         }
       });
 
       if (error) {
-        alert('❌ Registration error: ' + error.message);
-      } else {
-        alert('✅ Registration successful! Please check your email to confirm.');
+        alert("❌ Registration failed: " + error.message);
+        return;
       }
+
+      const user = data.user;
+      if (user) {
+        await supabase
+          .from('profiles')
+          .insert([{ id: user.id, full_name: fullName, email }]);
+      }
+
+      alert("✅ Registration successful! Please check your email to confirm before logging in.");
     };
 
-    // Login User
     window.loginUser = async function (e) {
       e.preventDefault();
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
 
       if (!email || !password) {
-        alert("❗ Both email and password are required.");
+        alert("❗ Email and password are required.");
         return;
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
       if (error) {
-        if (error.message.toLowerCase().includes("invalid login credentials")) {
-          // Check if email exists to give custom error
-          const { data: users } = await supabase
+        if (error.message.toLowerCase().includes("email not confirmed")) {
+          alert("📧 Please confirm your email first.");
+        } else if (error.message.toLowerCase().includes("invalid login credentials")) {
+          const { data: exists } = await supabase
             .from('profiles')
             .select('email')
             .eq('email', email);
 
-          if (!users || users.length === 0) {
+          if (!exists || exists.length === 0) {
             alert("📧 Email not registered.");
           } else {
             alert("🔒 Wrong password. Please try again.");
@@ -76,13 +95,13 @@
         } else {
           alert("⚠️ Login error: " + error.message);
         }
-      } else {
-        alert('✅ Login successful!');
-        window.location.href = "dashboard.html";
+        return;
       }
+
+      alert("✅ Login successful!");
+      window.location.href = "dashboard.html";
     };
 
-    // Show Registration Form
     window.showRegister = function () {
       document.getElementById('formContainer').innerHTML = `
         <form id="registerForm">
@@ -97,7 +116,6 @@
       document.getElementById('registerForm').addEventListener('submit', registerUser);
     };
 
-    // Show Login Form
     window.showLogin = function () {
       document.getElementById('formContainer').innerHTML = `
         <form id="loginForm">
@@ -176,7 +194,9 @@
       transition: 0.3s ease;
     }
 
-    button:hover { background: var(--primary-dark); }
+    button:hover {
+      background: var(--primary-dark);
+    }
 
     form {
       background: #f9fafb;
@@ -220,6 +240,6 @@
     </div>
 
     <div id="formContainer"></div>
-  </div>
+</div>
 </body>
 </html>
