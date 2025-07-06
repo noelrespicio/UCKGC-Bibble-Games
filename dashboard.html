@@ -409,33 +409,10 @@
     const name = isSelf ? "You" : (msg.profiles?.full_name || "Unknown");
     const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-   const msgContainer = document.createElement("div");
+ const msgContainer = document.createElement("div");
 msgContainer.style.marginBottom = "10px";
-msgContainer.style.display = "flex";
-msgContainer.style.justifyContent = isSelf ? "flex-end" : "flex-start";
+msgContainer.style.textAlign = isSelf ? "right" : "left";
 
-const bubble = document.createElement("div");
-bubble.style.background = isSelf ? '#d1e7ff' : '#f1f1f1';
-bubble.style.padding = "10px 14px";
-bubble.style.borderRadius = "12px";
-bubble.style.maxWidth = "75%";
-bubble.style.fontSize = "0.85rem";
-bubble.style.textAlign = "justify";
-bubble.style.lineHeight = "1.4";
-bubble.style.wordBreak = "break-word";
-bubble.style.whiteSpace = "pre-wrap";
-
-const name = isSelf ? "You" : (msg.profiles?.full_name || "Unknown");
-const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-bubble.innerHTML = `
-  <strong>${name}</strong><br/>
-  ${msg.message}
-  <div style="font-size: 0.7rem; color: gray; text-align: right;">${time}</div>
-`;
-
-msgContainer.appendChild(bubble);
-messagesBox.appendChild(msgContainer);
 
 
     msgContainer.innerHTML = `
