@@ -3,12 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ 
   <title>UCKGC Bible Games</title>
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
     const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // Replace with your actual key
     const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const { data: sessionData } = await supabase.auth.getSession();
@@ -57,26 +58,9 @@
 
       const user = data.user;
       if (user) {
-        const { error: profileError } = await supabase
+        await supabase
           .from('profiles')
           .insert([{ id: user.id, full_name: fullName, email }]);
-
-        if (profileError) {
-          console.error("❌ Error inserting profile:", profileError.message);
-          alert("❌ Registration failed: " + profileError.message);
-          return;
-        }
-
-        const { error: messageError } = await supabase
-          .from('chat_messages')
-          .insert([{
-            user_id: 'system',
-            message: `🎉 New member joined: ${fullName}! Welcome to UCKGC Bible Games! 🙌`
-          }]);
-
-        if (messageError) {
-          console.warn("⚠️ Chat message insert failed:", messageError.message);
-        }
       }
 
       alert("✅ Registration successful! You can now log in.");
@@ -122,7 +106,7 @@
     };
 
     window.showRegister = function () {
-      document.getElementById('formContainer').innerHTML = `
+      document.getElementById('formContainer').innerHTML = 
         <form id="registerForm">
           <h3>Create an Account</h3>
           <input type="text" id="fullName" placeholder="Full Name" required />
@@ -140,12 +124,12 @@
 
           <button type="submit">Register</button>
         </form>
-      `;
+      ;
       document.getElementById('registerForm').addEventListener('submit', registerUser);
     };
 
     window.showLogin = function () {
-      document.getElementById('formContainer').innerHTML = `
+      document.getElementById('formContainer').innerHTML = 
         <form id="loginForm">
           <h3>Login</h3>
           <input type="email" id="loginEmail" placeholder="Email" required />
@@ -157,7 +141,7 @@
 
           <button type="submit">Login</button>
         </form>
-      `;
+      ;
       document.getElementById('loginForm').addEventListener('submit', loginUser);
     };
   </script>
@@ -278,17 +262,18 @@
   </style>
 </head>
 <body>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8377874433999473" crossorigin="anonymous"></script>
-  <ins class="adsbygoogle"
-       style="display:block"
-       data-ad-client="ca-pub-8377874433999473"
-       data-ad-slot="1756631268"
-       data-ad-format="auto"
-       data-full-width-responsive="true"></ins>
-  <script>
-       (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-
+   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8377874433999473"
+     crossorigin="anonymous"></script>
+<!-- HomepageAd -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8377874433999473"
+     data-ad-slot="1756631268"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
   <div class="container">
     <header>
       <img src="logo.png" alt="UCKGC Logo" class="logo" />
