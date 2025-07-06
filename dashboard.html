@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>UCKGC Dashboard</title>
-
-  <!-- Lucide Icons CDN -->
+  <title>UCKGC Arcade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
 
   <script type="module">
@@ -30,11 +29,11 @@
 
   <style>
     :root {
-      --primary: #2e86de;
-      --primary-dark: #1b4f72;
-      --bg: #f0f9ff;
-      --text: #2c3e50;
+      --primary: #ff5e57;
+      --secondary: #ffbd69;
+      --bg: #fff8f0;
       --card-bg: #ffffff;
+      --text: #222;
     }
 
     * {
@@ -46,6 +45,7 @@
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
       background: var(--bg);
+      color: var(--text);
       padding: 20px;
       min-height: 100vh;
       display: flex;
@@ -55,6 +55,7 @@
     header {
       text-align: center;
       margin-bottom: 20px;
+      position: relative;
     }
 
     .logo {
@@ -65,13 +66,14 @@
     }
 
     h2 {
-      font-size: 1.5rem;
-      color: var(--text);
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.3rem;
+      color: var(--primary);
+      margin-bottom: 8px;
     }
 
     .welcome {
-      margin-top: 8px;
-      font-size: 1rem;
+      font-size: 0.9rem;
       color: #555;
     }
 
@@ -83,40 +85,42 @@
     }
 
     .card {
-      background: var(--card-bg);
+      background: linear-gradient(145deg, #ffffff, #f3f3f3);
       border-radius: 16px;
       padding: 20px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+      box-shadow: 6px 6px 12px rgba(0, 0, 0, 0.1);
       text-align: center;
-      transition: transform 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
       cursor: pointer;
+      border: 2px solid var(--primary);
     }
 
     .card:hover {
-      transform: scale(1.03);
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      background: var(--secondary);
     }
 
     .card .icon {
       width: 40px;
       height: 40px;
       margin: 0 auto 12px;
-      color: var(--primary-dark);
+      color: var(--primary);
     }
 
     .card h3 {
-      color: var(--primary-dark);
-      font-size: 1.2rem;
+      font-size: 1.1rem;
+      color: var(--primary);
       margin-bottom: 6px;
     }
 
     .card p {
-      font-size: 0.95rem;
-      color: #555;
+      font-size: 0.9rem;
+      color: #444;
     }
 
     .logout-btn {
-      background: #ff4d4d;
+      background: var(--primary);
       color: white;
       border: none;
       padding: 10px 16px;
@@ -128,7 +132,7 @@
     }
 
     .logout-btn:hover {
-      background: #cc0000;
+      background: #c0392b;
     }
 
     footer {
@@ -137,89 +141,70 @@
       color: #777;
     }
 
+    .leaderboard-link {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card-bg);
+      padding: 8px 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .leaderboard-link:hover {
+      background: var(--primary);
+      transform: scale(1.05);
+    }
+
+    .leaderboard-link .icon {
+      width: 20px;
+      height: 20px;
+      color: var(--primary);
+    }
+
+    .leaderboard-link span {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .leaderboard-link:hover .icon,
+    .leaderboard-link:hover span {
+      color: #fff;
+    }
+
     @media (max-width: 480px) {
-      h2 { font-size: 1.2rem; }
+      h2 { font-size: 1rem; }
       .logout-btn { font-size: 0.9rem; padding: 8px 12px; }
       .card h3 { font-size: 1rem; }
       .card p { font-size: 0.85rem; }
+      .leaderboard-link {
+        top: 10px;
+        right: 10px;
+        padding: 6px 10px;
+        gap: 4px;
+      }
+      .leaderboard-link span {
+        font-size: 0.85rem;
+      }
     }
- header {
-  text-align: center;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.leaderboard-link {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--card-bg);
-  padding: 8px 12px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  cursor: pointer;
-  transition: background 0.3s ease, transform 0.2s ease;
-}
-
-.leaderboard-link:hover {
-  background: var(--primary);
-  transform: scale(1.05);
-}
-
-.leaderboard-link .icon {
-  width: 20px;
-  height: 20px;
-  color: var(--primary-dark);
-  transition: color 0.3s ease;
-}
-
-.leaderboard-link span {
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--primary-dark);
-  transition: color 0.3s ease;
-}
-
-.leaderboard-link:hover .icon,
-.leaderboard-link:hover span {
-  color: #fff;
-}
-
-@media (max-width: 480px) {
-  .leaderboard-link {
-    top: 10px;
-    right: 10px;
-    padding: 6px 10px;
-    gap: 4px;
-  }
-
-  .leaderboard-link span {
-    font-size: 0.85rem;
-  }
-
-  .leaderboard-link .icon {
-    width: 18px;
-    height: 18px;
-  }
-}
-
-
   </style>
 </head>
 <body>
   <header>
     <img src="logo.png" alt="UCKGC Logo" class="logo" />
-    <h2>UCKGC Bible Games</h2>
+    <h2>UCKGC Arcade</h2>
     <div class="welcome">Welcome, <strong id="userName">Loading...</strong>!</div>
+    <div class="leaderboard-link" onclick="window.location.href='leaderboard.html'" title="View Leaderboard">
+      <i data-lucide="bar-chart-3" class="icon"></i>
+      <span>Leaderboard</span>
+    </div>
   </header>
-<div class="leaderboard-link" onclick="window.location.href='leaderboard.html'" title="View Leaderboard">
-  <i data-lucide="bar-chart-3" class="icon"></i>
-  <span>Leaderboard</span>
-</div>
-
 
   <section class="games-grid">
     <div class="card" onclick="window.location.href='bibblequiz.html'">
@@ -228,30 +213,29 @@
       <p>Test your knowledge of the Scriptures!</p>
     </div>
 
-   <div class="card" onclick="window.location.href='versematch.html'">
+    <div class="card" onclick="window.location.href='versematch.html'">
       <div class="icon" data-lucide="link-2"></div>
       <h3>Verse Match</h3>
       <p>Match Bible verses with references.</p>
     </div>
 
-    <div class="card" onclick="window.location.href='character-match.html'"> 
-  <div class="icon" data-lucide="link-2"></div>
-  <h3>Bible Character Match</h3>
-  <p>Match Bible characters to the correct verses.</p>
-</div>
+    <div class="card" onclick="window.location.href='character-match.html'">
+      <div class="icon" data-lucide="users"></div>
+      <h3>Bible Character Match</h3>
+      <p>Match Bible characters to the correct verses.</p>
+    </div>
 
+    <div class="card" onclick="window.location.href='biblepuzzle.html'">
+      <div class="icon" data-lucide="type"></div>
+      <h3>Bible Word Challenge</h3>
+      <p>Guess the hidden Bible words using clues.</p>
+    </div>
 
-     <div class="card" onclick="window.location.href='biblepuzzle.html'">
-  <div class="icon" data-lucide="type"></div>
-  <h3>Bible Word Challenge</h3>
-  <p>Guess the hidden Bible words using clues.</p>
-</div>
-
-<div class="card" onclick="alert('Coming Soon: Verse Shuffle!')">
-  <div class="icon" data-lucide="shuffle"></div>
-  <h3>Verse Shuffle</h3>
-  <p>Arrange Bible verses in the correct order.</p>
-</div>
+    <div class="card" onclick="alert('Coming Soon: Verse Shuffle!')">
+      <div class="icon" data-lucide="shuffle"></div>
+      <h3>Verse Shuffle</h3>
+      <p>Arrange Bible verses in the correct order.</p>
+    </div>
 
     <div class="card" onclick="alert('Coming Soon: Books Order!')">
       <div class="icon" data-lucide="list-ordered"></div>
@@ -259,11 +243,11 @@
       <p>Put the Bible books in correct order.</p>
     </div>
   </section>
- 
+
   <button class="logout-btn" onclick="logout()">Logout</button>
 
   <footer>
-    Developed by <strong>Noel Respicio</strong> © 2025
+    🎮 Developed by <strong>Noel Respicio</strong> © 2025
   </footer>
 
   <script>
@@ -280,16 +264,5 @@
       window.location.href = "index.html";
     }
   </script>
- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8377874433999473"
-     crossorigin="anonymous"></script>
-<ins class="adsbygoogle"
-     style="display:block; text-align:center;"
-     data-ad-layout="in-article"
-     data-ad-format="fluid"
-     data-ad-client="ca-pub-8377874433999473"
-     data-ad-slot="2736022081"></ins>
-<script>
-     (adsbygoogle = window.adsbygoogle || []).push({});
-</script>
 </body>
 </html>
