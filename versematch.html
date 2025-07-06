@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -121,7 +122,7 @@
   <div id="feedbackText" class="feedback-text hidden"></div>
 </div>
 
-<!-- ✅ Moved OUTSIDE -->
+<!-- Result Screen -->
 <div class="result-box" id="resultBox" style="display: none;">
   <h2>🎉 Game Over!</h2>
   <p id="finalScore"></p>
@@ -153,8 +154,9 @@
   const userId = user.id;
   const fullName = user.user_metadata.full_name || user.email;
 
+  // Your verseData array here (shortened for readability)
   const verseData = [
-  { verse: "I can do all things through Christ who strengthens me", reference: "Philippians 4:13" },
+    { verse: "I can do all things through Christ who strengthens me", reference: "Philippians 4:13" },
   { verse: "The Lord is my shepherd I shall not want", reference: "Psalm 23:1" },
   { verse: "Trust in the Lord with all your heart and lean not on your own understanding", reference: "Proverbs 3:5" },
   { verse: "In the beginning God created the heavens and the earth", reference: "Genesis 1:1" },
@@ -278,7 +280,7 @@
     feedbackText.classList.add("hidden");
     const item = shuffled[currentIndex];
     isVerseShown = Math.random() < 0.5;
-    verseEl.textContent = isVerseShown ? "${item.verse}" : item.reference;
+    verseEl.textContent = isVerseShown ? item.verse : item.reference;
 
     const options = shuffle([
       isVerseShown ? item.reference : item.verse,
@@ -298,6 +300,8 @@
   function handleSelect(selected, item) {
     const correct = isVerseShown ? item.reference : item.verse;
     if (selected === correct) {
+      correctSound.pause();
+      correctSound.currentTime = 0;
       correctSound.play();
       feedbackText.textContent = "✅ Correct!";
       feedbackText.className = "feedback-text correct-text";
@@ -310,8 +314,10 @@
         setTimeout(endGame, 1000);
       }
     } else {
+      wrongSound.pause();
+      wrongSound.currentTime = 0;
       wrongSound.play();
-      feedbackText.innerHTML = ❌ Wrong! Correct: <strong>${correct}</strong>;
+      feedbackText.innerHTML = `❌ Wrong! Correct: <strong>${correct}</strong>`;
       feedbackText.className = "feedback-text wrong-text";
       feedbackText.classList.remove("hidden");
       setTimeout(endGame, 2000);
@@ -323,7 +329,7 @@
     bgMusic.currentTime = 0;
     gameBox.style.display = "none";
     resultBox.style.display = "block";
-    finalScoreEl.textContent = You scored ${score} out of ${shuffled.length};
+    finalScoreEl.textContent = `You scored ${score} out of ${shuffled.length}`;
 
     const { data: existing } = await supabase
       .from("versematch_leaderboard")
@@ -356,7 +362,7 @@
 
     leaderboardEl.innerHTML = "";
     [...uniqueUsers.entries()].slice(0, 5).forEach(([name, score]) => {
-      leaderboardEl.innerHTML += <li><strong>${name}</strong>: ${score}</li>;
+      leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
     });
   }
 
@@ -386,3 +392,4 @@
 
 </body>
 </html>
+
