@@ -455,7 +455,12 @@
   const input = document.getElementById("chatText");
 
   function toggleChatbox() {
-    document.getElementById("chatbox").classList.toggle("hidden");
+  setTimeout(() => {
+  if (!document.getElementById("chatbox").classList.contains("hidden")) {
+    input.focus();
+  }
+}, 100);
+
   }
 
   window.toggleChatbox = toggleChatbox;
