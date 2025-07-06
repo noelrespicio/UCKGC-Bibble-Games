@@ -319,61 +319,61 @@
         { question: "What is the shortest verse in the Bible?", options: ["Jesus wept.", "God is love.", "Pray without ceasing.", "Love your neighbor."], answer: "Jesus wept." },
     ];
 
-    function shuffle(array) {
-      return array.sort(() => Math.random() - 0.5);
-    }
+  function shuffle(array) {
+  return array.sort(() => Math.random() - 0.5);
+}
 
-    let quizData = shuffle([...allQuestions]);
-    let currentQuestion = 0;
-    let score = 0;
-    let timer;
-    let timeLeft = 15;
+let quizData = shuffle([...allQuestions]);
+let currentQuestion = 0;
+let score = 0;
+let timer;
+let timeLeft = 15;
 
-    const questionEl = document.getElementById("question");
-    const optionsEl = document.getElementById("options");
-    const timerEl = document.getElementById("timer");
-    const quizBox = document.getElementById("quizBox");
-    const resultBox = document.getElementById("resultBox");
-    const leaderboardEl = document.getElementById("leaderboard");
-    const wrongText = document.getElementById("wrongAnswer");
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const timerEl = document.getElementById("timer");
+const quizBox = document.getElementById("quizBox");
+const resultBox = document.getElementById("resultBox");
+const leaderboardEl = document.getElementById("leaderboard");
+const wrongText = document.getElementById("wrongAnswer");
 
-    function startTimer() {
-      timeLeft = 15;
-      timerEl.textContent = ⏳ ${timeLeft} seconds;
-      timer = setInterval(() => {
-        timeLeft--;
-        timerEl.textContent = ⏳ ${timeLeft} seconds;
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          timesUpSound.play();
-          wrongText.innerHTML = ⏱️ Time's up!;
-          wrongText.style.display = "block";
-          setTimeout(endQuiz, 2000);
-        }
-      }, 1000);
-    }
-
-    function loadQuestion() {
+function startTimer() {
+  timeLeft = 15;
+  timerEl.textContent = `⏳ ${timeLeft} seconds`;
+  timer = setInterval(() => {
+    timeLeft--;
+    timerEl.textContent = `⏳ ${timeLeft} seconds`;
+    if (timeLeft <= 0) {
       clearInterval(timer);
-      const q = quizData[currentQuestion];
-      questionEl.textContent = Q${currentQuestion + 1}: ${q.question};
-      optionsEl.innerHTML = "";
-      wrongText.style.display = "none";
-      shuffle(q.options).forEach(option => {
-        const btn = document.createElement("button");
-        btn.textContent = option;
-        btn.className = "option-btn";
-        btn.onclick = () => selectAnswer(option, q.answer);
-        optionsEl.appendChild(btn);
-      });
-      startTimer();
+      timesUpSound.play();
+      wrongText.innerHTML = `⏱️ Time's up!`;
+      wrongText.style.display = "block";
+      setTimeout(endQuiz, 2000);
     }
+  }, 1000);
+}
 
-   async function selectAnswer(selected, correct) {
+function loadQuestion() {
+  clearInterval(timer);
+  const q = quizData[currentQuestion];
+  questionEl.textContent = `Q${currentQuestion + 1}: ${q.question}`;
+  optionsEl.innerHTML = "";
+  wrongText.style.display = "none";
+  shuffle(q.options).forEach(option => {
+    const btn = document.createElement("button");
+    btn.textContent = option;
+    btn.className = "option-btn";
+    btn.onclick = () => selectAnswer(option, q.answer);
+    optionsEl.appendChild(btn);
+  });
+  startTimer();
+}
+
+async function selectAnswer(selected, correct) {
   clearInterval(timer);
   if (selected === correct) {
     correctSound.play();
-    wrongText.innerHTML = ✅ Correct!;
+    wrongText.innerHTML = `✅ Correct!`;
     wrongText.style.display = "block";
     score++;
     currentQuestion++;
@@ -387,70 +387,72 @@
     }
   } else {
     wrongSound.play();
-    wrongText.innerHTML = ❌ Wrong! Correct: <span style="color:var(--primary-dark);">${correct}</span>;
+    wrongText.innerHTML = `❌ Wrong! Correct: <span style="color:var(--primary-dark);">${correct}</span>`;
     wrongText.style.display = "block";
     setTimeout(endQuiz, 2000);
   }
 }
 
+async function endQuiz() {
+  clearInterval(timer);
+  quizBox.style.display = "none";
+  resultBox.style.display = "block";
+  document.getElementById("finalScore").textContent = `You scored ${score} out of ${quizData.length}`;
 
-    async function endQuiz() {
-      clearInterval(timer);
-      quizBox.style.display = "none";
-      resultBox.style.display = "block";
-      document.getElementById("finalScore").textContent = You scored ${score} out of ${quizData.length};
+  const { data: existing } = await supabase
+    .from("biblequiz_leaderboard")
+    .select("id, score")
+    .eq("user_id", userId)
+    .maybeSingle();
 
-      const { data: existing } = await supabase
+  if (existing) {
+    if (score > existing.score) {
+      await supabase
         .from("biblequiz_leaderboard")
-        .select("id, score")
-        .eq("user_id", userId)
-        .maybeSingle();
-
-      if (existing) {
-        if (score > existing.score) {
-          await supabase
-            .from("biblequiz_leaderboard")
-            .update({ score: score })
-            .eq("id", existing.id);
-        }
-      } else {
-        await supabase
-          .from("biblequiz_leaderboard")
-          .insert([{ user_id: userId, name: fullName, score: score }]);
-      }
-
-      const { data: topScores } = await supabase
-        .from("biblequiz_leaderboard")
-        .select("name, score")
-        .order("score", { ascending: false });
-
-      const uniqueUsers = new Map();
-      topScores.forEach(row => {
-        if (!uniqueUsers.has(row.name)) {
-          uniqueUsers.set(row.name, row.score);
-        }
-      });
-
-      leaderboardEl.innerHTML = "";
-      [...uniqueUsers.entries()]
-        .slice(0, 5)
-        .forEach(([name, score]) => {
-          leaderboardEl.innerHTML += <li><strong>${name}</strong>: ${score}</li>;
-        });
+        .update({ score: score })
+        .eq("id", existing.id);
     }
+  } else {
+    await supabase
+      .from("biblequiz_leaderboard")
+      .insert([{ user_id: userId, name: fullName, score: score }]);
+  }
 
-    document.getElementById("tryAgainBtn").addEventListener("click", () => {
-      currentQuestion = 0;
-      score = 0;
-      quizData = shuffle([...allQuestions]);
-      quizBox.style.display = "block";
-      resultBox.style.display = "none";
-      loadQuestion();
+  const { data: topScores } = await supabase
+    .from("biblequiz_leaderboard")
+    .select("name, score")
+    .order("score", { ascending: false });
+
+  const uniqueUsers = new Map();
+  topScores.forEach(row => {
+    if (!uniqueUsers.has(row.name)) {
+      uniqueUsers.set(row.name, row.score);
+    }
+  });
+
+  leaderboardEl.innerHTML = "";
+  [...uniqueUsers.entries()]
+    .slice(0, 5)
+    .forEach(([name, score]) => {
+      leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
     });
+}
+
+// Event listeners
+document.getElementById("tryAgainBtn").addEventListener("click", () => {
+  currentQuestion = 0;
+  score = 0;
+  quizData = shuffle([...allQuestions]);
+  quizBox.style.display = "block";
+  resultBox.style.display = "none";
+  loadQuestion();
+});
+
 document.getElementById("exitBtn").addEventListener("click", () => {
   window.location.href = "dashboard.html";
 });
-    quizBox.style.display = "none";
+
+quizBox.style.display = "none";
 resultBox.style.display = "none";
 document.getElementById("introBox").style.display = "block";
 
