@@ -7,7 +7,7 @@
   <title>UCKGC Arcade</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
- <style>
+  <style>
     :root {
       --primary: #ff5e57;
       --secondary: #ffbd69;
@@ -45,14 +45,13 @@
       margin-bottom: 10px;
     }
 
-   h2 {
-  font-family: 'Arial Narrow', Arial, sans-serif;
-  font-size: 1.6rem;
-  color: var(--primary);
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
+    h2 {
+      font-family: 'Arial Narrow', Arial, sans-serif;
+      font-size: 1.6rem;
+      color: var(--primary);
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
 
     .welcome {
       font-size: 0.9rem;
@@ -175,108 +174,111 @@
         font-size: 0.85rem;
       }
     }
-   #chat-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--primary);
-  color: white;
-  width: 50px;
-  height: 50px;
-  font-size: 1.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 9999;
-}
 
-#chatbox.hidden {
-  display: none;
-}
+    #chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 9999;
+    }
 
-#chatbox {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  width: 280px;
-  background: white;
-  border: 2px solid var(--primary);
-  border-radius: 10px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-  z-index: 9999;
-  font-size: 0.85rem;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+    #chatbox.hidden {
+      display: none;
+    }
 
-#chat-header {
-  background: var(--primary);
-  color: white;
-  padding: 10px;
-  text-align: center;
-  font-weight: bold;
-}
+    #chatbox {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 280px;
+      max-width: 90%;
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      z-index: 9999;
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
 
-#chat-messages {
-  height: 180px;
-  overflow-y: auto;
-  padding: 10px;
-  background: #f9f9f9;
-  flex-grow: 1;
-}
+    #chat-header {
+      background: var(--primary);
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+    }
 
-#chat-input {
-  display: flex;
-  border-top: 1px solid #ddd;
-}
+    #chat-messages {
+      height: 180px;
+      overflow-y: auto;
+      padding: 10px;
+      background: #f9f9f9;
+      flex-grow: 1;
+    }
 
-#chat-input input {
-  flex: 1;
-  border: none;
-  padding: 8px;
-  font-size: 0.9rem;
-}
+    #chat-input {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
 
-#chat-input button {
-  background: var(--primary);
-  border: none;
-  color: white;
-  padding: 8px 12px;
-  cursor: pointer;
-  font-weight: bold;
-}
-.message {
-  margin-bottom: 6px;
-  padding: 6px 10px;
-  border-radius: 8px;
-  max-width: 80%;
-  word-wrap: break-word;
-}
+    #chat-input input {
+      flex: 1;
+      border: none;
+      padding: 8px;
+      font-size: 0.9rem;
+    }
 
-.message.self {
-  background: var(--primary);
-  color: white;
-  align-self: flex-end;
-  margin-left: auto;
-}
+    #chat-input button {
+      background: var(--primary);
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
 
-.message.other {
-  background: #eee;
-  color: #333;
-}
+    .message {
+      margin-bottom: 6px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      max-width: 80%;
+      word-wrap: break-word;
+      display: inline-block;
+    }
 
-#typing-indicator {
-  padding: 5px 10px;
-  font-size: 0.8rem;
-  color: #888;
-  font-style: italic;
-}
+    .message.self {
+      background: var(--primary);
+      color: white;
+      align-self: flex-end;
+      margin-left: auto;
+    }
 
+    .message.other {
+      background: #eee;
+      color: #333;
+    }
 
+    #typing-indicator {
+      padding: 5px 10px;
+      font-size: 0.8rem;
+      color: #888;
+      font-style: italic;
+      text-align: left;
+    }
   </style>
 </head>
 <body>
