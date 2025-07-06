@@ -391,24 +391,24 @@
 
 <div id="chat-toggle" onclick="toggleChatbox()">💬</div>
 
-<div id="chatbox" class="hidden">
-  <div id="chat-header">💬 Chat Room</div>
-  <div id="chat-messages"></div>
-  <div id="chat-input">
-    <select id="emojiPicker" onchange="appendEmoji(this.value)" style="font-size: 1.2rem; border: none; background: transparent; cursor: pointer;">
-  <option value="">😊</option>
-  <option value="😀">😀</option>
-  <option value="😂">😂</option>
-  <option value="😇">😇</option>
-  <option value="🙏">🙏</option>
-  <option value="🎉">🎉</option>
-  <option value="📖">📖</option>
-  <option value="✝️">✝️</option>
-</select>
-
-    <input type="text" id="chatText" placeholder="Type a message..." />
-    <button onclick="sendMessage()">Send</button>
-  </div>
+ <div id="chat-toggle" onclick="toggleChatbox()">💬</div>
+  <div id="chatbox" class="hidden">
+    <div id="chat-header">💬 Chat Room</div>
+    <div id="chat-messages"></div>
+    <div id="chat-input">
+      <select id="emojiPicker" onchange="appendEmoji(this.value)">
+        <option value="">😊</option>
+        <option value="😀">😀</option>
+        <option value="😂">😂</option>
+        <option value="😇">😇</option>
+        <option value="🙏">🙏</option>
+        <option value="🎉">🎉</option>
+        <option value="📖">📖</option>
+        <option value="✝️">✝️</option>
+      </select>
+      <input type="text" id="chatText" placeholder="Type a message..." />
+      <button>Send</button>
+    </div>
 </div>
 
 
@@ -438,133 +438,111 @@
 </script>
 
 <script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-  const supabase = createClient(
-    'https://wlthlwxcmltwescezjlk.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-  );
+    const supabase = createClient(
+      'https://wlthlwxcmltwescezjlk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+    );
 
-  const { data: sessionData } = await supabase.auth.getSession();
-  const session = sessionData.session;
-  const user = session?.user;
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    const user = session?.user;
 
-  if (!user) window.location.href = "index.html";
+    if (!user) {
+      window.location.href = "index.html";
+    } else {
+      document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
+    }
 
-  const messagesBox = document.getElementById("chat-messages");
-  const input = document.getElementById("chatText");
+    const messagesBox = document.getElementById("chat-messages");
+    const input = document.getElementById("chatText");
 
-  function toggleChatbox() {
-  setTimeout(() => {
-  if (!document.getElementById("chatbox").classList.contains("hidden")) {
-    input.focus();
-  }
-}, 100);
+    function toggleChatbox() {
+      const chatbox = document.getElementById("chatbox");
+      chatbox.classList.toggle("hidden");
+      if (!chatbox.classList.contains("hidden")) {
+        setTimeout(() => input.focus(), 100);
+      }
+    }
 
-  }
+    window.toggleChatbox = toggleChatbox;
 
-  window.toggleChatbox = toggleChatbox;
+    function renderMessage(msg) {
+      const isSelf = msg.user_id === user.id;
+      const name = isSelf ? "You" : (msg.profiles?.full_name || "Unknown");
+      const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-function renderMessage(msg) {
-  const isSelf = msg.user_id === user.id;
-  const name = isSelf ? "You" : (msg.profiles?.full_name || "Unknown");
-  const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const bubble = document.createElement("div");
+      bubble.className = `chat-bubble ${isSelf ? 'you' : 'other'}`;
+      bubble.innerHTML = `
+        <div><strong>${name}</strong></div>
+        <div>${msg.message}</div>
+        <div class="chat-meta">${time}</div>
+      `;
+      messagesBox.appendChild(bubble);
+    }
 
-  const bubble = document.createElement("div");
-  bubble.className = `chat-bubble ${isSelf ? 'you' : 'other'}`;
+    async function loadMessages() {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('message, created_at, user_id, profiles (full_name)')
+        .order('created_at', { ascending: true });
 
-  bubble.innerHTML = `
-    <div><strong>${name}</strong></div>
-    <div>${msg.message}</div>
-    <div class="chat-meta">${time}</div>
-  `;
+      if (!error && data) {
+        messagesBox.innerHTML = data.length === 0 ? "<em>No messages yet. Be the first to chat!</em>" : "";
+        data.forEach(renderMessage);
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+      }
+    }
 
-  messagesBox.appendChild(bubble);
-}
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
 
+      await supabase.from('chat_messages').insert({
+        user_id: user.id,
+        message: text
+      });
 
- const msgContainer = document.createElement("div");
-msgContainer.style.marginBottom = "10px";
-msgContainer.style.textAlign = isSelf ? "right" : "left";
+      input.value = '';
+    }
 
-
-
-    msgContainer.innerHTML = `
-      <div style="
-        display: inline-block;
-        background: ${isSelf ? '#d1e7ff' : '#f1f1f1'};
-        padding: 8px 12px;
-        border-radius: 12px;
-        max-width: 75%;
-        font-size: 0.85rem;
-      ">
-        <strong>${name}</strong><br/>
-        ${msg.message}
-        <div style="font-size: 0.7rem; color: gray; text-align: right;">${time}</div>
-      </div>
-    `;
-
-    messagesBox.appendChild(msgContainer);
-  }
-
-  async function loadMessages() {
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .select('message, created_at, user_id, profiles (full_name)')
-      .order('created_at', { ascending: true });
-
-  if (!error && data) {
-  messagesBox.innerHTML = data.length === 0 ? "<em>No messages yet. Be the first to chat!</em>" : "";
-  data.forEach(renderMessage);
-  messagesBox.scrollTop = messagesBox.scrollHeight;
-}
-
-  }
-
-  async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    await supabase.from('chat_messages').insert({
-      user_id: user.id,
-      message: text
+    document.querySelector("#chat-input button").addEventListener("click", sendMessage);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
     });
 
-    input.value = '';
-  }
+    supabase
+      .channel('chat-room')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'chat_messages'
+      }, payload => {
+        renderMessage(payload.new);
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+      })
+      .subscribe();
 
-  document.querySelector("#chat-input button").addEventListener("click", sendMessage);
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
-  });
+    loadMessages();
 
-  // Real-time chat
-  supabase
-    .channel('chat-room')
-    .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'chat_messages'
-    }, payload => {
-      renderMessage(payload.new);
-      messagesBox.scrollTop = messagesBox.scrollHeight;
-    })
-    .subscribe();
+    window.logout = async function () {
+      await supabase.auth.signOut();
+      alert("👋 Logged out successfully!");
+      window.location.href = "index.html";
+    };
+  </script>
 
-  // Set user display name
-  document.getElementById('userName').textContent =
-    user.user_metadata?.full_name || user.email;
-
-  // Load existing messages
-  loadMessages();
-
-  // Logout function
-  window.logout = async function () {
-    await supabase.auth.signOut();
-    alert("👋 Logged out successfully!");
-    window.location.href = "index.html";
-  };
-</script>
+  <script>
+    window.appendEmoji = function (emoji) {
+      if (!emoji) return;
+      const input = document.getElementById("chatText");
+      input.value += emoji;
+      document.getElementById("emojiPicker").value = "";
+      input.focus();
+    };
+  </script>
 <script>
   window.appendEmoji = function (emoji) {
     if (!emoji) return;
