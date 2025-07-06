@@ -4,17 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arcade Bible Quiz | UCKGC</title>
-  <style>
+ <style>
     :root {
-      --primary: #00cc99;
-      --danger: #ff4d4d;
-      --background: #e6f7ff;
+      --primary: #00bcd4;
+      --danger: #ff5252;
+      --background: #fffde7;
       --card-bg: #ffffff;
+      --accent: #ffd54f;
+      --highlight: #ff80ab;
     }
     body {
       font-family: 'Arial Narrow', sans-serif;
       background: var(--background);
-      color: #000;
+      color: #212121;
       margin: 0;
       padding: 16px;
       text-align: center;
@@ -30,44 +32,48 @@
       margin: 0 auto;
       padding: 28px;
       border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0, 204, 153, 0.3);
-      transition: transform 0.3s ease;
+      box-shadow: 0 0 24px rgba(255, 204, 128, 0.5);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     .game-box:hover, .result-box:hover, .intro-box:hover {
       transform: scale(1.02);
+      box-shadow: 0 0 32px rgba(255, 171, 64, 0.7);
     }
     h2 {
       color: var(--primary);
       margin-bottom: 16px;
-      font-size: 1.6rem;
+      font-size: 1.7rem;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
     #verse {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       margin-bottom: 20px;
       font-style: italic;
+      color: var(--highlight);
     }
     .option-btn {
-      background: var(--primary);
+      background: linear-gradient(90deg, #00c6ff, #ffb347);
       color: white;
       border: none;
       width: 100%;
       margin: 8px 0;
       padding: 14px;
-      font-size: 0.9rem;
+      font-size: 1rem;
       border-radius: 12px;
       cursor: pointer;
-      transition: background 0.3s ease, transform 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.1);
     }
     .option-btn:hover {
-      background: #00b386;
-      transform: scale(1.02);
+      transform: scale(1.05);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.25);
     }
     .exit-btn {
-      background: #ffa600;
-      color: white;
+      background: linear-gradient(90deg, #ffa726, #fdd835);
+      color: #000;
     }
     .exit-btn:hover {
-      background: #cc8400;
+      background: #ffca28;
     }
     .feedback-text {
       font-weight: bold;
@@ -75,7 +81,7 @@
       font-size: 1rem;
     }
     .correct-text {
-      color: limegreen;
+      color: #4caf50;
     }
     .wrong-text {
       color: var(--danger);
@@ -87,11 +93,11 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 12px;
-      font-size: 0.85rem;
+      font-size: 0.9rem;
     }
     #timerBar {
-      height: 12px;
-      background: lime;
+      height: 14px;
+      background: linear-gradient(90deg, #69f0ae, #ffee58, #ff5252);
       width: 100%;
       border-radius: 6px;
       margin: 12px 0;
