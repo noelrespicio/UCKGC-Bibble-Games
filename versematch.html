@@ -6,10 +6,11 @@
   <title>Verse Match | UCKGC</title>
   <style>
     :root {
-      --primary: #00ffcc;
+      --primary: #00cc99;
       --danger: #ff4d4d;
-      --background: #f0f8ff;
+      --background: #e0f7fa;
       --card-bg: #ffffff;
+      --accent: #ffd54f;
     }
     body {
       font-family: 'Arial Narrow', sans-serif;
@@ -28,46 +29,54 @@
       max-width: 600px;
       width: 100%;
       margin: 0 auto;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px var(--primary);
+      padding: 28px;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 204, 153, 0.3);
+      transition: transform 0.3s ease;
+    }
+    .game-box:hover, .result-box:hover, .intro-box:hover {
+      transform: scale(1.02);
     }
     h2 {
       color: var(--primary);
       margin-bottom: 16px;
+      font-size: 1.6rem;
     }
     #verse {
-      font-size: 1rem;
+      font-size: 1.1rem;
       margin-bottom: 20px;
       font-style: italic;
     }
     .option-btn {
       background: var(--primary);
-      color: black;
+      color: white;
       border: none;
       width: 100%;
       margin: 8px 0;
-      padding: 12px;
-      font-size: 0.8rem;
-      border-radius: 10px;
+      padding: 14px;
+      font-size: 0.9rem;
+      border-radius: 12px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.2s ease;
     }
     .option-btn:hover {
-      background: #00ccb3;
+      background: #00b386;
+      transform: scale(1.02);
     }
     .exit-btn {
-      background: #ffa600;
+      background: var(--accent);
+      color: #000;
     }
     .exit-btn:hover {
-      background: #cc8400;
+      background: #ffb300;
     }
     .feedback-text {
       font-weight: bold;
       margin-top: 16px;
+      font-size: 1rem;
     }
     .correct-text {
-      color: lime;
+      color: limegreen;
     }
     .wrong-text {
       color: var(--danger);
@@ -79,14 +88,14 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 12px;
-      font-size: 0.8rem;
+      font-size: 0.85rem;
     }
     #timerBar {
-      height: 10px;
-      background: lime;
+      height: 12px;
+      background: linear-gradient(90deg, #00e676, #ffeb3b);
       width: 100%;
       border-radius: 6px;
-      margin: 10px 0;
+      margin: 12px 0;
       transition: width 1s linear;
     }
   </style>
