@@ -1,4 +1,3 @@
-<!-- ✂️ COPY AND PASTE INTO YOUR FILE -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,6 +10,7 @@
       --primary-dark: #1b4f72;
       --bg: #f0f8ff;
     }
+
     body {
       font-family: 'Segoe UI', sans-serif;
       background: var(--bg);
@@ -22,6 +22,7 @@
       justify-content: center;
       min-height: 100vh;
     }
+
     .game-box, .result-box {
       background: #fff;
       max-width: 600px;
@@ -31,28 +32,18 @@
       border-radius: 16px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.1);
     }
-    .intro-box {
-      background: #fff;
-      max-width: 500px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-    }
+
     h2 {
       color: var(--primary);
       margin-bottom: 16px;
     }
+
     #verse {
       font-size: 1.1rem;
       margin-bottom: 20px;
       font-style: italic;
     }
+
     .option-btn {
       background: var(--primary);
       color: #fff;
@@ -65,36 +56,38 @@
       cursor: pointer;
       transition: background 0.3s ease;
     }
+
     .option-btn:hover {
       background: var(--primary-dark);
     }
-    .exit-btn {
-      background: #ffa600;
-    }
-    .exit-btn:hover {
-      background: #cc8400;
-    }
+
     .feedback-text {
       font-weight: bold;
       margin-top: 16px;
     }
+
     .correct-text {
       color: green;
     }
+
     .wrong-text {
       color: red;
     }
+
     .hidden {
       display: none;
     }
+
     ul {
       padding: 0;
       list-style: none;
     }
+
     li {
       font-weight: bold;
       margin: 4px 0;
     }
+
     a {
       margin-top: 16px;
       display: inline-block;
@@ -102,11 +95,64 @@
       color: var(--primary);
       text-decoration: none;
     }
+
+    @media (max-width: 480px) {
+      .game-box, .result-box {
+        padding: 20px;
+      }
+
+      #verse {
+        font-size: 1rem;
+      }
+
+      .option-btn {
+        font-size: 0.95rem;
+        padding: 12px;
+      }
+    }
+    .intro-box {
+  background: var(--card-bg);
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  text-align: center;
+}
+
+.exit-btn {
+  background: #ffa600;
+  color: #fff;
+}
+
+.exit-btn:hover {
+  background: #cc8400;
+}
+
+@media (max-width: 480px) {
+  .intro-box {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .option-btn {
+    font-size: 0.95rem;
+    padding: 12px;
+  }
+}
+
   </style>
 </head>
 <body>
-
-<!-- Intro Screen -->
 <div class="intro-box" id="introBox">
   <h2>📜 Welcome to Verse Match!</h2>
   <p>Arrange the Bible verses in the correct order.</p>
@@ -114,50 +160,43 @@
   <button id="exitBtn" class="option-btn exit-btn">🚪 Exit</button>
 </div>
 
-<!-- Game Screen -->
-<!-- Game Screen -->
-<div class="game-box" id="gameBox" style="display: none;">
-  <h2>Match the Verse!</h2>
-  <div id="verse"></div>
-  <div id="options"></div>
-  <div id="feedbackText" class="feedback-text hidden"></div>
-</div>
+  <div class="game-box" id="gameBox">
+    <h2>Verse Match</h2>
+    <div id="verse">Loading...</div>
+    <div id="options"></div>
+    <p id="feedbackText" class="feedback-text hidden"></p>
+  </div>
 
-<!-- ✅ Moved OUTSIDE -->
-<div class="result-box" id="resultBox" style="display: none;">
-  <h2>🎉 Game Over!</h2>
-  <p id="finalScore"></p>
-  <h3>🏆 Leaderboard</h3>
-  <ul id="leaderboard"></ul>
-  <button id="tryAgainBtn" class="option-btn">🔁 Try Again</button>
-  <a href="dashboard.html">🔙 Back to Dashboard</a>
-</div>
-</div>
+  <div class="result-box" id="resultBox" style="display: none;">
+    <h2>🎉 Game Over!</h2>
+    <p id="finalScore"></p>
+    <h3>🏆 Leaderboard</h3>
+    <ul id="leaderboard"></ul>
+    <button id="tryAgainBtn" class="option-btn">🔁 Try Again</button>
+    <a href="dashboard.html">🔙 Back to Dashboard</a>
+  </div>
 
-<!-- Sounds -->
-<audio id="correctSound" src="correct.mp4"></audio>
-<audio id="wrongSound" src="gameover.mp4"></audio>
-<audio id="bgMusic" src="bg-music.mp3" loop preload="auto"></audio>
+  <!-- Audio -->
+  <audio id="correctSound" src="correct.mp4"></audio>
+  <audio id="wrongSound" src="gameover.mp4"></audio>
 
-<!-- Game Logic -->
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-  const supabase = createClient(
-    'https://wlthlwxcmltwescezjlk.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-  );
+    const supabase = createClient(
+      'https://wlthlwxcmltwescezjlk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+    );
 
-  const { data: sessionData } = await supabase.auth.getSession();
-  const session = sessionData.session;
-  if (!session) window.location.href = "index.html";
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    if (!session) window.location.href = "index.html";
 
-  const user = session.user;
-  const userId = user.id;
-  const fullName = user.user_metadata.full_name || user.email;
+    const user = session.user;
+    const userId = user.id;
+    const fullName = user.user_metadata.full_name || user.email;
 
-  const verseData = [
-  { verse: "I can do all things through Christ who strengthens me", reference: "Philippians 4:13" },
+    const verseData = [  { verse: "I can do all things through Christ who strengthens me", reference: "Philippians 4:13" },
   { verse: "The Lord is my shepherd I shall not want", reference: "Psalm 23:1" },
   { verse: "Trust in the Lord with all your heart and lean not on your own understanding", reference: "Proverbs 3:5" },
   { verse: "In the beginning God created the heavens and the earth", reference: "Genesis 1:1" },
@@ -253,139 +292,134 @@
   { verse: "Be strong and do not give up", reference: "2 Chronicles 15:7" },
   { verse: "The Lord gives wisdom", reference: "Proverbs 2:6" },
   { verse: "Whatever is true, noble, right, pure, lovely—think about such things", reference: "Philippians 4:8" },
-  { verse: "Draw near to God and He will draw near to you", reference: "James 4:8" }
-  ];
+  { verse: "Draw near to God and He will draw near to you", reference: "James 4:8" }]; // keep your full verseData array here
 
-  const verseEl = document.getElementById("verse");
-  const optionsEl = document.getElementById("options");
-  const feedbackText = document.getElementById("feedbackText");
-  const correctSound = document.getElementById("correctSound");
-  const wrongSound = document.getElementById("wrongSound");
-  const resultBox = document.getElementById("resultBox");
-  const gameBox = document.getElementById("gameBox");
-  const leaderboardEl = document.getElementById("leaderboard");
-  const finalScoreEl = document.getElementById("finalScore");
-  const tryAgainBtn = document.getElementById("tryAgainBtn");
-  const bgMusic = document.getElementById("bgMusic");
+    const verseEl = document.getElementById("verse");
+    const optionsEl = document.getElementById("options");
+    const feedbackText = document.getElementById("feedbackText");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const resultBox = document.getElementById("resultBox");
+    const gameBox = document.getElementById("gameBox");
+    const leaderboardEl = document.getElementById("leaderboard");
+    const finalScoreEl = document.getElementById("finalScore");
+    const tryAgainBtn = document.getElementById("tryAgainBtn");
 
-  let currentIndex = 0;
-  let isVerseShown = true;
-  let shuffled = shuffle([...verseData]);
-  let score = 0;
+    let currentIndex = 0;
+    let isVerseShown = true;
+    let shuffled = shuffle([...verseData]);
+    let score = 0;
 
-  function shuffle(arr) {
-    return arr.sort(() => Math.random() - 0.5);
-  }
+    function shuffle(arr) {
+      return arr.sort(() => Math.random() - 0.5);
+    }
 
-  function loadItem() {
-    feedbackText.classList.add("hidden");
-    const item = shuffled[currentIndex];
-    isVerseShown = Math.random() < 0.5;
-    verseEl.textContent = isVerseShown ? `"${item.verse}"` : item.reference;
+    function loadItem() {
+      feedbackText.classList.add("hidden");
+      const item = shuffled[currentIndex];
 
-    const options = shuffle([
-      isVerseShown ? item.reference : item.verse,
-      ...shuffle(verseData.filter(v => v !== item)).slice(0, 3).map(v => isVerseShown ? v.reference : v.verse)
-    ]);
+      isVerseShown = Math.random() < 0.5;
+      verseEl.textContent = isVerseShown ? "${item.verse}" : item.reference;
 
-    optionsEl.innerHTML = "";
-    options.forEach(opt => {
-      const btn = document.createElement("button");
-      btn.textContent = opt;
-      btn.className = "option-btn";
-      btn.onclick = () => handleSelect(opt, item);
-      optionsEl.appendChild(btn);
-    });
-  }
+      const options = shuffle([
+        isVerseShown ? item.reference : item.verse,
+        ...shuffle(verseData.filter(v => v !== item)).slice(0, 3).map(v => isVerseShown ? v.reference : v.verse)
+      ]);
 
-  function handleSelect(selected, item) {
-    const correct = isVerseShown ? item.reference : item.verse;
-    if (selected === correct) {
-      correctSound.play();
-      feedbackText.textContent = "✅ Correct!";
-      feedbackText.className = "feedback-text correct-text";
-      feedbackText.classList.remove("hidden");
-      score++;
-      currentIndex++;
-      if (currentIndex < shuffled.length) {
-        setTimeout(loadItem, 1000);
+      optionsEl.innerHTML = "";
+      options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.className = "option-btn";
+        btn.onclick = () => handleSelect(opt, item);
+        optionsEl.appendChild(btn);
+      });
+    }
+
+    function handleSelect(selected, item) {
+      const correct = isVerseShown ? item.reference : item.verse;
+      if (selected === correct) {
+        correctSound.play();
+        feedbackText.textContent = "✅ Correct!";
+        feedbackText.className = "feedback-text correct-text";
+        feedbackText.classList.remove("hidden");
+        score++;
+        currentIndex++;
+        if (currentIndex < shuffled.length) {
+          setTimeout(loadItem, 1000);
+        } else {
+          setTimeout(endGame, 1000);
+        }
       } else {
-        setTimeout(endGame, 1000);
+        wrongSound.play();
+        feedbackText.innerHTML = ❌ Wrong! Correct: <strong>${correct}</strong>;
+        feedbackText.className = "feedback-text wrong-text";
+        feedbackText.classList.remove("hidden");
+        setTimeout(endGame, 2000);
       }
-    } else {
-      wrongSound.play();
-      feedbackText.innerHTML = `❌ Wrong! Correct: <strong>${correct}</strong>`;
-      feedbackText.className = "feedback-text wrong-text";
-      feedbackText.classList.remove("hidden");
-      setTimeout(endGame, 2000);
-    }
-  }
-
-  async function endGame() {
-    bgMusic.pause();
-    bgMusic.currentTime = 0;
-    gameBox.style.display = "none";
-    resultBox.style.display = "block";
-    finalScoreEl.textContent = `You scored ${score} out of ${shuffled.length}`;
-
-    const { data: existing } = await supabase
-      .from("versematch_leaderboard")
-      .select("id, score")
-      .eq("user_id", userId)
-      .maybeSingle();
-
-    if (existing && score > existing.score) {
-      await supabase
-        .from("versematch_leaderboard")
-        .update({ score })
-        .eq("id", existing.id);
-    } else if (!existing) {
-      await supabase
-        .from("versematch_leaderboard")
-        .insert([{ user_id: userId, name: fullName, score }]);
     }
 
-    const { data: topScores } = await supabase
-      .from("versematch_leaderboard")
-      .select("name, score")
-      .order("score", { ascending: false });
+    async function endGame() {
+      gameBox.style.display = "none";
+      resultBox.style.display = "block";
+      finalScoreEl.textContent = You scored ${score} out of ${shuffled.length};
 
-    const uniqueUsers = new Map();
-    topScores.forEach(row => {
-      if (!uniqueUsers.has(row.name)) {
-        uniqueUsers.set(row.name, row.score);
+      const { data: existing } = await supabase
+        .from("versematch_leaderboard")
+        .select("id, score")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (existing) {
+        if (score > existing.score) {
+          await supabase
+            .from("versematch_leaderboard")
+            .update({ score })
+            .eq("id", existing.id);
+        }
+      } else {
+        await supabase
+          .from("versematch_leaderboard")
+          .insert([{ user_id: userId, name: fullName, score }]);
       }
-    });
 
-    leaderboardEl.innerHTML = "";
-    [...uniqueUsers.entries()].slice(0, 5).forEach(([name, score]) => {
-      leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
-    });
-  }
+      const { data: topScores } = await supabase
+        .from("versematch_leaderboard")
+        .select("name, score")
+        .order("score", { ascending: false });
+
+      const uniqueUsers = new Map();
+      topScores.forEach(row => {
+        if (!uniqueUsers.has(row.name)) {
+          uniqueUsers.set(row.name, row.score);
+        }
+      });
+
+      leaderboardEl.innerHTML = "";
+      [...uniqueUsers.entries()].slice(0, 5).forEach(([name, score]) => {
+        leaderboardEl.innerHTML += <li><strong>${name}</strong>: ${score}</li>;
+      });
+    }
+
+    function resetGame() {
+      currentIndex = 0;
+      score = 0;
+      shuffled = shuffle([...verseData]);
+      resultBox.style.display = "none";
+      gameBox.style.display = "block";
+      loadItem();
+    }
 
   document.getElementById("playBtn").addEventListener("click", () => {
-    document.getElementById("introBox").style.display = "none";
-    gameBox.style.display = "block";
-    loadItem();
-    bgMusic.play();
-  });
+  document.getElementById("introBox").style.display = "none";
+  document.getElementById("gameContainer").style.display = "block"; // Or whatever your game div is
+});
 
-  tryAgainBtn.addEventListener("click", () => {
-    currentIndex = 0;
-    score = 0;
-    shuffled = shuffle([...verseData]);
-    resultBox.style.display = "none";
-    gameBox.style.display = "block";
-    loadItem();
-    bgMusic.play();
-  });
+document.getElementById("exitBtn").addEventListener("click", () => {
+  window.location.href = "dashboard.html";
+});
 
-  document.getElementById("exitBtn").addEventListener("click", () => {
-    bgMusic.pause();
-    bgMusic.currentTime = 0;
-    window.location.href = "dashboard.html";
-  });
-</script>
+  </script>
 
 </body>
 </html>
