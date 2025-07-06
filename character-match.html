@@ -429,10 +429,20 @@
       loadQuestion();
     });
 
-    bgMusic.volume = 0.3;
-    bgMusic.play().catch(() => {
-      document.body.addEventListener("click", () => bgMusic.play(), { once: true });
-    });
+bgMusic.volume = 0.3;
+bgMusic.load(); // preload for safety
+
+document.getElementById("playBtn").addEventListener("click", () => {
+  document.getElementById("introBox").style.display = "none";
+  quizBox.style.display = "block";
+  loadQuestion();
+
+  // Play background music after user interaction
+  bgMusic.play().catch(() => {
+    document.body.addEventListener("click", () => bgMusic.play(), { once: true });
+  });
+});
+
   </script>
 </body>
 </html>
