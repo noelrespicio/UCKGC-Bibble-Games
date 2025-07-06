@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -315,7 +314,7 @@
       const item = shuffled[currentIndex];
 
       isVerseShown = Math.random() < 0.5;
-      verseEl.textContent = isVerseShown ? `"${item.verse}"` : item.reference;
+      verseEl.textContent = isVerseShown ? "${item.verse}" : item.reference;
 
       const options = shuffle([
         isVerseShown ? item.reference : item.verse,
@@ -348,7 +347,7 @@
         }
       } else {
         wrongSound.play();
-        feedbackText.innerHTML = `❌ Wrong! Correct: <strong>${correct}</strong>`;
+        feedbackText.innerHTML = ❌ Wrong! Correct: <strong>${correct}</strong>;
         feedbackText.className = "feedback-text wrong-text";
         feedbackText.classList.remove("hidden");
         setTimeout(endGame, 2000);
@@ -358,7 +357,7 @@
     async function endGame() {
       gameBox.style.display = "none";
       resultBox.style.display = "block";
-      finalScoreEl.textContent = `You scored ${score} out of ${shuffled.length}`;
+      finalScoreEl.textContent = You scored ${score} out of ${shuffled.length};
 
       const { data: existing } = await supabase
         .from("versematch_leaderboard")
@@ -393,7 +392,7 @@
 
       leaderboardEl.innerHTML = "";
       [...uniqueUsers.entries()].slice(0, 5).forEach(([name, score]) => {
-        leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+        leaderboardEl.innerHTML += <li><strong>${name}</strong>: ${score}</li>;
       });
     }
 
@@ -419,4 +418,4 @@ document.getElementById("exitBtn").addEventListener("click", () => {
   </script>
 
 </body>
-</html>
+</html> 
