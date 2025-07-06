@@ -411,15 +411,15 @@
       loadItem();
     }
 
-    tryAgainBtn.addEventListener("click", resetGame);
-document.getElementById("playBtn").addEventListener("click", () => {
+  document.getElementById("playBtn").addEventListener("click", () => {
   document.getElementById("introBox").style.display = "none";
-  document.getElementById("gameContainer").style.display = "block";
-  loadItem(); // ← Call it here so the game logic starts after showing the game container
+  document.getElementById("gameContainer").style.display = "block"; // Or whatever your game div is
 });
+
 document.getElementById("exitBtn").addEventListener("click", () => {
   window.location.href = "dashboard.html";
 });
+
   </script>
 
 </body>
