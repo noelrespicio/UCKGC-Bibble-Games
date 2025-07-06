@@ -355,6 +355,10 @@
       window.location.href = "index.html";
     }
   </script>
+<script>
+  lucide.createIcons();
+</script>
+
 <script type="module">
   import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -367,14 +371,19 @@
   const session = sessionData.session;
   const user = session?.user;
 
+  if (!user) {
+    window.location.href = "index.html";
+  }
+
   const messagesBox = document.getElementById("chat-messages");
   const input = document.getElementById("chatText");
-  const sendBtn = document.getElementById("sendBtn");
+  const sendBtn = document.querySelector("#chat-input button");
 
   function toggleChatbox() {
-    const chatbox = document.getElementById("chatbox");
-    chatbox.classList.toggle("hidden");
+    document.getElementById("chatbox").classList.toggle("hidden");
   }
+
+  window.toggleChatbox = toggleChatbox;
 
   async function loadMessages() {
     const { data, error } = await supabase
@@ -386,10 +395,10 @@
       messagesBox.innerHTML = '';
       data.forEach(msg => {
         const isSelf = msg.user_id === user.id;
-        const name = msg.profiles?.full_name || 'Unknown';
+        const name = isSelf ? 'You' : (msg.profiles?.full_name || 'Unknown');
         const p = document.createElement('p');
         p.style.marginBottom = '6px';
-        p.innerHTML = `<strong>${isSelf ? 'You' : name}</strong>: ${msg.message}`;
+        p.innerHTML = `<strong>${name}:</strong> ${msg.message}`;
         messagesBox.appendChild(p);
       });
       messagesBox.scrollTop = messagesBox.scrollHeight;
@@ -406,25 +415,39 @@
     });
 
     input.value = '';
-    await loadMessages(); // optional refresh
   }
 
-  sendBtn.addEventListener('click', sendMessage);
-  input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') sendMessage();
+  sendBtn.addEventListener("click", sendMessage);
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") sendMessage();
   });
 
-  // Listen to new messages in real time
+  // Real-time subscription
   supabase.channel('chat-room')
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
       table: 'chat_messages'
-    }, loadMessages)
+    }, payload => {
+      loadMessages();
+    })
     .subscribe();
 
+  // Set user name
+  document.getElementById('userName').textContent =
+    user.user_metadata?.full_name || user.email;
+
+  // Load initial messages
   loadMessages();
+
+  // Logout function
+  window.logout = async function () {
+    await supabase.auth.signOut();
+    alert("👋 Logged out successfully!");
+    window.location.href = "index.html";
+  };
 </script>
+
 
 </body>
 </html>
