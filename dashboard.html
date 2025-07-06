@@ -1,4 +1,5 @@
-'<!DOCTYPE html>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -6,28 +7,7 @@
   <title>UCKGC Arcade</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-    const supabase = createClient(
-      'https://wlthlwxcmltwescezjlk.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-    );
-
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
-
-    if (!session) {
-      window.location.href = "index.html";
-    } else {
-      const user = session.user;
-      document.getElementById('userName').textContent =
-        user.user_metadata?.full_name || user.email;
-    }
-  </script>
-
-  <style>
+ <style>
     :root {
       --primary: #ff5e57;
       --secondary: #ffbd69;
@@ -285,6 +265,7 @@
   </header>
 
   <section class="games-grid">
+     <section class="games-grid">
     <div class="card" onclick="window.location.href='bibblequiz.html'">
       <div class="icon" data-lucide="book-open"></div>
       <h3>Bible Quiz</h3>
@@ -321,19 +302,16 @@
       <p>Put the Bible books in correct order.</p>
     </div>
   </section>
+  <div id="chat-toggle" onclick="toggleChatbox()">💬</div>
 
-<div id="chat-toggle" onclick="toggleChatbox()">💬</div>
-
-<div id="chatbox" class="hidden">
-  <div id="chat-header">💬 Chat Room</div>
-  <div id="chat-messages"></div>
-  <div id="chat-input">
-    <input type="text" id="chatText" placeholder="Type a message..." />
-    <button onclick="sendMessage()">Send</button>
+  <div id="chatbox" class="hidden">
+    <div id="chat-header">💬 Chat Room</div>
+    <div id="chat-messages"></div>
+    <div id="chat-input">
+      <input type="text" id="chatText" placeholder="Type a message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
   </div>
-</div>
-
-
 
   <button class="logout-btn" onclick="logout()">Logout</button>
 
@@ -343,111 +321,90 @@
 
   <script>
     lucide.createIcons();
+  </script>
 
-    async function logout() {
-      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-      const supabase = createClient(
-        'https://wlthlwxcmltwescezjlk.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-      );
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabase = createClient(
+      'https://wlthlwxcmltwescezjlk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+    );
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    const user = session?.user;
+
+    if (!user) {
+      window.location.href = "index.html";
+    }
+
+    document.getElementById('userName').textContent =
+      user.user_metadata?.full_name || user.email;
+
+    const messagesBox = document.getElementById("chat-messages");
+    const input = document.getElementById("chatText");
+    const sendBtn = document.querySelector("#chat-input button");
+
+    window.toggleChatbox = function () {
+      document.getElementById("chatbox").classList.toggle("hidden");
+    };
+
+    async function loadMessages() {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('message, created_at, user_id, profiles (full_name)')
+        .order('created_at', { ascending: true });
+
+      if (!error && data) {
+        messagesBox.innerHTML = '';
+        data.forEach(msg => {
+          const isSelf = msg.user_id === user.id;
+          const name = isSelf ? 'You' : (msg.profiles?.full_name || 'Unknown');
+          const p = document.createElement('p');
+          p.style.marginBottom = '6px';
+          p.innerHTML = `<strong>${name}:</strong> ${msg.message}`;
+          messagesBox.appendChild(p);
+        });
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+      }
+    }
+
+    window.sendMessage = async function () {
+      const text = input.value.trim();
+      if (!text) return;
+
+      await supabase.from('chat_messages').insert({
+        user_id: user.id,
+        message: text
+      });
+
+      input.value = '';
+    };
+
+    sendBtn.addEventListener("click", sendMessage);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    supabase.channel('chat-room')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'chat_messages'
+      }, payload => {
+        loadMessages();
+      })
+      .subscribe();
+
+    loadMessages();
+
+    window.logout = async function () {
       await supabase.auth.signOut();
       alert("👋 Logged out successfully!");
       window.location.href = "index.html";
-    }
+    };
   </script>
-<script>
-  lucide.createIcons();
-</script>
-
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-  const supabase = createClient(
-    'https://wlthlwxcmltwescezjlk.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-  );
-
-  const { data: sessionData } = await supabase.auth.getSession();
-  const session = sessionData.session;
-  const user = session?.user;
-
-  if (!user) {
-    window.location.href = "index.html";
-  }
-
-  const messagesBox = document.getElementById("chat-messages");
-  const input = document.getElementById("chatText");
-  const sendBtn = document.querySelector("#chat-input button");
-
-  function toggleChatbox() {
-    document.getElementById("chatbox").classList.toggle("hidden");
-  }
-
-  window.toggleChatbox = toggleChatbox;
-
-  async function loadMessages() {
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .select('message, created_at, user_id, profiles (full_name)')
-      .order('created_at', { ascending: true });
-
-    if (!error && data) {
-      messagesBox.innerHTML = '';
-      data.forEach(msg => {
-        const isSelf = msg.user_id === user.id;
-        const name = isSelf ? 'You' : (msg.profiles?.full_name || 'Unknown');
-        const p = document.createElement('p');
-        p.style.marginBottom = '6px';
-        p.innerHTML = <strong>${name}:</strong> ${msg.message};
-        messagesBox.appendChild(p);
-      });
-      messagesBox.scrollTop = messagesBox.scrollHeight;
-    }
-  }
-
-  async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
-
-    await supabase.from('chat_messages').insert({
-      user_id: user.id,
-      message: text
-    });
-
-    input.value = '';
-  }
-
-  sendBtn.addEventListener("click", sendMessage);
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
-  });
-
-  // Real-time subscription
-  supabase.channel('chat-room')
-    .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'chat_messages'
-    }, payload => {
-      loadMessages();
-    })
-    .subscribe();
-
-  // Set user name
-  document.getElementById('userName').textContent =
-    user.user_metadata?.full_name || user.email;
-
-  // Load initial messages
-  loadMessages();
-
-  // Logout function
-  window.logout = async function () {
-    await supabase.auth.signOut();
-    alert("👋 Logged out successfully!");
-    window.location.href = "index.html";
-  };
-</script>
-
-
 </body>
 </html>
+
