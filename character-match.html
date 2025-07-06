@@ -67,7 +67,7 @@
     <h3>🏆 Leaderboard</h3>
     <ul id="leaderboard"></ul>
     <button id="tryAgainBtn" class="option-btn">🔁 Try Again</button>
-    <a href="dashboard.html">🔙 Back to Dashboard</a>
+    <a href="dashboard.html">💙 Back to Dashboard</a>
   </div>
 
   <!-- Audio elements -->
@@ -81,7 +81,7 @@
 
     const supabase = createClient(
       'https://wlthlwxcmltwescezjlk.supabase.co',
-      'your-public-anon-key-here'
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
     );
 
     const { data: sessionData } = await supabase.auth.getSession();
@@ -93,7 +93,7 @@
     const fullName = user.user_metadata.full_name || user.email;
 
     const allQuestions = [
-    { question: 'Who is known as "The Baptist"?', options: ['Peter', 'Paul', 'John', 'James'], answer: 'John' },
+     { question: 'Who is known as "The Baptist"?', options: ['Peter', 'Paul', 'John', 'James'], answer: 'John' },
   { question: 'Who betrayed Jesus for 30 pieces of silver?', options: ['Peter', 'Judas', 'Thomas', 'Bartholomew'], answer: 'Judas' },
   { question: 'Who led the Israelites out of Egypt?', options: ['Moses', 'Aaron', 'Joshua', 'Caleb'], answer: 'Moses' },
   { question: 'Who killed Goliath with a sling?', options: ['Saul', 'David', 'Samuel', 'Jonathan'], answer: 'David' },
@@ -266,7 +266,7 @@
       document.getElementById("finalScore").textContent = `You scored ${score} out of ${quizData.length}`;
 
       const { data: existing } = await supabase
-        .from("biblequiz_leaderboard")
+        .from("biblecharacter_leaderboard")
         .select("id, score")
         .eq("user_id", userId)
         .maybeSingle();
@@ -274,18 +274,18 @@
       if (existing) {
         if (score > existing.score) {
           await supabase
-            .from("biblequiz_leaderboard")
+            .from("biblecharacter_leaderboard")
             .update({ score: score })
             .eq("id", existing.id);
         }
       } else {
         await supabase
-          .from("biblequiz_leaderboard")
+          .from("biblecharacter_leaderboard")
           .insert([{ user_id: userId, name: fullName, score: score }]);
       }
 
       const { data: topScores } = await supabase
-        .from("biblequiz_leaderboard")
+        .from("biblecharacter_leaderboard")
         .select("name, score")
         .order("score", { ascending: false });
 
@@ -323,7 +323,6 @@
       loadQuestion();
     });
 
-    // Music autoplay
     bgMusic.volume = 0.3;
     bgMusic.play().catch(() => {
       document.body.addEventListener("click", () => bgMusic.play(), { once: true });
