@@ -249,6 +249,32 @@
   cursor: pointer;
   font-weight: bold;
 }
+.message {
+  margin-bottom: 6px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
+.message.self {
+  background: var(--primary);
+  color: white;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.message.other {
+  background: #eee;
+  color: #333;
+}
+
+#typing-indicator {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  color: #888;
+  font-style: italic;
+}
 
 
   </style>
@@ -323,87 +349,133 @@
     lucide.createIcons();
   </script>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+ <script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-    const supabase = createClient(
-      'https://wlthlwxcmltwescezjlk.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-    );
+const supabase = createClient(
+  'https://wlthlwxcmltwescezjlk.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+);
 
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
-    const user = session?.user;
+const { data: sessionData } = await supabase.auth.getSession();
+const session = sessionData.session;
+const user = session?.user;
 
-    if (!user) {
-      window.location.href = "index.html";
-    }
+if (!user) window.location.href = "index.html";
 
-    document.getElementById('userName').textContent =
-      user.user_metadata?.full_name || user.email;
+document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
 
-    const messagesBox = document.getElementById("chat-messages");
-    const input = document.getElementById("chatText");
-    const sendBtn = document.querySelector("#chat-input button");
+const messagesBox = document.getElementById("chat-messages");
+const input = document.getElementById("chatText");
+const sendBtn = document.querySelector("#chat-input button");
 
-    window.toggleChatbox = function () {
-      document.getElementById("chatbox").classList.toggle("hidden");
-    };
+window.toggleChatbox = function () {
+  document.getElementById("chatbox").classList.toggle("hidden");
+};
 
-    async function loadMessages() {
-      const { data, error } = await supabase
-        .from('chat_messages')
-        .select('message, created_at, user_id, profiles (full_name)')
-        .order('created_at', { ascending: true });
+async function loadMessages() {
+  const { data, error } = await supabase
+    .from('chat_messages')
+    .select('message, created_at, user_id, profiles (full_name)')
+    .order('created_at', { ascending: true });
 
-      if (!error && data) {
-        messagesBox.innerHTML = '';
-        data.forEach(msg => {
-          const isSelf = msg.user_id === user.id;
-          const name = isSelf ? 'You' : (msg.profiles?.full_name || 'Unknown');
-          const p = document.createElement('p');
-          p.style.marginBottom = '6px';
-          p.innerHTML = `<strong>${name}:</strong> ${msg.message}`;
-          messagesBox.appendChild(p);
-        });
-        messagesBox.scrollTop = messagesBox.scrollHeight;
-      }
-    }
-
-    window.sendMessage = async function () {
-      const text = input.value.trim();
-      if (!text) return;
-
-      await supabase.from('chat_messages').insert({
-        user_id: user.id,
-        message: text
-      });
-
-      input.value = '';
-    };
-
-    sendBtn.addEventListener("click", sendMessage);
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") sendMessage();
+  if (!error && data) {
+    messagesBox.innerHTML = '';
+    data.forEach(msg => {
+      const isSelf = msg.user_id === user.id;
+      const name = isSelf ? 'You' : (msg.profiles?.full_name || 'Unknown');
+      const div = document.createElement('div');
+      div.classList.add('message', isSelf ? 'self' : 'other');
+      div.innerHTML = `<strong>${name}:</strong> ${msg.message}`;
+      messagesBox.appendChild(div);
     });
+    messagesBox.scrollTop = messagesBox.scrollHeight;
+  }
+}
 
-    supabase.channel('chat-room')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'chat_messages'
-      }, payload => {
-        loadMessages();
-      })
-      .subscribe();
+window.sendMessage = async function () {
+  const text = input.value.trim();
+  if (!text) return;
 
+  await supabase.from('chat_messages').insert({
+    user_id: user.id,
+    message: text
+  });
+
+  input.value = '';
+  await setTyping(false);
+};
+
+sendBtn.addEventListener("click", sendMessage);
+
+input.addEventListener("keydown", async (e) => {
+  if (e.key === "Enter") {
+    sendMessage();
+  } else {
+    await setTyping(true);
+    resetTypingTimeout();
+  }
+});
+
+// Typing indicator logic
+let typingTimeout;
+const TYPING_DELAY = 2000; // 2 seconds of inactivity
+const typingIndicator = document.createElement("div");
+typingIndicator.id = "typing-indicator";
+messagesBox.parentElement.appendChild(typingIndicator);
+
+function resetTypingTimeout() {
+  clearTimeout(typingTimeout);
+  typingTimeout = setTimeout(() => setTyping(false), TYPING_DELAY);
+}
+
+async function setTyping(isTyping) {
+  await supabase.from("typing_status")
+    .upsert({ user_id: user.id, is_typing: isTyping, updated_at: new Date().toISOString() }, { onConflict: ['user_id'] });
+}
+
+async function listenTypingStatus() {
+  supabase.channel('typing-status')
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'typing_status'
+    }, payload => {
+      const typingUserId = payload.new.user_id;
+      const isTyping = payload.new.is_typing;
+      if (typingUserId !== user.id) {
+        updateTypingIndicator(typingUserId, isTyping);
+      }
+    }).subscribe();
+}
+
+const userMap = {}; // user_id to full_name
+
+async function updateTypingIndicator(userId, isTyping) {
+  if (!userMap[userId]) {
+    const { data } = await supabase.from("profiles").select("full_name").eq("id", userId).single();
+    userMap[userId] = data?.full_name || "Someone";
+  }
+  typingIndicator.textContent = isTyping ? `${userMap[userId]} is typing...` : "";
+}
+
+supabase.channel('chat-room')
+  .on('postgres_changes', {
+    event: 'INSERT',
+    schema: 'public',
+    table: 'chat_messages'
+  }, payload => {
     loadMessages();
+  }).subscribe();
 
-    window.logout = async function () {
-      await supabase.auth.signOut();
-      alert("👋 Logged out successfully!");
-      window.location.href = "index.html";
-    };
+loadMessages();
+listenTypingStatus();
+
+window.logout = async function () {
+  await supabase.auth.signOut();
+  alert("👋 Logged out successfully!");
+  window.location.href = "index.html";
+};
   </script>
 </body>
 </html>
