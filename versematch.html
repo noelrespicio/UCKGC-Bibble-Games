@@ -4,18 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Verse Match | UCKGC</title>
-  <style>
+ <style>
     :root {
-      --primary: #00cc99;
-      --danger: #ff4d4d;
-      --background: #e0f7fa;
+      --primary: #00bcd4;
+      --danger: #ff5252;
+      --background: #fff8e1;
       --card-bg: #ffffff;
       --accent: #ffd54f;
+      --highlight: #ff80ab;
     }
     body {
       font-family: 'Arial Narrow', sans-serif;
       background: var(--background);
-      color: #000;
+      color: #212121;
       margin: 0;
       padding: 16px;
       text-align: center;
@@ -31,7 +32,7 @@
       margin: 0 auto;
       padding: 28px;
       border-radius: 20px;
-      box-shadow: 0 8px 24px rgba(0, 204, 153, 0.3);
+      box-shadow: 0 8px 24px rgba(0, 188, 212, 0.3);
       transition: transform 0.3s ease;
     }
     .game-box:hover, .result-box:hover, .intro-box:hover {
@@ -46,9 +47,10 @@
       font-size: 1.1rem;
       margin-bottom: 20px;
       font-style: italic;
+      color: var(--highlight);
     }
     .option-btn {
-      background: var(--primary);
+      background: linear-gradient(90deg, var(--primary), var(--highlight));
       color: white;
       border: none;
       width: 100%;
@@ -57,11 +59,12 @@
       font-size: 0.9rem;
       border-radius: 12px;
       cursor: pointer;
-      transition: background 0.3s ease, transform 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
     .option-btn:hover {
-      background: #00b386;
-      transform: scale(1.02);
+      transform: scale(1.03);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
     }
     .exit-btn {
       background: var(--accent);
@@ -92,7 +95,7 @@
     }
     #timerBar {
       height: 12px;
-      background: linear-gradient(90deg, #00e676, #ffeb3b);
+      background: linear-gradient(90deg, #00e676, #ffeb3b, #ff4081);
       width: 100%;
       border-radius: 6px;
       margin: 12px 0;
