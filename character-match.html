@@ -4,90 +4,146 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bible Character Match</title>
-  <style>
+<style>
     :root {
-      --primary: #2e86de;
-      --primary-dark: #1b4f72;
-      --background: #f0f8ff;
-      --card: #fff;
+      --primary: #ff4081;
+      --secondary: #00e5ff;
+      --bg-gradient: linear-gradient(to right top, #e0f7fa, #fce4ec);
+      --card-bg: #ffffffdd;
+      --text: #222;
       --radius: 12px;
     }
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
+
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: var(--background);
-      color: var(--primary-dark);
+      background: var(--bg-gradient);
+      color: var(--text);
       padding: 20px;
       display: flex;
       justify-content: center;
+      min-height: 100vh;
     }
+
     .container {
       max-width: 480px;
       width: 100%;
     }
+
     .card {
-      background: var(--card);
+      background: var(--card-bg);
       border-radius: var(--radius);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
       padding: 20px;
       margin-bottom: 20px;
       text-align: center;
+      backdrop-filter: blur(5px);
     }
+
     h2 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1rem;
       margin-bottom: 12px;
+      color: var(--primary);
     }
+
+    h3 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.8rem;
+      color: var(--secondary);
+      margin: 10px 0;
+    }
+
     p {
       margin-bottom: 16px;
+      font-size: 0.9rem;
     }
+
     .option-btn {
       display: block;
       width: 100%;
-      margin: 8px 0;
-      padding: 12px;
-      font-size: 16px;
+      margin: 10px 0;
+      padding: 14px;
+      font-size: 14px;
       background: var(--primary);
       color: #fff;
       border: none;
       border-radius: var(--radius);
       cursor: pointer;
-      transition: background 0.2s;
+      font-weight: bold;
+      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 10px var(--primary);
     }
+
     .option-btn:hover {
-      background: var(--primary-dark);
+      background: #c2185b;
+      transform: scale(1.03);
+      box-shadow: 0 0 15px #c2185b;
     }
+
     .exit-btn {
-      background-color: #c0392b;
+      background-color: #ff1744;
+      box-shadow: 0 0 10px #ff1744;
     }
-    .quiz-box, .result-box {
+
+    .exit-btn:hover {
+      background-color: #d50000;
+      box-shadow: 0 0 15px #d50000;
+    }
+
+    .quiz-box,
+    .result-box {
       display: none;
     }
+
     .wrong-text {
       font-weight: bold;
       margin-top: 10px;
-      color: #e74c3c;
+      color: #d50000;
     }
+
     #timer {
       font-weight: bold;
       margin-bottom: 10px;
+      color: #009688;
     }
+
     #leaderboard {
       list-style: none;
       padding: 0;
       text-align: left;
     }
+
     #leaderboard li {
-      padding: 5px 0;
+      padding: 6px 0;
+      font-size: 0.9rem;
     }
+
     @media screen and (max-width: 600px) {
       body {
         padding: 10px;
       }
+
       .card {
         padding: 15px;
+      }
+
+      h2 {
+        font-size: 0.8rem;
+      }
+
+      h3 {
+        font-size: 0.7rem;
+      }
+
+      .option-btn {
+        font-size: 13px;
+        padding: 12px;
       }
     }
   </style>
