@@ -163,7 +163,6 @@
   <h2>📖 Welcome to the Bible Quiz!</h2>
   <p>Test your knowledge and climb the leaderboard.</p>
   <button id="playBtn" class="option-btn">▶️ Play</button>
-  <button id="viewLeaderboardBtn" class="option-btn">📊 View Leaderboard</button>
   <button id="exitBtn" class="option-btn exit-btn">🚪 Exit</button>
 </div>
 
@@ -340,14 +339,14 @@
 
     function startTimer() {
       timeLeft = 15;
-      timerEl.textContent = `⏳ ${timeLeft} seconds`;
+      timerEl.textContent = ⏳ ${timeLeft} seconds;
       timer = setInterval(() => {
         timeLeft--;
-        timerEl.textContent = `⏳ ${timeLeft} seconds`;
+        timerEl.textContent = ⏳ ${timeLeft} seconds;
         if (timeLeft <= 0) {
           clearInterval(timer);
           timesUpSound.play();
-          wrongText.innerHTML = `⏱️ Time's up!`;
+          wrongText.innerHTML = ⏱️ Time's up!;
           wrongText.style.display = "block";
           setTimeout(endQuiz, 2000);
         }
@@ -357,7 +356,7 @@
     function loadQuestion() {
       clearInterval(timer);
       const q = quizData[currentQuestion];
-      questionEl.textContent = `Q${currentQuestion + 1}: ${q.question}`;
+      questionEl.textContent = Q${currentQuestion + 1}: ${q.question};
       optionsEl.innerHTML = "";
       wrongText.style.display = "none";
       shuffle(q.options).forEach(option => {
@@ -374,7 +373,7 @@
   clearInterval(timer);
   if (selected === correct) {
     correctSound.play();
-    wrongText.innerHTML = `✅ Correct!`;
+    wrongText.innerHTML = ✅ Correct!;
     wrongText.style.display = "block";
     score++;
     currentQuestion++;
@@ -388,7 +387,7 @@
     }
   } else {
     wrongSound.play();
-    wrongText.innerHTML = `❌ Wrong! Correct: <span style="color:var(--primary-dark);">${correct}</span>`;
+    wrongText.innerHTML = ❌ Wrong! Correct: <span style="color:var(--primary-dark);">${correct}</span>;
     wrongText.style.display = "block";
     setTimeout(endQuiz, 2000);
   }
@@ -399,7 +398,7 @@
       clearInterval(timer);
       quizBox.style.display = "none";
       resultBox.style.display = "block";
-      document.getElementById("finalScore").textContent = `You scored ${score} out of ${quizData.length}`;
+      document.getElementById("finalScore").textContent = You scored ${score} out of ${quizData.length};
 
       const { data: existing } = await supabase
         .from("biblequiz_leaderboard")
@@ -436,45 +435,31 @@
       [...uniqueUsers.entries()]
         .slice(0, 5)
         .forEach(([name, score]) => {
-          leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+          leaderboardEl.innerHTML += <li><strong>${name}</strong>: ${score}</li>;
         });
     }
 
-  document.getElementById("viewLeaderboardBtn").addEventListener("click", async () => {
-  document.getElementById("introBox").style.display = "none";
-  quizBox.style.display = "none";
-  resultBox.style.display = "block";
-  document.getElementById("finalScore").textContent = `Top 5 Leaderboard`;
-
-  const { data: topScores } = await supabase
-    .from("biblequiz_leaderboard")
-    .select("name, score")
-    .order("score", { ascending: false });
-
-  const uniqueUsers = new Map();
-  topScores.forEach(row => {
-    if (!uniqueUsers.has(row.name)) {
-      uniqueUsers.set(row.name, row.score);
-    }
-  });
-
-  leaderboardEl.innerHTML = "";
-  [...uniqueUsers.entries()]
-    .slice(0, 5)
-    .forEach(([name, score]) => {
-      leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+    document.getElementById("tryAgainBtn").addEventListener("click", () => {
+      currentQuestion = 0;
+      score = 0;
+      quizData = shuffle([...allQuestions]);
+      quizBox.style.display = "block";
+      resultBox.style.display = "none";
+      loadQuestion();
     });
+document.getElementById("exitBtn").addEventListener("click", () => {
+  window.location.href = "dashboard.html";
+});
+    quizBox.style.display = "none";
+resultBox.style.display = "none";
+document.getElementById("introBox").style.display = "block";
 
-  const backBtn = document.createElement("button");
-  backBtn.textContent = "🔙 Back";
-  backBtn.className = "option-btn btn-try-again";
-  backBtn.onclick = () => {
-    resultBox.style.display = "none";
-    document.getElementById("introBox").style.display = "block";
-  };
-  leaderboardEl.appendChild(backBtn);
+document.getElementById("playBtn").addEventListener("click", () => {
+  document.getElementById("introBox").style.display = "none";
+  quizBox.style.display = "block";
+  loadQuestion();
 });
 
   </script>
 </body>
-</html>
+</html> 
