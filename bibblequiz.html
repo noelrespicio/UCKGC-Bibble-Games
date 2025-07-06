@@ -163,6 +163,7 @@
   <h2>📖 Welcome to the Bible Quiz!</h2>
   <p>Test your knowledge and climb the leaderboard.</p>
   <button id="playBtn" class="option-btn">▶️ Play</button>
+  <button id="viewLeaderboardBtn" class="option-btn">📊 View Leaderboard</button>
   <button id="exitBtn" class="option-btn exit-btn">🚪 Exit</button>
 </div>
 
@@ -439,25 +440,39 @@
         });
     }
 
-    document.getElementById("tryAgainBtn").addEventListener("click", () => {
-      currentQuestion = 0;
-      score = 0;
-      quizData = shuffle([...allQuestions]);
-      quizBox.style.display = "block";
-      resultBox.style.display = "none";
-      loadQuestion();
-    });
-document.getElementById("exitBtn").addEventListener("click", () => {
-  window.location.href = "dashboard.html";
-});
-    quizBox.style.display = "none";
-resultBox.style.display = "none";
-document.getElementById("introBox").style.display = "block";
-
-document.getElementById("playBtn").addEventListener("click", () => {
+  document.getElementById("viewLeaderboardBtn").addEventListener("click", async () => {
   document.getElementById("introBox").style.display = "none";
-  quizBox.style.display = "block";
-  loadQuestion();
+  quizBox.style.display = "none";
+  resultBox.style.display = "block";
+  document.getElementById("finalScore").textContent = `Top 5 Leaderboard`;
+
+  const { data: topScores } = await supabase
+    .from("biblequiz_leaderboard")
+    .select("name, score")
+    .order("score", { ascending: false });
+
+  const uniqueUsers = new Map();
+  topScores.forEach(row => {
+    if (!uniqueUsers.has(row.name)) {
+      uniqueUsers.set(row.name, row.score);
+    }
+  });
+
+  leaderboardEl.innerHTML = "";
+  [...uniqueUsers.entries()]
+    .slice(0, 5)
+    .forEach(([name, score]) => {
+      leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+    });
+
+  const backBtn = document.createElement("button");
+  backBtn.textContent = "🔙 Back";
+  backBtn.className = "option-btn btn-try-again";
+  backBtn.onclick = () => {
+    resultBox.style.display = "none";
+    document.getElementById("introBox").style.display = "block";
+  };
+  leaderboardEl.appendChild(backBtn);
 });
 
   </script>
