@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bible Character Match</title>
+  <style>
+    :root {
+      --primary: #2e86de;
+      --primary-dark: #1b4f72;
+      --background: #f0f8ff;
+    }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--background);
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    .option-btn {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      background-color: var(--primary);
+      color: white;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .option-btn:hover {
+      background-color: var(--primary-dark);
+    }
+    .exit-btn {
+      background-color: #c0392b;
+    }
+    .quiz-box, .result-box {
+      display: none;
+    }
+    .wrong-text {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    #leaderboard {
+      list-style: none;
+      padding: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="intro-box" id="introBox">
+    <h2>📖 Welcome to Bible Character Match!</h2>
+    <p>Match Bible characters with their correct description.</p>
+    <button id="playBtn" class="option-btn">▶️ Play</button>
+    <button id="exitBtn" class="option-btn exit-btn">🚪 Exit</button>
+  </div>
+
+  <div class="quiz-box" id="quizBox">
+    <h2 id="question">Loading...</h2>
+    <div id="timer">⏳ 15 seconds</div>
+    <div id="options"></div>
+    <p id="wrongAnswer" class="wrong-text" style="display: none;"></p>
+  </div>
+
+  <div class="result-box" id="resultBox">
+    <h2>Quiz Finished!</h2>
+    <p id="finalScore"></p>
+    <h3>🏆 Leaderboard</h3>
+    <ul id="leaderboard"></ul>
+    <button id="tryAgainBtn" class="option-btn">🔁 Try Again</button>
+    <a href="dashboard.html">🔙 Back to Dashboard</a>
+  </div>
+
+  <!-- Audio elements -->
+  <audio id="bgMusic" src="backgroundmusic.mp3" loop></audio>
+  <audio id="correctSound" src="correct.mp4"></audio>
+  <audio id="wrongSound" src="gameover.mp4"></audio>
+  <audio id="timesUpSound" src="audio/timesup.mp3"></audio>
+
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const supabase = createClient(
+      'https://wlthlwxcmltwescezjlk.supabase.co',
+      'your-public-anon-key-here'
+    );
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    if (!session) window.location.href = "index.html";
+
+    const user = session.user;
+    const userId = user.id;
+    const fullName = user.user_metadata.full_name || user.email;
+
+    const allQuestions = [
+    { question: 'Who is known as "The Baptist"?', options: ['Peter', 'Paul', 'John', 'James'], answer: 'John' },
+  { question: 'Who betrayed Jesus for 30 pieces of silver?', options: ['Peter', 'Judas', 'Thomas', 'Bartholomew'], answer: 'Judas' },
+  { question: 'Who led the Israelites out of Egypt?', options: ['Moses', 'Aaron', 'Joshua', 'Caleb'], answer: 'Moses' },
+  { question: 'Who killed Goliath with a sling?', options: ['Saul', 'David', 'Samuel', 'Jonathan'], answer: 'David' },
+  { question: 'Who was the strongest man in the Bible?', options: ['Samson', 'Saul', 'Joshua', 'Gideon'], answer: 'Samson' },
+  { question: 'Who built the ark to survive the great flood?', options: ['Noah', 'Enoch', 'Moses', 'Job'], answer: 'Noah' },
+  { question: 'Who interpreted Pharaoh’s dreams in Egypt?', options: ['Daniel', 'Joseph', 'Elijah', 'Joshua'], answer: 'Joseph' },
+  { question: 'Who was the first king of Israel?', options: ['David', 'Saul', 'Solomon', 'Samuel'], answer: 'Saul' },
+  { question: 'Who wrote most of the Psalms?', options: ['David', 'Solomon', 'Asaph', 'Moses'], answer: 'David' },
+  { question: 'Who was the mother of Jesus?', options: ['Mary', 'Elizabeth', 'Martha', 'Rachel'], answer: 'Mary' },
+  { question: 'Who was the first martyr of the Christian church?', options: ['Peter', 'James', 'Stephen', 'Paul'], answer: 'Stephen' },
+  { question: 'Who walked on water with Jesus?', options: ['Peter', 'John', 'James', 'Andrew'], answer: 'Peter' },
+  { question: 'Who is famous for doubting Jesus until he saw Him resurrected?', options: ['Thomas', 'Luke', 'Simon', 'Philip'], answer: 'Thomas' },
+  { question: 'Who wrote the book of Revelation?', options: ['John', 'Peter', 'Paul', 'James'], answer: 'John' },
+  { question: 'Who led the Israelites in the battle of Jericho?', options: ['Joshua', 'Caleb', 'Moses', 'Aaron'], answer: 'Joshua' },
+  { question: 'Who was known as “loved by God”?', options: ['Daniel', 'John', 'James', 'Saul'], answer: 'John' },
+  { question: 'Who denied Jesus three times before the rooster crowed?', options: ['Peter', 'John', 'Judas', 'Andrew'], answer: 'Peter' },
+  { question: 'Who was the tax collector turned apostle?', options: ['Matthew', 'Mark', 'Luke', 'John'], answer: 'Matthew' },
+  { question: 'Who accompanied Paul on his missionary journeys?', options: ['Barnabas', 'Silas', 'Timothy', 'Luke'], answer: 'Barnabas' },
+  { question: 'Who betrayed Jesus with a kiss?', options: ['Peter', 'Judas', 'Thomas', 'Andrew'], answer: 'Judas' },
+  { question: 'Who was thrown into the lion’s den?', options: ['Daniel', 'Joseph', 'David', 'Moses'], answer: 'Daniel' },
+  { question: 'Who saw a vision of a valley of dry bones?', options: ['Ezekiel', 'Isaiah', 'Jeremiah', 'Daniel'], answer: 'Ezekiel' },
+  { question: 'Who was the prophet who married a prostitute as commanded by God?', options: ['Hosea', 'Amos', 'Isaiah', 'Jeremiah'], answer: 'Hosea' },
+  { question: 'Who was known for his patience in the Old Testament?', options: ['Job', 'Noah', 'Abraham', 'Isaac'], answer: 'Job' },
+  { question: 'Who wrestled with God and was renamed Israel?', options: ['Jacob', 'Esau', 'Isaac', 'Reuben'], answer: 'Jacob' },
+  { question: 'Who was Joshua’s assistant?', options: ['Caleb', 'Aaron', 'Hur', 'Eleazar'], answer: 'Hur' },
+  { question: 'Who was the queen that saved the Jews from genocide?', options: ['Esther', 'Ruth', 'Mary', 'Deborah'], answer: 'Esther' },
+  { question: 'Who is known as the woman of noble character in Proverbs 31?', options: ['Ruth', 'Esther', 'The wife of noble character (unnamed)', 'Deborah'], answer: 'The wife of noble character (unnamed)' },
+  { question: 'Who was the wife of Isaac and mother of Jacob and Esau?', options: ['Rebekah', 'Sarah', 'Rachel', 'Leah'], answer: 'Rebekah' },
+  { question: 'Who was sold into slavery by his brothers and later became ruler in Egypt?', options: ['Joseph', 'Benjamin', 'Levi', 'Judah'], answer: 'Joseph' },
+  { question: 'Who was the prophet taken up by a whirlwind without dying?', options: ['Elijah', 'Elisha', 'Isaiah', 'Jeremiah'], answer: 'Elijah' },
+  { question: 'Who succeeded Elijah as prophet?', options: ['Elisha', 'Jeremiah', 'Ezekiel', 'Daniel'], answer: 'Elisha' },
+  { question: 'Who was the king famous for his wisdom?', options: ['Solomon', 'David', 'Saul', 'Hezekiah'], answer: 'Solomon' },
+  { question: 'Who collected kingdoms for the Lord and sealed a covenant?', options: ['Solomon', 'David', 'Hezekiah', 'Josiah'], answer: 'Solomon' },
+  { question: 'Who is the apostle to the Gentiles?', options: ['Paul', 'Peter', 'James', 'John'], answer: 'Paul' },
+  { question: 'Who wrote the majority of New Testament letters?', options: ['Paul', 'Peter', 'James', 'John'], answer: 'Paul' },
+  { question: 'Who was known as the beloved disciple?', options: ['John', 'Peter', 'James', 'Andrew'], answer: 'John' },
+  { question: 'Who fasted for 40 days and nights in the wilderness?', options: ['Moses', 'Jesus', 'Elijah', 'Ezekiel'], answer: 'Jesus' },
+  { question: 'Who spoke in tongues on the Day of Pentecost?', options: ['Peter', 'John', 'Paul', 'All the apostles'], answer: 'All the apostles' },
+  { question: 'Who wrote the book of Job?', options: ['Unknown', 'Moses', 'Solomon', 'Ethan'], answer: 'Unknown' },
+  { question: 'Who was Abraham’s wife?', options: ['Sarah', 'Rebekah', 'Rachel', 'Leah'], answer: 'Sarah' },
+  { question: 'Who almost sacrificed his son Isaac?', options: ['Abraham', 'Moses', 'Jacob', 'Isaac'], answer: 'Abraham' },
+  { question: 'Who is the Pentateuch traditionally attributed to?', options: ['Moses', 'Ezra', 'Samuel', 'Joshua'], answer: 'Moses' },
+  { question: 'Who was the mute priest of God in Numbers?', options: ['Eleazar', 'Phinehas', 'Aaron', 'Zadok'], answer: 'Aaron' },
+  { question: 'Who was the first judge of Israel?', options: ['Othniel', 'Ehud', 'Gideon', 'Deborah'], answer: 'Othniel' },
+  { question: 'Who defeated the Midianites with just 300 men?', options: ['Gideon', 'Barak', 'Jephthah', 'Eli'], answer: 'Gideon' },
+  { question: 'Who was the only female judge of Israel?', options: ['Deborah', 'Esther', 'Hannah', 'Ruth'], answer: 'Deborah' },
+  { question: 'Who made the golden calf?', options: ['Aaron', 'Moses', 'Joshua', 'Phinehas'], answer: 'Aaron' },
+  { question: 'Who carried the ark of the covenant into battle and died?', options: ['Uzzah', 'Uriah', 'Uzziah', 'Uriah'], answer: 'Uzzah' },
+  { question: 'Who became king after Saul died?', options: ['David', 'Solomon', 'Samuel', 'Rehoboam'], answer: 'David' },
+  { question: 'Who was Bathsheba’s husband before David?', options: ['Uriah', 'Joab', 'Amasa', 'Absalom'], answer: 'Uriah' },
+  { question: 'Who led a rebellion against David and died in a tree?', options: ['Absalom', 'Amnon', 'Amalek', 'Adonijah'], answer: 'Absalom' },
+  { question: 'Who accompanied Paul on the shipwreck at Malta?', options: ['Luke', 'Barnabas', 'Silas', 'Timothy'], answer: 'Luke' },
+  { question: 'Who baptized the Ethiopian eunuch?', options: ['Philip', 'Peter', 'Paul', 'John'], answer: 'Philip' },
+  { question: 'Who wrote the book of Acts?', options: ['Luke', 'Matthew', 'Mark', 'John'], answer: 'Luke' },
+  { question: 'Who is called the weeping prophet?', options: ['Jeremiah', 'Ezekiel', 'Daniel', 'Isaiah'], answer: 'Jeremiah' },
+  { question: 'Who saw the valley of dry bones come to life?', options: ['Ezekiel', 'Isaiah', 'Jeremiah', 'Daniel'], answer: 'Ezekiel' },
+  { question: 'Who was the prophet during Israel’s captivity in Babylon?', options: ['Daniel', 'Ezekiel', 'Jeremiah', 'Obadiah'], answer: 'Daniel' },
+  { question: 'Who was the prophet that challenged Baal prophets on Mount Carmel?', options: ['Elijah', 'Elisha', 'Jeremiah', 'Amos'], answer: 'Elijah' },
+  { question: 'Who reigned during Judah’s best revival?', options: ['Hezekiah', 'Josiah', 'Uzziah', 'Jotham'], answer: 'Hezekiah' },
+  { question: 'Who found baby Moses in the river?', options: ['Pharaoh’s daughter', 'Miriam', 'Aaron', 'Jochebed'], answer: 'Pharaoh’s daughter' },
+  { question: 'Who threw his staff over the Jordan to part the waters?', options: ['Joshua', 'Moses', 'Elijah', 'Elisha'], answer: 'Joshua' },
+  { question: 'Who wrote the Song of Solomon?', options: ['Solomon', 'David', 'Asaph', 'Moses'], answer: 'Solomon' },
+  { question: 'Who led Saul’s army and later became king of Israel?', options: ['David', 'Goliath', 'Jonathan', 'Samuel'], answer: 'David' },
+  { question: 'Who was the first Christian convert in Europe?', options: ['Lydia', 'Priscilla', 'Phoebe', 'Tabitha'], answer: 'Lydia' },
+  { question: 'Who was known for her hospitality in Acts?', options: ['Priscilla', 'Lydia', 'Dorcas', 'Phoebe'], answer: 'Priscilla' },
+  { question: 'Who wrote a letter to the church in Rome?', options: ['Paul', 'Peter', 'James', 'John'], answer: 'Paul' },
+  { question: 'Who was called the father of faith?', options: ['Abraham', 'Moses', 'Jacob', 'David'], answer: 'Abraham' },
+  { question: 'Who was sold as a slave in Egypt and interpreted dreams?', options: ['Joseph', 'Daniel', 'Ezekiel', 'Joshua'], answer: 'Joseph' },
+  { question: 'Who wrote the book of Genesis according to tradition?', options: ['Moses', 'Abraham', 'Ezra', 'Daniel'], answer: 'Moses' },
+  { question: 'Who was the prophet sent to Nineveh?', options: ['Jonah', 'Nahum', 'Habakkuk', 'Zephaniah'], answer: 'Jonah' },
+  { question: 'Who mocked baldness and was punished by bears?', options: ['Elisha', 'Elijah', 'Jeremiah'], answer: 'Elisha' },
+  { question: 'Who refused to bow to Nebuchadnezzar’s statue?', options: ['Shadrach, Meshach, and Abednego', 'Daniel', 'Ezekiel', 'Jeremiah'], answer: 'Shadrach, Meshach, and Abednego' },
+  { question: 'Who climbed a sycamore tree to see Jesus?', options: ['Zacchaeus', 'Bartimaeus', 'Nicodemus', 'Philip'], answer: 'Zacchaeus' },
+  { question: 'Who was struck blind and later became a missionary?', options: ['Paul', 'Peter', 'John', 'James'], answer: 'Paul' },
+  { question: 'Who wrote the letter to the Hebrews?', options: ['Unknown', 'Paul', 'Barnabas', 'Luke'], answer: 'Unknown' },
+  { question: 'Who is the longest-lived man recorded in the Bible?', options: ['Methuselah', 'Noah', 'Adam', 'Enoch'], answer: 'Methuselah' },
+  { question: 'Who was taken up into heaven without dying in the New Testament?', options: ['Jesus', 'Elijah', 'Moses', 'Enoch'], answer: 'Jesus' },
+  { question: 'Who asked Jesus, “Who is my neighbor?”', options: ['A lawyer', 'Peter', 'John', 'James'], answer: 'A lawyer' },
+  { question: 'Who denied knowing Jesus three times?', options: ['Peter', 'Thomas', 'John', 'James'], answer: 'Peter' },
+  { question: 'Who carried wood for his own crucifixion?', options: ['Simon of Cyrene', 'Peter', 'John', 'James'], answer: 'Simon of Cyrene' },
+  { question: 'Who is known as the "beloved physician"?', options: ['Luke', 'Paul', 'John', 'Mark'], answer: 'Luke' },
+  { question: 'Who apologized that he was “unworthy to untie the sandals” of Jesus?', options: ['John the Baptist', 'Peter', 'John', 'Andrew'], answer: 'John the Baptist' },
+  { question: 'Who was raised from the dead by Jesus at Bethany?', options: ['Lazarus', 'Jairus’s daughter', 'Tabitha', 'Dorcas'], answer: 'Lazarus' },
+  { question: 'Who traveled with Paul as a silversmith in Ephesus?', options: ['Priscilla and Aquila', 'Lydia', 'Phoebe', 'Stephanie'], answer: 'Priscilla and Aquila' },
+  { question: 'Who wrote the book of Philemon?', options: ['Paul', 'Peter', 'James', 'John'], answer: 'Paul' },
+    ];
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    let quizData = shuffle([...allQuestions]);
+    let currentQuestion = 0;
+    let score = 0;
+    let timer;
+    let timeLeft = 15;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const timerEl = document.getElementById("timer");
+    const quizBox = document.getElementById("quizBox");
+    const resultBox = document.getElementById("resultBox");
+    const leaderboardEl = document.getElementById("leaderboard");
+    const wrongText = document.getElementById("wrongAnswer");
+    const bgMusic = document.getElementById("bgMusic");
+    const correctSound = document.getElementById("correctSound");
+    const wrongSound = document.getElementById("wrongSound");
+    const timesUpSound = document.getElementById("timesUpSound");
+
+    function startTimer() {
+      timeLeft = 15;
+      timerEl.textContent = `⏳ ${timeLeft} seconds`;
+      timer = setInterval(() => {
+        timeLeft--;
+        timerEl.textContent = `⏳ ${timeLeft} seconds`;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          timesUpSound.play();
+          wrongText.innerHTML = "⏱️ Time's up!";
+          wrongText.style.display = "block";
+          setTimeout(endQuiz, 2000);
+        }
+      }, 1000);
+    }
+
+    function loadQuestion() {
+      clearInterval(timer);
+      const q = quizData[currentQuestion];
+      questionEl.textContent = `Q${currentQuestion + 1}: ${q.question}`;
+      optionsEl.innerHTML = "";
+      wrongText.style.display = "none";
+      shuffle(q.options).forEach(option => {
+        const btn = document.createElement("button");
+        btn.textContent = option;
+        btn.className = "option-btn";
+        btn.onclick = () => selectAnswer(option, q.answer);
+        optionsEl.appendChild(btn);
+      });
+      startTimer();
+    }
+
+    async function selectAnswer(selected, correct) {
+      clearInterval(timer);
+      if (selected === correct) {
+        correctSound.play();
+        wrongText.innerHTML = "✅ Correct!";
+        wrongText.style.display = "block";
+        score++;
+        currentQuestion++;
+        if (currentQuestion < quizData.length) {
+          setTimeout(() => {
+            wrongText.style.display = "none";
+            loadQuestion();
+          }, 1000);
+        } else {
+          setTimeout(endQuiz, 1000);
+        }
+      } else {
+        wrongSound.play();
+        wrongText.innerHTML = `❌ Wrong! Correct: <span style="color:var(--primary-dark);">${correct}</span>`;
+        wrongText.style.display = "block";
+        setTimeout(endQuiz, 2000);
+      }
+    }
+
+    async function endQuiz() {
+      clearInterval(timer);
+      quizBox.style.display = "none";
+      resultBox.style.display = "block";
+      document.getElementById("finalScore").textContent = `You scored ${score} out of ${quizData.length}`;
+
+      const { data: existing } = await supabase
+        .from("biblequiz_leaderboard")
+        .select("id, score")
+        .eq("user_id", userId)
+        .maybeSingle();
+
+      if (existing) {
+        if (score > existing.score) {
+          await supabase
+            .from("biblequiz_leaderboard")
+            .update({ score: score })
+            .eq("id", existing.id);
+        }
+      } else {
+        await supabase
+          .from("biblequiz_leaderboard")
+          .insert([{ user_id: userId, name: fullName, score: score }]);
+      }
+
+      const { data: topScores } = await supabase
+        .from("biblequiz_leaderboard")
+        .select("name, score")
+        .order("score", { ascending: false });
+
+      const uniqueUsers = new Map();
+      topScores.forEach(row => {
+        if (!uniqueUsers.has(row.name)) {
+          uniqueUsers.set(row.name, row.score);
+        }
+      });
+
+      leaderboardEl.innerHTML = "";
+      [...uniqueUsers.entries()]
+        .slice(0, 5)
+        .forEach(([name, score]) => {
+          leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+        });
+    }
+
+    document.getElementById("tryAgainBtn").addEventListener("click", () => {
+      currentQuestion = 0;
+      score = 0;
+      quizData = shuffle([...allQuestions]);
+      quizBox.style.display = "block";
+      resultBox.style.display = "none";
+      loadQuestion();
+    });
+
+    document.getElementById("exitBtn").addEventListener("click", () => {
+      window.location.href = "dashboard.html";
+    });
+
+    document.getElementById("playBtn").addEventListener("click", () => {
+      document.getElementById("introBox").style.display = "none";
+      quizBox.style.display = "block";
+      loadQuestion();
+    });
+
+    // Music autoplay
+    bgMusic.volume = 0.3;
+    bgMusic.play().catch(() => {
+      document.body.addEventListener("click", () => bgMusic.play(), { once: true });
+    });
+  </script>
+</body>
+</html>
