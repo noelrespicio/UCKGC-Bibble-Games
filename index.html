@@ -57,16 +57,17 @@
       }
 
       const user = data.user;
-     if (user) {
-  await supabase
-    .from('profiles')
-    .insert([{ id: user.id, full_name: fullName, email }]);
+    if (user) {
+        await supabase
+          .from('profiles')
+          .insert([{ id: user.id, full_name: fullName, email }]);
+      }
 
   // System welcome message to chat
   await supabase
     .from('chat_messages')
     .insert([{
-      user_id: 'system',  // or any reserved user_id you want to use
+      user.id: 'system',  // or any reserved user_id you want to use
       message: `🎉 New member joined: ${fullName}! Welcome to UCKGC Bible Games! 🙌`
     }]);
 }
