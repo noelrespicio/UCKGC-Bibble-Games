@@ -2,33 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bible Character Match</title>
   <style>
     :root {
       --primary: #2e86de;
       --primary-dark: #1b4f72;
       --background: #f0f8ff;
+      --card: #fff;
+      --radius: 12px;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
     body {
       font-family: 'Segoe UI', sans-serif;
       background: var(--background);
-      margin: 0;
+      color: var(--primary-dark);
       padding: 20px;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 480px;
+      width: 100%;
+    }
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 20px;
+      margin-bottom: 20px;
       text-align: center;
     }
+    h2 {
+      margin-bottom: 12px;
+    }
+    p {
+      margin-bottom: 16px;
+    }
     .option-btn {
-      margin: 10px;
-      padding: 10px 20px;
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 12px;
       font-size: 16px;
+      background: var(--primary);
+      color: #fff;
       border: none;
-      background-color: var(--primary);
-      color: white;
+      border-radius: var(--radius);
       cursor: pointer;
-      border-radius: 8px;
+      transition: background 0.2s;
     }
     .option-btn:hover {
-      background-color: var(--primary-dark);
+      background: var(--primary-dark);
     }
     .exit-btn {
       background-color: #c0392b;
@@ -39,35 +68,54 @@
     .wrong-text {
       font-weight: bold;
       margin-top: 10px;
+      color: #e74c3c;
+    }
+    #timer {
+      font-weight: bold;
+      margin-bottom: 10px;
     }
     #leaderboard {
       list-style: none;
       padding: 0;
+      text-align: left;
+    }
+    #leaderboard li {
+      padding: 5px 0;
+    }
+    @media screen and (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .card {
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="intro-box" id="introBox">
-    <h2>📖 Welcome to Bible Character Match!</h2>
-    <p>Match Bible characters with their correct description.</p>
-    <button id="playBtn" class="option-btn">▶️ Play</button>
-    <button id="exitBtn" class="option-btn exit-btn">🚪 Exit</button>
-  </div>
+  <div class="container">
+    <div class="card intro-box" id="introBox">
+      <h2>📖 Welcome to Bible Character Match!</h2>
+      <p>Match Bible characters with their correct description.</p>
+      <button id="playBtn" class="option-btn">▶️ Play</button>
+      <button id="exitBtn" class="option-btn exit-btn">🚪 Exit</button>
+    </div>
 
-  <div class="quiz-box" id="quizBox">
-    <h2 id="question">Loading...</h2>
-    <div id="timer">⏳ 15 seconds</div>
-    <div id="options"></div>
-    <p id="wrongAnswer" class="wrong-text" style="display: none;"></p>
-  </div>
+    <div class="card quiz-box" id="quizBox">
+      <h2 id="question">Loading...</h2>
+      <div id="timer">⏳ 15 seconds</div>
+      <div id="options"></div>
+      <p id="wrongAnswer" class="wrong-text" style="display: none;"></p>
+    </div>
 
-  <div class="result-box" id="resultBox">
-    <h2>Quiz Finished!</h2>
-    <p id="finalScore"></p>
-    <h3>🏆 Leaderboard</h3>
-    <ul id="leaderboard"></ul>
-    <button id="tryAgainBtn" class="option-btn">🔁 Try Again</button>
-    <a href="dashboard.html">💙 Back to Dashboard</a>
+    <div class="card result-box" id="resultBox">
+      <h2>Quiz Finished!</h2>
+      <p id="finalScore"></p>
+      <h3>🏆 Leaderboard</h3>
+      <ul id="leaderboard"></ul>
+      <button id="tryAgainBtn" class="option-btn">🔁 Try Again</button>
+      <a href="dashboard.html" class="option-btn exit-btn">💙 Back to Dashboard</a>
+    </div>
   </div>
 
   <!-- Audio elements -->
