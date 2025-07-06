@@ -195,7 +195,7 @@
         font-size: 0.85rem;
       }
     }
-   #chat-toggle {
+#chat-toggle {
   position: fixed;
   bottom: 20px;
   right: 20px;
@@ -211,6 +211,11 @@
   box-shadow: 0 6px 12px rgba(0,0,0,0.2);
   cursor: pointer;
   z-index: 9999;
+  transition: transform 0.3s ease;
+}
+
+#chat-toggle:hover {
+  transform: scale(1.1);
 }
 
 #chatbox.hidden {
@@ -221,16 +226,23 @@
   position: fixed;
   bottom: 80px;
   right: 20px;
-  width: 280px;
+  width: 300px;
+  max-height: 400px;
   background: white;
   border: 2px solid var(--primary);
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: 0 8px 16px rgba(0,0,0,0.2);
   z-index: 9999;
   font-size: 0.85rem;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 #chat-header {
@@ -239,14 +251,14 @@
   padding: 10px;
   text-align: center;
   font-weight: bold;
+  border-bottom: 1px solid #ccc;
 }
 
 #chat-messages {
-  height: 180px;
-  overflow-y: auto;
-  padding: 10px;
-  background: #f9f9f9;
   flex-grow: 1;
+  padding: 10px;
+  overflow-y: auto;
+  background: #fdfdfd;
 }
 
 #chat-input {
@@ -259,6 +271,7 @@
   border: none;
   padding: 8px;
   font-size: 0.9rem;
+  outline: none;
 }
 
 #chat-input button {
@@ -268,8 +281,62 @@
   padding: 8px 12px;
   cursor: pointer;
   font-weight: bold;
+  transition: background 0.3s ease;
 }
 
+#chat-input button:hover {
+  background: #c0392b;
+}
+
+#emojiPicker {
+  font-size: 1.2rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.chat-bubble {
+  max-width: 75%;
+  margin: 6px 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  position: relative;
+  display: inline-block;
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+.chat-bubble.you {
+  background-color: #d1e7ff;
+  align-self: flex-end;
+  text-align: right;
+  margin-left: auto;
+  border-bottom-right-radius: 0;
+}
+
+.chat-bubble.other {
+  background-color: #f1f1f1;
+  align-self: flex-start;
+  text-align: left;
+  margin-right: auto;
+  border-bottom-left-radius: 0;
+}
+
+.chat-meta {
+  font-size: 0.7rem;
+  color: gray;
+  margin-top: 2px;
+  text-align: right;
+}
+
+@media (max-width: 480px) {
+  #chatbox {
+    right: 10px;
+    bottom: 70px;
+    width: 95%;
+  }
+}
 
   </style>
 </head>
@@ -324,13 +391,24 @@
 
 <div id="chat-toggle" onclick="toggleChatbox()">💬</div>
 
-<div id="chatbox" class="hidden">
-  <div id="chat-header">💬 Chat Room</div>
-  <div id="chat-messages"></div>
-  <div id="chat-input">
-    <input type="text" id="chatText" placeholder="Type a message..." />
-    <button onclick="sendMessage()">Send</button>
-  </div>
+ <div id="chat-toggle" onclick="toggleChatbox()">💬</div>
+  <div id="chatbox" class="hidden">
+    <div id="chat-header">💬 Chat Room</div>
+    <div id="chat-messages"></div>
+    <div id="chat-input">
+      <select id="emojiPicker" onchange="appendEmoji(this.value)">
+        <option value="">😊</option>
+        <option value="😀">😀</option>
+        <option value="😂">😂</option>
+        <option value="😇">😇</option>
+        <option value="🙏">🙏</option>
+        <option value="🎉">🎉</option>
+        <option value="📖">📖</option>
+        <option value="✝️">✝️</option>
+      </select>
+      <input type="text" id="chatText" placeholder="Type a message..." />
+      <button>Send</button>
+    </div>
 </div>
 
 
@@ -360,94 +438,120 @@
 </script>
 
 <script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-  const supabase = createClient(
-    'https://wlthlwxcmltwescezjlk.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-  );
+    const supabase = createClient(
+      'https://wlthlwxcmltwescezjlk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+    );
 
-  const { data: sessionData } = await supabase.auth.getSession();
-  const session = sessionData.session;
-  const user = session?.user;
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    const user = session?.user;
 
-  if (!user) {
-    window.location.href = "index.html";
-  }
-
-  const messagesBox = document.getElementById("chat-messages");
-  const input = document.getElementById("chatText");
-  const sendBtn = document.querySelector("#chat-input button");
-
-  function toggleChatbox() {
-    document.getElementById("chatbox").classList.toggle("hidden");
-  }
-
-  window.toggleChatbox = toggleChatbox;
-
-  async function loadMessages() {
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .select('message, created_at, user_id, profiles (full_name)')
-      .order('created_at', { ascending: true });
-
-    if (!error && data) {
-      messagesBox.innerHTML = '';
-      data.forEach(msg => {
-        const isSelf = msg.user_id === user.id;
-        const name = isSelf ? 'You' : (msg.profiles?.full_name || 'Unknown');
-        const p = document.createElement('p');
-        p.style.marginBottom = '6px';
-        p.innerHTML = <strong>${name}:</strong> ${msg.message};
-        messagesBox.appendChild(p);
-      });
-      messagesBox.scrollTop = messagesBox.scrollHeight;
+    if (!user) {
+      window.location.href = "index.html";
+    } else {
+      document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
     }
-  }
 
-  async function sendMessage() {
-    const text = input.value.trim();
-    if (!text) return;
+    const messagesBox = document.getElementById("chat-messages");
+    const input = document.getElementById("chatText");
 
-    await supabase.from('chat_messages').insert({
-      user_id: user.id,
-      message: text
+    function toggleChatbox() {
+      const chatbox = document.getElementById("chatbox");
+      chatbox.classList.toggle("hidden");
+      if (!chatbox.classList.contains("hidden")) {
+        setTimeout(() => input.focus(), 100);
+      }
+    }
+
+    window.toggleChatbox = toggleChatbox;
+
+    function renderMessage(msg) {
+      const isSelf = msg.user_id === user.id;
+      const name = isSelf ? "You" : (msg.profiles?.full_name || "Unknown");
+      const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      const bubble = document.createElement("div");
+      bubble.className = chat-bubble ${isSelf ? 'you' : 'other'};
+      bubble.innerHTML = 
+        <div><strong>${name}</strong></div>
+        <div>${msg.message}</div>
+        <div class="chat-meta">${time}</div>
+      ;
+      messagesBox.appendChild(bubble);
+    }
+
+    async function loadMessages() {
+      const { data, error } = await supabase
+        .from('chat_messages')
+        .select('message, created_at, user_id, profiles (full_name)')
+        .order('created_at', { ascending: true });
+
+      if (!error && data) {
+        messagesBox.innerHTML = data.length === 0 ? "<em>No messages yet. Be the first to chat!</em>" : "";
+        data.forEach(renderMessage);
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+      }
+    }
+
+    async function sendMessage() {
+      const text = input.value.trim();
+      if (!text) return;
+
+      await supabase.from('chat_messages').insert({
+        user_id: user.id,
+        message: text
+      });
+
+      input.value = '';
+    }
+
+    document.querySelector("#chat-input button").addEventListener("click", sendMessage);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
     });
 
-    input.value = '';
-  }
+    supabase
+      .channel('chat-room')
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'chat_messages'
+      }, payload => {
+        renderMessage(payload.new);
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+      })
+      .subscribe();
 
-  sendBtn.addEventListener("click", sendMessage);
-  input.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") sendMessage();
-  });
+    loadMessages();
 
-  // Real-time subscription
-  supabase.channel('chat-room')
-    .on('postgres_changes', {
-      event: 'INSERT',
-      schema: 'public',
-      table: 'chat_messages'
-    }, payload => {
-      loadMessages();
-    })
-    .subscribe();
+    window.logout = async function () {
+      await supabase.auth.signOut();
+      alert("👋 Logged out successfully!");
+      window.location.href = "index.html";
+    };
+  </script>
 
-  // Set user name
-  document.getElementById('userName').textContent =
-    user.user_metadata?.full_name || user.email;
-
-  // Load initial messages
-  loadMessages();
-
-  // Logout function
-  window.logout = async function () {
-    await supabase.auth.signOut();
-    alert("👋 Logged out successfully!");
-    window.location.href = "index.html";
+  <script>
+    window.appendEmoji = function (emoji) {
+      if (!emoji) return;
+      const input = document.getElementById("chatText");
+      input.value += emoji;
+      document.getElementById("emojiPicker").value = "";
+      input.focus();
+    };
+  </script>
+<script>
+  window.appendEmoji = function (emoji) {
+    if (!emoji) return;
+    const input = document.getElementById("chatText");
+    input.value += emoji;
+    document.getElementById("emojiPicker").value = "";
+    input.focus();
   };
 </script>
-
 
 </body>
 </html>
