@@ -143,10 +143,21 @@
         font-size: 1.4rem;
       }
     }
+    .puzzle-box {
+  margin-top: 40px;
+}
+
   </style>
 </head>
 <body>
 
+  <div class="puzzle-box" id="introScreen">
+  <h2>📖 Bible Puzzle Game</h2>
+  <p>Test your knowledge of the Bible by guessing the hidden word based on a clue.</p>
+  <p>Are you ready to begin?</p>
+  <button class="submit-btn" onclick="startPuzzleGame()">▶️ Play</button>
+  <a href="dashboard.html" class="try-again-link">❌ Exit to Dashboard</a>
+</div>
   <div class="puzzle-box" id="gameBox">
     <h2>Bible Puzzle</h2>
    
@@ -502,8 +513,13 @@ window.toggleMusic = () => {
   }
 };
 
-    shufflePuzzles();
-    startGame();
+function startPuzzleGame() {
+  document.getElementById("introScreen").classList.add("hidden");
+  document.getElementById("gameBox").classList.remove("hidden");
+  shufflePuzzles();
+  startGame();
+}
+
   </script>
 </body>
 </html>
