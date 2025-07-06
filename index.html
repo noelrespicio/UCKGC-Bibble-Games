@@ -64,13 +64,12 @@
       }
 
   // System welcome message to chat
-  await supabase
-    .from('chat_messages')
-    .insert([{
-      user.id: 'system',  // or any reserved user_id you want to use
-      message: 🎉 New member joined: ${fullName}! Welcome to UCKGC Bible Games! 🙌
-    }]);
-}
+await supabase
+  .from('chat_messages')
+  .insert([{
+    user_id: 'system', // Use the correct column name
+    message: `🎉 New member joined: ${fullName}!`
+  }]);
 
 
       alert("✅ Registration successful! You can now log in.");
