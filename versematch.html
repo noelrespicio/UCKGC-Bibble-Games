@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,14 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Verse Match | UCKGC</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
     :root {
-      --primary: #2e86de;
-      --primary-dark: #1b4f72;
-      --bg: #f0f8ff;
+      --primary: #00ffcc;
+      --danger: #ff4d4d;
+      --background: #000;
+      --card-bg: #111;
     }
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
+      font-family: 'Press Start 2P', cursive;
+      background: var(--background);
+      color: white;
       margin: 0;
       padding: 16px;
       text-align: center;
@@ -22,51 +25,38 @@
       justify-content: center;
       min-height: 100vh;
     }
-    .game-box, .result-box {
-      background: #fff;
+    .game-box, .result-box, .intro-box {
+      background: var(--card-bg);
       max-width: 600px;
       width: 100%;
       margin: 0 auto;
       padding: 24px;
       border-radius: 16px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    }
-    .intro-box {
-      background: #fff;
-      max-width: 500px;
-      width: 100%;
-      margin: 0 auto;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
+      box-shadow: 0 0 20px var(--primary);
     }
     h2 {
       color: var(--primary);
       margin-bottom: 16px;
     }
     #verse {
-      font-size: 1.1rem;
+      font-size: 1rem;
       margin-bottom: 20px;
       font-style: italic;
     }
     .option-btn {
       background: var(--primary);
-      color: #fff;
+      color: black;
       border: none;
       width: 100%;
       margin: 8px 0;
-      padding: 14px;
-      font-size: 1rem;
+      padding: 12px;
+      font-size: 0.8rem;
       border-radius: 10px;
       cursor: pointer;
       transition: background 0.3s ease;
     }
     .option-btn:hover {
-      background: var(--primary-dark);
+      background: #00ccb3;
     }
     .exit-btn {
       background: #ffa600;
@@ -79,50 +69,51 @@
       margin-top: 16px;
     }
     .correct-text {
-      color: green;
+      color: lime;
     }
     .wrong-text {
-      color: red;
+      color: var(--danger);
     }
     .hidden {
       display: none;
     }
-    ul {
-      padding: 0;
-      list-style: none;
+    #hud {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
     }
-    li {
-      font-weight: bold;
-      margin: 4px 0;
-    }
-    a {
-      margin-top: 16px;
-      display: inline-block;
-      font-weight: bold;
-      color: var(--primary);
-      text-decoration: none;
+    #timerBar {
+      height: 10px;
+      background: lime;
+      width: 100%;
+      border-radius: 6px;
+      margin: 10px 0;
+      transition: width 1s linear;
     }
   </style>
 </head>
 <body>
 
-<!-- Intro Screen -->
 <div class="intro-box" id="introBox">
-  <h2>📜 Welcome to Verse Match!</h2>
-  <p>Arrange the Bible verses in the correct order.</p>
+  <h2>📜 Verse Match Arcade</h2>
+  <p>Match the Bible verse or reference. Be quick!</p>
   <button id="playBtn" class="option-btn">▶️ Play</button>
   <button id="exitBtn" class="option-btn exit-btn">🚪 Exit</button>
 </div>
 
-<!-- Game Screen -->
 <div class="game-box" id="gameBox" style="display: none;">
+  <div id="hud">
+    <div id="scoreDisplay">🏅 Score: 0</div>
+    <div id="questionCount">🔢 Q1</div>
+  </div>
   <h2>Match the Verse!</h2>
+  <div id="timerBar"></div>
   <div id="verse"></div>
   <div id="options"></div>
   <div id="feedbackText" class="feedback-text hidden"></div>
 </div>
 
-<!-- Result Screen -->
 <div class="result-box" id="resultBox" style="display: none;">
   <h2>🎉 Game Over!</h2>
   <p id="finalScore"></p>
@@ -132,10 +123,10 @@
   <a href="dashboard.html">🔙 Back to Dashboard</a>
 </div>
 
-<!-- Sounds -->
 <audio id="correctSound" src="correct.mp4"></audio>
 <audio id="wrongSound" src="gameover.mp4"></audio>
 <audio id="bgMusic" src="backroundmusic.mp3" loop preload="auto"></audio>
+<audio id="timesUpSound" src="audio/timesup.mp3"></audio>
 
 <!-- Game Logic -->
 <script type="module">
