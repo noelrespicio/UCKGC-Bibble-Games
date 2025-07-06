@@ -114,16 +114,36 @@
         padding: 12px;
       }
     }
-    .intro-box {
-  background: var(--card-bg);
-  max-width: 500px;
+  .option-btn {
+  background: var(--primary);
+  color: #fff;
+  border: none;
   width: 100%;
-  margin: 0 auto;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-  text-align: center;
+  margin: 10px 0;
+  padding: 14px;
+  font-size: 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
+
+.option-btn:hover {
+  background: var(--primary-dark);
+}
+
+.btn-try-again {
+  background: #ffa600;
+  color: #fff;
+}
+
+.btn-try-again:hover {
+  background: #cc8400;
+}
+
 
   </style>
 </head>
