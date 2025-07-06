@@ -61,13 +61,12 @@
           .from('profiles')
           .insert([{ id: user.id, full_name: fullName, email }]);
 
-        // Safe insert to chat_messages
-        const { error: chatError } = await supabase
-          .from('chat_messages')
-          .insert([{
-            user_id: user.id,
-            message: `🎉 New member joined: ${fullName}!`
-          }]);
+     await supabase
+  .from('chat_messages')
+  .insert([{
+    user_id: null,
+    message: `🎉 New member joined: ${fullName}!`
+  }]);
 
         if (chatError) {
           console.warn("Chat message insert failed:", chatError.message);
