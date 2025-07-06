@@ -270,6 +270,17 @@
   font-weight: bold;
 }
 
+#chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+#chat-messages::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 10px;
+}
+#chat-messages div {
+  font-family: 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  line-height: 1.4;
+}
 
   </style>
 </head>
@@ -328,6 +339,17 @@
   <div id="chat-header">💬 Chat Room</div>
   <div id="chat-messages"></div>
   <div id="chat-input">
+    <select id="emojiPicker" onchange="appendEmoji(this.value)" style="font-size: 1.2rem; border: none; background: transparent; cursor: pointer;">
+  <option value="">😊</option>
+  <option value="😀">😀</option>
+  <option value="😂">😂</option>
+  <option value="😇">😇</option>
+  <option value="🙏">🙏</option>
+  <option value="🎉">🎉</option>
+  <option value="📖">📖</option>
+  <option value="✝️">✝️</option>
+</select>
+
     <input type="text" id="chatText" placeholder="Type a message..." />
     <button onclick="sendMessage()">Send</button>
   </div>
@@ -371,19 +393,43 @@
   const session = sessionData.session;
   const user = session?.user;
 
-  if (!user) {
-    window.location.href = "index.html";
-  }
+  if (!user) window.location.href = "index.html";
 
   const messagesBox = document.getElementById("chat-messages");
   const input = document.getElementById("chatText");
-  const sendBtn = document.querySelector("#chat-input button");
 
   function toggleChatbox() {
     document.getElementById("chatbox").classList.toggle("hidden");
   }
 
   window.toggleChatbox = toggleChatbox;
+
+  function renderMessage(msg) {
+    const isSelf = msg.user_id === user.id;
+    const name = isSelf ? "You" : (msg.profiles?.full_name || "Unknown");
+    const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const msgContainer = document.createElement("div");
+    msgContainer.style.marginBottom = "10px";
+    msgContainer.style.textAlign = isSelf ? "right" : "left";
+
+    msgContainer.innerHTML = `
+      <div style="
+        display: inline-block;
+        background: ${isSelf ? '#d1e7ff' : '#f1f1f1'};
+        padding: 8px 12px;
+        border-radius: 12px;
+        max-width: 75%;
+        font-size: 0.85rem;
+      ">
+        <strong>${name}</strong><br/>
+        ${msg.message}
+        <div style="font-size: 0.7rem; color: gray; text-align: right;">${time}</div>
+      </div>
+    `;
+
+    messagesBox.appendChild(msgContainer);
+  }
 
   async function loadMessages() {
     const { data, error } = await supabase
@@ -393,14 +439,7 @@
 
     if (!error && data) {
       messagesBox.innerHTML = '';
-      data.forEach(msg => {
-        const isSelf = msg.user_id === user.id;
-        const name = isSelf ? 'You' : (msg.profiles?.full_name || 'Unknown');
-        const p = document.createElement('p');
-        p.style.marginBottom = '6px';
-        p.innerHTML = `<strong>${name}:</strong> ${msg.message}`;
-        messagesBox.appendChild(p);
-      });
+      data.forEach(renderMessage);
       messagesBox.scrollTop = messagesBox.scrollHeight;
     }
   }
@@ -417,27 +456,29 @@
     input.value = '';
   }
 
-  sendBtn.addEventListener("click", sendMessage);
+  document.querySelector("#chat-input button").addEventListener("click", sendMessage);
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter") sendMessage();
   });
 
-  // Real-time subscription
-  supabase.channel('chat-room')
+  // Real-time chat
+  supabase
+    .channel('chat-room')
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
       table: 'chat_messages'
     }, payload => {
-      loadMessages();
+      renderMessage(payload.new);
+      messagesBox.scrollTop = messagesBox.scrollHeight;
     })
     .subscribe();
 
-  // Set user name
+  // Set user display name
   document.getElementById('userName').textContent =
     user.user_metadata?.full_name || user.email;
 
-  // Load initial messages
+  // Load existing messages
   loadMessages();
 
   // Logout function
@@ -447,7 +488,15 @@
     window.location.href = "index.html";
   };
 </script>
-
+<script>
+  window.appendEmoji = function (emoji) {
+    if (!emoji) return;
+    const input = document.getElementById("chatText");
+    input.value += emoji;
+    document.getElementById("emojiPicker").value = "";
+    input.focus();
+  };
+</script>
 
 </body>
 </html>
