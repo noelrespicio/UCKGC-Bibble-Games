@@ -4,94 +4,93 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Arcade Bible Quiz | UCKGC</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+ <style>
+  :root {
+    --primary: #00ffcc;
+    --danger: #ff4d4d;
+    --background: #000;
+    --card-bg: #111;
+  }
 
-    :root {
-      --primary: #00ffcc;
-      --danger: #ff4d4d;
-      --background: #000;
-      --card-bg: #111;
-    }
+  body {
+    font-family: 'Arial Narrow', Arial, sans-serif;
+    background: var(--background);
+    color: white;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+  }
 
-    body {
-      font-family: 'Press Start 2P', cursive;
-      background: var(--background);
-      color: white;
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-    }
+  .quiz-box, .result-box, .intro-box {
+    background: var(--card-bg);
+    max-width: 600px;
+    width: 100%;
+    padding: 20px;
+    border-radius: 16px;
+    box-shadow: 0 0 20px var(--primary);
+    text-align: center;
+    margin-top: 20px;
+  }
 
-    .quiz-box, .result-box, .intro-box {
-      background: var(--card-bg);
-      max-width: 600px;
-      width: 100%;
-      padding: 20px;
-      border-radius: 16px;
-      box-shadow: 0 0 20px var(--primary);
-      text-align: center;
-      margin-top: 20px;
-    }
+  .option-btn, .exit-btn, .btn-try-again {
+    font-family: inherit;
+    background: var(--primary);
+    color: black;
+    border: none;
+    width: 100%;
+    margin: 10px 0;
+    padding: 14px;
+    font-size: 0.9rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
 
-    .option-btn, .exit-btn, .btn-try-again {
-      font-family: inherit;
-      background: var(--primary);
-      color: black;
-      border: none;
-      width: 100%;
-      margin: 10px 0;
-      padding: 14px;
-      font-size: 0.9rem;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: 0.3s ease;
-    }
+  .option-btn:hover, .exit-btn:hover, .btn-try-again:hover {
+    background: #00ccb3;
+  }
 
-    .option-btn:hover, .exit-btn:hover, .btn-try-again:hover {
-      background: #00ccb3;
-    }
+  #timerBar {
+    height: 10px;
+    background: lime;
+    width: 100%;
+    border-radius: 6px;
+    margin: 10px 0;
+    transition: width 1s linear;
+  }
 
-    #timerBar {
-      height: 10px;
-      background: lime;
-      width: 100%;
-      border-radius: 6px;
-      margin: 10px 0;
-      transition: width 1s linear;
-    }
+  #hud {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 0.8rem;
+  }
 
-    #hud {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 12px;
-      font-size: 0.8rem;
-    }
+  .correct-flash {
+    background-color: rgba(0,255,0,0.3);
+    animation: flash 0.3s;
+  }
+  .wrong-shake {
+    animation: shake 0.3s;
+  }
 
-    .correct-flash {
-      background-color: rgba(0,255,0,0.3);
-      animation: flash 0.3s;
-    }
-    .wrong-shake {
-      animation: shake 0.3s;
-    }
+  @keyframes flash {
+    from { background-color: rgba(0,255,0,0.3); }
+    to { background-color: transparent; }
+  }
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    50% { transform: translateX(8px); }
+    75% { transform: translateX(-8px); }
+    100% { transform: translateX(0); }
+  }
+</style>
 
-    @keyframes flash {
-      from { background-color: rgba(0,255,0,0.3); }
-      to { background-color: transparent; }
-    }
-    @keyframes shake {
-      0% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      50% { transform: translateX(8px); }
-      75% { transform: translateX(-8px); }
-      100% { transform: translateX(0); }
-    }
-  </style>
 </head>
 <body>
 
