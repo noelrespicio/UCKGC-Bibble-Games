@@ -1,1 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ 
+  <title>UCKGC Bible Games</title>
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+    const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'; // Replace with your actual key
+    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData.session) window.location.href = "dashboard.html";
+
+    window.registerUser = async function (e) {
+      e.preventDefault();
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      if (!fullName || !email || !password || !confirmPassword) {
+        alert("❗ All fields are required.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert("❗ Passwords do not match.");
+        return;
+      }
+
+      const { data: existingUser } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (existingUser) {
+        alert("📧 Email already registered. Try logging in.");
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { full_name: fullName }
+        }
+      });
+
+      if (error) {
+        alert("❌ Registration failed: " + error.message);
+        return;
+      }
+
+      const user = data.user;
+    if (user) {
+        await supabase
+          .from('profiles')
+          .insert([{ id: user.id, full_name: fullName, email }]);
+      }
+
+  // System welcome message to chat
+await supabase
+  .from('chat_messages')
+  .insert([{
+    user_id: 'system', // Use the correct column name
+    message: `🎉 New member joined: ${fullName}!`
+  }]);
+
+
+      alert("✅ Registration successful! You can now log in.");
+      showLogin();
+    };
+
+    window.loginUser = async function (e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+
+      if (!email || !password) {
+        alert("❗ Email and password are required.");
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        const { data: exists } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('email', email);
+
+        if (!exists || exists.length === 0) {
+          alert("📧 Email not registered.");
+        } else {
+          alert("🔒 Wrong password. Try again.");
+        }
+        return;
+      }
+
+      alert("✅ Login successful!");
+      window.location.href = "dashboard.html";
+    };
+
+    window.togglePassword = function (inputId, iconId) {
+      const input = document.getElementById(inputId);
+      const icon = document.getElementById(iconId);
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      icon.textContent = isHidden ? '👁️' : '🙈';
+    };
+
+    window.showRegister = function () {
+      document.getElementById('formContainer').innerHTML = 
+        <form id="registerForm">
+          <h3>Create an Account</h3>
+          <input type="text" id="fullName" placeholder="Full Name" required />
+          <input type="email" id="regEmail" placeholder="Email" required />
+
+          <div class="pw-group">
+            <input type="password" id="regPassword" placeholder="Password" required />
+            <span class="toggle-icon" id="icon1" onclick="togglePassword('regPassword', 'icon1')">🙈</span>
+          </div>
+
+          <div class="pw-group">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+            <span class="toggle-icon" id="icon2" onclick="togglePassword('confirmPassword', 'icon2')">🙈</span>
+          </div>
+
+          <button type="submit">Register</button>
+        </form>
+      ;
+      document.getElementById('registerForm').addEventListener('submit', registerUser);
+    };
+
+    window.showLogin = function () {
+      document.getElementById('formContainer').innerHTML = 
+        <form id="loginForm">
+          <h3>Login</h3>
+          <input type="email" id="loginEmail" placeholder="Email" required />
+
+          <div class="pw-group">
+            <input type="password" id="loginPassword" placeholder="Password" required />
+            <span class="toggle-icon" id="icon3" onclick="togglePassword('loginPassword', 'icon3')">🙈</span>
+          </div>
+
+          <button type="submit">Login</button>
+        </form>
+      ;
+      document.getElementById('loginForm').addEventListener('submit', loginUser);
+    };
+  </script>
+
+  <style>
+    :root {
+      --primary: #2e86de;
+      --primary-dark: #1b4f72;
+      --text: #2c3e50;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      background: linear-gradient(to right, #e0f2fe, #f0f9ff);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      min-width: 120px;
+      padding: 12px;
+      font-size: 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+    }
+
+    form {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .pw-group {
+      position: relative;
+      margin: 12px 0;
+    }
+
+    .pw-group input {
+      padding-right: 18px;
+    }
+
+    .toggle-icon {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: #555;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.4rem; }
+      .logo { width: 70px; height: 70px; }
+      button { font-size: 0.95rem; padding: 10px; }
+      input { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8377874433999473"
+     crossorigin="anonymous"></script>
+<!-- HomepageAd -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-8377874433999473"
+     data-ad-slot="1756631268"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+  <div class="container">
+    <header>
+      <img src="logo.png" alt="UCKGC Logo" class="logo" />
+      <h1>UCKGC Bible Games</h1>
+    </header>
+
+    <div class="buttons">
+      <button onclick="showRegister()">Register</button>
+      <button onclick="showLogin()">Login</button>
+    </div>
+
+    <div id="formContainer"></div>
+
+    <footer>
+      Developed by <strong>Respicio Noel</strong>
+    </footer>
+  </div>
+</body>
+</html>
 
