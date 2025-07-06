@@ -5,148 +5,150 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bible Character Match</title>
 <style>
-    :root {
-      --primary: #ff4081;
-      --secondary: #00e5ff;
-      --bg-gradient: linear-gradient(to right top, #e0f7fa, #fce4ec);
-      --card-bg: #ffffffdd;
-      --text: #222;
-      --radius: 12px;
-    }
+  @import url('https://fonts.googleapis.com/css2?family=Arial+Narrow&display=swap');
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+  :root {
+    --primary: #ff4081;
+    --secondary: #00e5ff;
+    --third: #7c4dff;
+    --fourth: #69f0ae;
+    --bg-gradient: linear-gradient(to right top, #ffebee, #f3e5f5, #e3f2fd, #e0f7fa, #e8f5e9);
+    --card-bg: #ffffffee;
+    --text: #212121;
+    --radius: 14px;
+  }
 
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Arial Narrow', sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text);
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+  }
+
+  .container {
+    max-width: 500px;
+    width: 100%;
+  }
+
+  .card {
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    padding: 24px;
+    margin-bottom: 24px;
+    text-align: center;
+    backdrop-filter: blur(6px);
+  }
+
+  h2 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    color: var(--primary);
+  }
+
+  h3 {
+    font-size: 1rem;
+    margin-top: 14px;
+    color: var(--third);
+  }
+
+  p {
+    margin-bottom: 18px;
+    font-size: 1rem;
+    color: #424242;
+  }
+
+  .option-btn {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    padding: 14px;
+    font-size: 15px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: #fff;
+    font-weight: bold;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .option-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
+  }
+
+  .exit-btn {
+    background: linear-gradient(to right, #ff5252, #ff4081);
+  }
+
+  .exit-btn:hover {
+    box-shadow: 0 0 18px #ff1744;
+  }
+
+  .quiz-box,
+  .result-box {
+    display: none;
+  }
+
+  .wrong-text {
+    font-weight: bold;
+    margin-top: 10px;
+    color: #d50000;
+  }
+
+  #timer {
+    font-weight: bold;
+    margin-bottom: 12px;
+    color: #009688;
+  }
+
+  #leaderboard {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+    color: #333;
+  }
+
+  #leaderboard li {
+    padding: 6px 0;
+    font-size: 0.95rem;
+  }
+
+  @media screen and (max-width: 600px) {
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg-gradient);
-      color: var(--text);
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-    }
-
-    .container {
-      max-width: 480px;
-      width: 100%;
+      padding: 12px;
     }
 
     .card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
-      padding: 20px;
-      margin-bottom: 20px;
-      text-align: center;
-      backdrop-filter: blur(5px);
+      padding: 18px;
     }
 
     h2 {
-      font-family: 'Press Start 2P', cursive;
       font-size: 1rem;
-      margin-bottom: 12px;
-      color: var(--primary);
     }
 
     h3 {
-      font-family: 'Press Start 2P', cursive;
-      font-size: 0.8rem;
-      color: var(--secondary);
-      margin: 10px 0;
-    }
-
-    p {
-      margin-bottom: 16px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     .option-btn {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 14px;
       font-size: 14px;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius);
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
-      box-shadow: 0 0 10px var(--primary);
+      padding: 12px;
     }
+  }
+</style>
 
-    .option-btn:hover {
-      background: #c2185b;
-      transform: scale(1.03);
-      box-shadow: 0 0 15px #c2185b;
-    }
-
-    .exit-btn {
-      background-color: #ff1744;
-      box-shadow: 0 0 10px #ff1744;
-    }
-
-    .exit-btn:hover {
-      background-color: #d50000;
-      box-shadow: 0 0 15px #d50000;
-    }
-
-    .quiz-box,
-    .result-box {
-      display: none;
-    }
-
-    .wrong-text {
-      font-weight: bold;
-      margin-top: 10px;
-      color: #d50000;
-    }
-
-    #timer {
-      font-weight: bold;
-      margin-bottom: 10px;
-      color: #009688;
-    }
-
-    #leaderboard {
-      list-style: none;
-      padding: 0;
-      text-align: left;
-    }
-
-    #leaderboard li {
-      padding: 6px 0;
-      font-size: 0.9rem;
-    }
-
-    @media screen and (max-width: 600px) {
-      body {
-        padding: 10px;
-      }
-
-      .card {
-        padding: 15px;
-      }
-
-      h2 {
-        font-size: 0.8rem;
-      }
-
-      h3 {
-        font-size: 0.7rem;
-      }
-
-      .option-btn {
-        font-size: 13px;
-        padding: 12px;
-      }
-    }
-  </style>
 </head>
 <body>
   <div class="container">
