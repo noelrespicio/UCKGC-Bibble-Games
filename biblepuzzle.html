@@ -143,21 +143,10 @@
         font-size: 1.4rem;
       }
     }
-    .puzzle-box {
-  margin-top: 40px;
-}
-
   </style>
 </head>
 <body>
 
-  <div class="puzzle-box" id="introScreen">
-  <h2>📖 Bible Puzzle Game</h2>
-  <p>Test your knowledge of the Bible by guessing the hidden word based on a clue.</p>
-  <p>Are you ready to begin?</p>
-  <button class="submit-btn" onclick="startPuzzleGame()">▶️ Play</button>
-  <a href="dashboard.html" class="try-again-link">❌ Exit to Dashboard</a>
-</div>
   <div class="puzzle-box" id="gameBox">
     <h2>Bible Puzzle</h2>
    
@@ -397,7 +386,7 @@
       puzzle = current.word;
       clue = current.clue;
       puzzleWordEl.textContent = "_ ".repeat(puzzle.length);
-      clueText.textContent = `📖 Clue: ${clue}`;
+      clueText.textContent = 📖 Clue: ${clue};
       inputEl.value = "";
       inputEl.focus();
       feedbackEl.classList.add("hidden");
@@ -406,7 +395,7 @@
     async function endGame() {
       gameBox.classList.add("hidden");
       resultBox.classList.remove("hidden");
-      finalScoreEl.textContent = `You solved ${score} puzzle${score > 1 ? "s" : ""}!`;
+      finalScoreEl.textContent = You solved ${score} puzzle${score > 1 ? "s" : ""}!;
 
       const { data: existing } = await supabase
         .from("biblepuzzle_leaderboard")
@@ -444,9 +433,9 @@
       [...uniqueUsers.entries()].slice(0, 5).forEach(([name, scoreVal]) => {
         const isCurrentUser = name === fullName;
         const crown = isCurrentUser && position === 1 ? "👑 " : "";
-        leaderboardEl.innerHTML += `<li style="${isCurrentUser ? 'color: var(--primary); font-weight: bold;' : ''}">
+        leaderboardEl.innerHTML += <li style="${isCurrentUser ? 'color: var(--primary); font-weight: bold;' : ''}">
           ${crown}<strong>${name}</strong>: ${scoreVal}
-        </li>`;
+        </li>;
 
         if (isCurrentUser && position === 1) triggerConfetti();
         position++;
@@ -458,13 +447,13 @@
       if (guess === puzzle) {
         correctSound.play();
         score++;
-        feedbackEl.textContent = `🎉 Correct! The word was "${puzzle}"`;
+        feedbackEl.textContent = 🎉 Correct! The word was "${puzzle}";
         feedbackEl.className = "feedback correct";
         feedbackEl.classList.remove("hidden");
         setTimeout(startGame, 2000);
       } else {
         wrongSound.play();
-        feedbackEl.textContent = `❌ Wrong! Correct answer: ${puzzle}`;
+        feedbackEl.textContent = ❌ Wrong! Correct answer: ${puzzle};
         feedbackEl.className = "feedback wrong";
         feedbackEl.classList.remove("hidden");
         setTimeout(endGame, 2000);
@@ -513,13 +502,8 @@ window.toggleMusic = () => {
   }
 };
 
-function startPuzzleGame() {
-  document.getElementById("introScreen").classList.add("hidden");
-  document.getElementById("gameBox").classList.remove("hidden");
-  shufflePuzzles();
-  startGame();
-}
-
+    shufflePuzzles();
+    startGame();
   </script>
 </body>
 </html>
