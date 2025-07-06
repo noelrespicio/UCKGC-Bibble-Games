@@ -2,222 +2,169 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Bible Quiz | UCKGC</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Arcade Bible Quiz | UCKGC</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+
     :root {
-      --primary: #2e86de;
-      --primary-dark: #1b4f72;
-      --background: #f0f8ff;
-      --card-bg: #ffffff;
+      --primary: #00ffcc;
       --danger: #ff4d4d;
+      --background: #000;
+      --card-bg: #111;
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Press Start 2P', cursive;
       background: var(--background);
+      color: white;
       margin: 0;
       padding: 20px;
-      text-align: center;
       display: flex;
       flex-direction: column;
+      align-items: center;
       justify-content: center;
       min-height: 100vh;
     }
 
-    .quiz-box, .result-box {
+    .quiz-box, .result-box, .intro-box {
       background: var(--card-bg);
-      max-width: 500px;
+      max-width: 600px;
       width: 100%;
-      margin: 0 auto;
-      padding: 24px;
+      padding: 20px;
       border-radius: 16px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-      transition: all 0.3s ease;
+      box-shadow: 0 0 20px var(--primary);
+      text-align: center;
+      margin-top: 20px;
     }
 
-    h2 {
-      color: var(--primary-dark);
-      font-size: 1.5rem;
-      margin-bottom: 12px;
-    }
-
-    #timer {
-      font-weight: bold;
-      color: var(--danger);
-      margin-bottom: 10px;
-    }
-
-    .option-btn {
+    .option-btn, .exit-btn, .btn-try-again {
+      font-family: inherit;
       background: var(--primary);
-      color: #fff;
+      color: black;
       border: none;
       width: 100%;
       margin: 10px 0;
       padding: 14px;
-      font-size: 1rem;
+      font-size: 0.9rem;
       border-radius: 10px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: 0.3s ease;
     }
 
-    .option-btn:hover {
-      background: var(--primary-dark);
+    .option-btn:hover, .exit-btn:hover, .btn-try-again:hover {
+      background: #00ccb3;
     }
 
-    .wrong-text {
-      color: var(--danger);
-      font-weight: bold;
-      margin-top: 12px;
+    #timerBar {
+      height: 10px;
+      background: lime;
+      width: 100%;
+      border-radius: 6px;
+      margin: 10px 0;
+      transition: width 1s linear;
     }
 
-    ul {
-      list-style: none;
-      padding: 0;
+    #hud {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      font-size: 0.8rem;
     }
 
-    li {
-      margin: 6px 0;
-      font-weight: bold;
+    .correct-flash {
+      background-color: rgba(0,255,0,0.3);
+      animation: flash 0.3s;
+    }
+    .wrong-shake {
+      animation: shake 0.3s;
     }
 
-    .btn-try-again {
-      margin-top: 16px;
-      background: #ffa600;
-      color: #fff;
+    @keyframes flash {
+      from { background-color: rgba(0,255,0,0.3); }
+      to { background-color: transparent; }
     }
-
-    .btn-try-again:hover {
-      background: #cc8400;
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      50% { transform: translateX(8px); }
+      75% { transform: translateX(-8px); }
+      100% { transform: translateX(0); }
     }
-
-    a {
-      margin-top: 14px;
-      display: inline-block;
-      text-decoration: none;
-      color: var(--primary-dark);
-      font-weight: bold;
-    }
-
-    @media (max-width: 480px) {
-      .quiz-box, .result-box {
-        padding: 16px;
-        border-radius: 12px;
-      }
-
-      h2 {
-        font-size: 1.25rem;
-      }
-
-      .option-btn {
-        font-size: 0.95rem;
-        padding: 12px;
-      }
-    }
-.intro-box {
-  background: var(--card-bg);
-  max-width: 500px;
-  width: 100%;
-  margin: 0 auto;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  text-align: center;
-}
-
-.exit-btn {
-  background: #ffa600;
-  color: #fff;
-}
-
-.exit-btn:hover {
-  background: #cc8400;
-}
-
-@media (max-width: 480px) {
-  .intro-box {
-    padding: 16px;
-    border-radius: 12px;
-  }
-
-  h2 {
-    font-size: 1.25rem;
-  }
-
-  .option-btn {
-    font-size: 0.95rem;
-    padding: 12px;
-  }
-}
-
-
-
   </style>
 </head>
 <body>
+
 <div class="intro-box" id="introBox">
-  <h2>📖 Welcome to the Bible Quiz!</h2>
-  <p>Test your knowledge and climb the leaderboard.</p>
-  <button id="playBtn" class="option-btn">▶️ Play</button>
-  <button id="exitBtn" class="option-btn exit-btn">🚪 Exit</button>
+  <h2>🎮 Arcade Bible Quiz</h2>
+  <p>Test your knowledge and aim for the high score!</p>
+  <button id="playBtn" class="option-btn">▶️ Start Game</button>
+  <button id="exitBtn" class="exit-btn">🚪 Exit</button>
 </div>
 
-
-  <div class="quiz-box" id="quizBox">
-    <h2 id="question">Loading...</h2>
-    <div id="timer">⏳ 15 seconds</div>
-    <div id="options"></div>
-    <p id="wrongAnswer" class="wrong-text" style="display: none;"></p>
+<div class="quiz-box" id="quizBox" style="display:none;">
+  <div id="hud">
+    <div id="scoreDisplay">🏅 Score: 0</div>
+    <div id="questionCount">🔢 Q1</div>
   </div>
+  <h2 id="question">Loading...</h2>
+  <div id="timerBar"></div>
+  <div id="options"></div>
+  <p id="wrongAnswer" style="color: var(--danger); display: none;"></p>
+</div>
 
-  <div class="result-box" id="resultBox" style="display:none;">
-    <h2>Quiz Finished!</h2>
-    <p id="finalScore"></p>
-    <h3>🏆 Leaderboard</h3>
-    <ul id="leaderboard"></ul>
-    <button id="tryAgainBtn" class="option-btn btn-try-again">🔁 Try Again</button>
-    <a href="dashboard.html">🔙 Back to Dashboard</a>
-  </div>
+<div class="result-box" id="resultBox" style="display:none;">
+  <h2>🎉 Game Over!</h2>
+  <p id="finalScore"></p>
+  <h3>🏆 Leaderboard</h3>
+  <ul id="leaderboard"></ul>
+  <button id="tryAgainBtn" class="btn-try-again">🔁 Try Again</button>
+  <a href="dashboard.html" style="color: var(--primary); display:block; margin-top: 14px;">🔙 Back to Dashboard</a>
+</div>
 
-  <!-- Audio elements -->
-  <audio id="bgMusic" src="backroundmusic.mp3" loop></audio>
-  <audio id="correctSound" src="correct.mp4"></audio>
-  <audio id="wrongSound" src="gameover.mp4"></audio>
-  <audio id="timesUpSound" src="audio/timesup.mp3"></audio>
+<audio id="bgMusic" src="backroundmusic.mp3" loop></audio>
+<audio id="correctSound" src="correct.mp4"></audio>
+<audio id="wrongSound" src="gameover.mp4"></audio>
+<audio id="timesUpSound" src="audio/timesup.mp3"></audio>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-    const supabase = createClient(
-      'https://wlthlwxcmltwescezjlk.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-    );
+const supabase = createClient(
+  'https://wlthlwxcmltwescezjlk.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
+);
 
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
-    if (!session) window.location.href = "index.html";
+const { data: sessionData } = await supabase.auth.getSession();
+const session = sessionData.session;
+if (!session) window.location.href = "index.html";
+const user = session.user;
+const userId = user.id;
+const fullName = user.user_metadata.full_name || user.email;
 
-    const user = session.user;
-    const userId = user.id;
-    const fullName = user.user_metadata.full_name || user.email;
+const questionEl = document.getElementById("question");
+const optionsEl = document.getElementById("options");
+const timerBar = document.getElementById("timerBar");
+const quizBox = document.getElementById("quizBox");
+const resultBox = document.getElementById("resultBox");
+const leaderboardEl = document.getElementById("leaderboard");
+const wrongText = document.getElementById("wrongAnswer");
+const scoreDisplay = document.getElementById("scoreDisplay");
+const questionCount = document.getElementById("questionCount");
 
-    const bgMusic = document.getElementById("bgMusic");
-    const correctSound = document.getElementById("correctSound");
-    const wrongSound = document.getElementById("wrongSound");
-    const timesUpSound = document.getElementById("timesUpSound");
+const bgMusic = document.getElementById("bgMusic");
+bgMusic.volume = 0.3;
+bgMusic.play().catch(() => {
+  document.body.addEventListener("click", () => bgMusic.play(), { once: true });
+});
 
-    // Try autoplay or trigger on user interaction
-    bgMusic.volume = 0.3;
-    bgMusic.play().catch(() => {
-      document.body.addEventListener("click", () => bgMusic.play(), { once: true });
-    });
+let currentQuestion = 0;
+let score = 0;
+let timer;
+let timeLeft = 15;
 
-    const allQuestions = [
-    { question: "Who built the ark?", options: ["Moses", "Noah", "Abraham", "David"], answer: "Noah" },
+const allQuestions = [
+  { question: "Who built the ark?", options: ["Moses", "Noah", "Abraham", "David"], answer: "Noah" },
         { question: "What is the first commandment?", options: ["Love your neighbor", "Do not steal", "Have no other gods", "Honor your parents"], answer: "Have no other gods" },
         { question: "What is the first book of the Bible?", options: ["Genesis", "Exodus", "Leviticus", "Numbers"], answer: "Genesis" },
         { question: "What is the first miracle of Jesus?", options: ["Walking on water", "Feeding the 5000", "Turning water into wine", "Healing the blind"], answer: "Turning water into wine" },
@@ -316,49 +263,40 @@
         { question: "Who betrayed Jesus for 30 pieces of silver?", options: ["Peter", "Judas", "John", "Thomas"], answer: "Judas" },
         { question: "What miracle did Jesus perform at a wedding in Cana?", options: ["Healing the sick", "Turning water into wine", "Feeding the 5000", "Walking on water"], answer: "Turning water into wine" },
         { question: "Who was thrown into a lion's den?", options: ["Daniel", "David", "Joseph", "Solomon"], answer: "Daniel" }, 
-        { question: "What is the shortest verse in the Bible?", options: ["Jesus wept.", "God is love.", "Pray without ceasing.", "Love your neighbor."], answer: "Jesus wept." },
-    ];
+        { question: "What is the shortest verse in the Bible?", options: ["Jesus wept.", "God is love.", "Pray without ceasing.", "Love your neighbor."], answer: "Jesus wept." }
 
-  function shuffle(array) {
+];
+
+function shuffle(array) {
   return array.sort(() => Math.random() - 0.5);
 }
 
 let quizData = shuffle([...allQuestions]);
-let currentQuestion = 0;
-let score = 0;
-let timer;
-let timeLeft = 15;
-
-const questionEl = document.getElementById("question");
-const optionsEl = document.getElementById("options");
-const timerEl = document.getElementById("timer");
-const quizBox = document.getElementById("quizBox");
-const resultBox = document.getElementById("resultBox");
-const leaderboardEl = document.getElementById("leaderboard");
-const wrongText = document.getElementById("wrongAnswer");
 
 function startTimer() {
+  clearInterval(timer);
   timeLeft = 15;
-  timerEl.textContent = `⏳ ${timeLeft} seconds`;
+  timerBar.style.width = "100%";
   timer = setInterval(() => {
     timeLeft--;
-    timerEl.textContent = `⏳ ${timeLeft} seconds`;
+    timerBar.style.width = `${(timeLeft / 15) * 100}%`;
     if (timeLeft <= 0) {
       clearInterval(timer);
-      timesUpSound.play();
-      wrongText.innerHTML = `⏱️ Time's up!`;
+      document.getElementById("timesUpSound").play();
+      wrongText.textContent = `⏱️ Time's up!`;
       wrongText.style.display = "block";
-      setTimeout(endQuiz, 2000);
+      setTimeout(endQuiz, 1500);
     }
   }, 1000);
 }
 
 function loadQuestion() {
-  clearInterval(timer);
   const q = quizData[currentQuestion];
-  questionEl.textContent = `Q${currentQuestion + 1}: ${q.question}`;
+  questionEl.textContent = q.question;
   optionsEl.innerHTML = "";
   wrongText.style.display = "none";
+  questionCount.textContent = `🔢 Q${currentQuestion + 1}`;
+
   shuffle(q.options).forEach(option => {
     const btn = document.createElement("button");
     btn.textContent = option;
@@ -372,24 +310,20 @@ function loadQuestion() {
 async function selectAnswer(selected, correct) {
   clearInterval(timer);
   if (selected === correct) {
-    correctSound.play();
-    wrongText.innerHTML = `✅ Correct!`;
-    wrongText.style.display = "block";
+    document.getElementById("correctSound").play();
     score++;
+    scoreDisplay.textContent = `🏅 Score: ${score}`;
     currentQuestion++;
     if (currentQuestion < quizData.length) {
-      setTimeout(() => {
-        wrongText.style.display = "none";
-        loadQuestion();
-      }, 1000); // Wait 1 second before next question
+      loadQuestion();
     } else {
-      setTimeout(endQuiz, 1000);
+      endQuiz();
     }
   } else {
-    wrongSound.play();
-    wrongText.innerHTML = `❌ Wrong! Correct: <span style="color:var(--primary-dark);">${correct}</span>`;
+    document.getElementById("wrongSound").play();
+    wrongText.innerHTML = `❌ Wrong! Correct: ${correct}`;
     wrongText.style.display = "block";
-    setTimeout(endQuiz, 2000);
+    setTimeout(endQuiz, 1500);
   }
 }
 
@@ -397,71 +331,49 @@ async function endQuiz() {
   clearInterval(timer);
   quizBox.style.display = "none";
   resultBox.style.display = "block";
-  document.getElementById("finalScore").textContent = `You scored ${score} out of ${quizData.length}`;
+  document.getElementById("finalScore").textContent = `You scored ${score} point(s)`;
 
-  const { data: existing } = await supabase
-    .from("biblequiz_leaderboard")
-    .select("id, score")
-    .eq("user_id", userId)
-    .maybeSingle();
-
+  const { data: existing } = await supabase.from("biblequiz_leaderboard").select("id, score").eq("user_id", userId).maybeSingle();
   if (existing) {
     if (score > existing.score) {
-      await supabase
-        .from("biblequiz_leaderboard")
-        .update({ score: score })
-        .eq("id", existing.id);
+      await supabase.from("biblequiz_leaderboard").update({ score }).eq("id", existing.id);
     }
   } else {
-    await supabase
-      .from("biblequiz_leaderboard")
-      .insert([{ user_id: userId, name: fullName, score: score }]);
+    await supabase.from("biblequiz_leaderboard").insert([{ user_id: userId, name: fullName, score }]);
   }
 
-  const { data: topScores } = await supabase
-    .from("biblequiz_leaderboard")
-    .select("name, score")
-    .order("score", { ascending: false });
-
-  const uniqueUsers = new Map();
-  topScores.forEach(row => {
-    if (!uniqueUsers.has(row.name)) {
-      uniqueUsers.set(row.name, row.score);
-    }
-  });
-
+  const { data: topScores } = await supabase.from("biblequiz_leaderboard").select("name, score").order("score", { ascending: false });
+  const unique = new Map();
+  topScores.forEach(row => { if (!unique.has(row.name)) unique.set(row.name, row.score); });
   leaderboardEl.innerHTML = "";
-  [...uniqueUsers.entries()]
-    .slice(0, 5)
-    .forEach(([name, score]) => {
-      leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
-    });
+  [...unique.entries()].slice(0, 5).forEach(([name, score]) => {
+    leaderboardEl.innerHTML += `<li><strong>${name}</strong>: ${score}</li>`;
+  });
 }
 
-// Event listeners
-document.getElementById("tryAgainBtn").addEventListener("click", () => {
-  currentQuestion = 0;
-  score = 0;
-  quizData = shuffle([...allQuestions]);
-  quizBox.style.display = "block";
-  resultBox.style.display = "none";
-  loadQuestion();
-});
-
-document.getElementById("exitBtn").addEventListener("click", () => {
-  window.location.href = "dashboard.html";
-});
-
-quizBox.style.display = "none";
-resultBox.style.display = "none";
-document.getElementById("introBox").style.display = "block";
-
-document.getElementById("playBtn").addEventListener("click", () => {
+document.getElementById("playBtn").onclick = () => {
   document.getElementById("introBox").style.display = "none";
   quizBox.style.display = "block";
+  score = 0;
+  currentQuestion = 0;
+  scoreDisplay.textContent = `🏅 Score: 0`;
+  quizData = shuffle([...allQuestions]);
   loadQuestion();
-});
+};
 
-  </script>
+document.getElementById("tryAgainBtn").onclick = () => {
+  resultBox.style.display = "none";
+  quizBox.style.display = "block";
+  score = 0;
+  currentQuestion = 0;
+  scoreDisplay.textContent = `🏅 Score: 0`;
+  quizData = shuffle([...allQuestions]);
+  loadQuestion();
+};
+
+document.getElementById("exitBtn").onclick = () => {
+  window.location.href = "dashboard.html";
+};
+</script>
 </body>
 </html>
