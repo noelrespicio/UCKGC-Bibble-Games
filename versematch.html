@@ -411,9 +411,10 @@
       loadItem();
     }
 
-  document.getElementById("playBtn").addEventListener("click", () => {
+ document.getElementById("playBtn").addEventListener("click", () => {
   document.getElementById("introBox").style.display = "none";
-  document.getElementById("gameContainer").style.display = "block"; // Or whatever your game div is
+  gameBox.style.display = "block";
+  loadItem();
 });
 
 document.getElementById("exitBtn").addEventListener("click", () => {
