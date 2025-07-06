@@ -114,9 +114,26 @@
         padding: 12px;
       }
     }
+    .intro-box {
+  background: var(--card-bg);
+  max-width: 500px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
   </style>
 </head>
 <body>
+<div class="intro-box" id="introBox">
+  <h2>📖 Welcome to the Bible Quiz!</h2>
+  <p>Test your knowledge and climb the leaderboard.</p>
+  <button id="playBtn" class="option-btn">▶️ Play</button>
+  <a href="dashboard.html" class="option-btn btn-try-again">🚪 Exit</a>
+</div>
 
   <div class="quiz-box" id="quizBox">
     <h2 id="question">Loading...</h2>
@@ -399,7 +416,16 @@
       loadQuestion();
     });
 
-    loadQuestion();
+    quizBox.style.display = "none";
+resultBox.style.display = "none";
+document.getElementById("introBox").style.display = "block";
+
+document.getElementById("playBtn").addEventListener("click", () => {
+  document.getElementById("introBox").style.display = "none";
+  quizBox.style.display = "block";
+  loadQuestion();
+});
+
   </script>
 </body>
 </html>
