@@ -143,11 +143,69 @@
       .card h3 { font-size: 1rem; }
       .card p { font-size: 0.85rem; }
     }
-    header {
-  position: relative; /* Add this line */
+ header {
   text-align: center;
   margin-bottom: 20px;
+  position: relative;
 }
+
+.leaderboard-link {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--card-bg);
+  padding: 8px 12px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.leaderboard-link:hover {
+  background: var(--primary);
+  transform: scale(1.05);
+}
+
+.leaderboard-link .icon {
+  width: 20px;
+  height: 20px;
+  color: var(--primary-dark);
+  transition: color 0.3s ease;
+}
+
+.leaderboard-link span {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  transition: color 0.3s ease;
+}
+
+.leaderboard-link:hover .icon,
+.leaderboard-link:hover span {
+  color: #fff;
+}
+
+@media (max-width: 480px) {
+  .leaderboard-link {
+    top: 10px;
+    right: 10px;
+    padding: 6px 10px;
+    gap: 4px;
+  }
+
+  .leaderboard-link span {
+    font-size: 0.85rem;
+  }
+
+  .leaderboard-link .icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
 
   </style>
 </head>
@@ -157,11 +215,11 @@
     <h2>UCKGC Bible Games</h2>
     <div class="welcome">Welcome, <strong id="userName">Loading...</strong>!</div>
   </header>
-<div style="position: absolute; top: 20px; right: 20px;">
-  <button onclick="window.location.href='leaderboard.html'" style="background: none; border: none; cursor: pointer;" title="Leaderboard">
-    <i data-lucide="bar-chart-3" style="width: 28px; height: 28px; color: var(--primary-dark);"></i>
-  </button>
+<div class="leaderboard-link" onclick="window.location.href='leaderboard.html'" title="View Leaderboard">
+  <i data-lucide="bar-chart-3" class="icon"></i>
+  <span>Leaderboard</span>
 </div>
+
 
   <section class="games-grid">
     <div class="card" onclick="window.location.href='bibblequiz.html'">
