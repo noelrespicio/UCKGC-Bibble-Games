@@ -195,9 +195,31 @@
         font-size: 0.85rem;
       }
     }
-    #chatbox {
+   #chat-toggle {
   position: fixed;
   bottom: 20px;
+  right: 20px;
+  background: var(--primary);
+  color: white;
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 9999;
+}
+
+#chatbox.hidden {
+  display: none;
+}
+
+#chatbox {
+  position: fixed;
+  bottom: 80px;
   right: 20px;
   width: 280px;
   background: white;
@@ -247,6 +269,7 @@
   cursor: pointer;
   font-weight: bold;
 }
+
 
   </style>
 </head>
@@ -299,7 +322,9 @@
     </div>
   </section>
 
-  <div id="chatbox">
+<div id="chat-toggle" onclick="toggleChatbox()">💬</div>
+
+<div id="chatbox" class="hidden">
   <div id="chat-header">💬 Chat Room</div>
   <div id="chat-messages"></div>
   <div id="chat-input">
@@ -307,6 +332,7 @@
     <button onclick="sendMessage()">Send</button>
   </div>
 </div>
+
 
 
   <button class="logout-btn" onclick="logout()">Logout</button>
@@ -385,6 +411,34 @@
     .subscribe();
 
   loadMessages();
+</script>
+<script>
+  function toggleChatbox() {
+    const chatbox = document.getElementById('chatbox');
+    chatbox.classList.toggle('hidden');
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById("chatText");
+    const text = input.value.trim();
+    if (!text) return;
+
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+    const supabase = createClient(
+      'https://wlthlwxcmltwescezjlk.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+    );
+    const { data: sessionData } = await supabase.auth.getSession();
+    const session = sessionData.session;
+    const user = session?.user;
+
+    await supabase.from('chat_messages').insert({
+      user_id: user.id,
+      message: text
+    });
+
+    input.value = '';
+  }
 </script>
 
 </body>
