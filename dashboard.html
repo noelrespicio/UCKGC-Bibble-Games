@@ -6,27 +6,6 @@
   <title>UCKGC Arcade</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-    const supabase = createClient(
-      'https://wlthlwxcmltwescezjlk.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-    );
-
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
-
-    if (!session) {
-      window.location.href = "index.html";
-    } else {
-      const user = session.user;
-      document.getElementById('userName').textContent =
-        user.user_metadata?.full_name || user.email;
-    }
-  </script>
-
   <style>
     :root {
       --primary: #ff5e57;
@@ -35,13 +14,7 @@
       --card-bg: #ffffff;
       --text: #222;
     }
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
       background: var(--bg);
@@ -51,41 +24,22 @@
       display: flex;
       flex-direction: column;
     }
-
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-      position: relative;
+    header { text-align: center; margin-bottom: 20px; position: relative; }
+    .logo { width: 80px; height: 80px; object-fit: contain; margin-bottom: 10px; }
+    h2 {
+      font-family: 'Arial Narrow', Arial, sans-serif;
+      font-size: 1.6rem;
+      color: var(--primary);
+      font-weight: bold;
+      margin-bottom: 8px;
     }
-
-    .logo {
-      width: 80px;
-      height: 80px;
-      object-fit: contain;
-      margin-bottom: 10px;
-    }
-
-   h2 {
-  font-family: 'Arial Narrow', Arial, sans-serif;
-  font-size: 1.6rem;
-  color: var(--primary);
-  font-weight: bold;
-  margin-bottom: 8px;
-}
-
-
-    .welcome {
-      font-size: 0.9rem;
-      color: #555;
-    }
-
+    .welcome { font-size: 0.9rem; color: #555; }
     .games-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 20px;
       margin-bottom: 30px;
     }
-
     .card {
       background: linear-gradient(145deg, #ffffff, #f3f3f3);
       border-radius: 16px;
@@ -96,31 +50,26 @@
       cursor: pointer;
       border: 2px solid var(--primary);
     }
-
     .card:hover {
       transform: translateY(-5px);
       box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
       background: var(--secondary);
     }
-
     .card .icon {
       width: 40px;
       height: 40px;
       margin: 0 auto 12px;
       color: var(--primary);
     }
-
     .card h3 {
       font-size: 1.1rem;
       color: var(--primary);
       margin-bottom: 6px;
     }
-
     .card p {
       font-size: 0.9rem;
       color: #444;
     }
-
     .logout-btn {
       background: var(--primary);
       color: white;
@@ -132,17 +81,12 @@
       margin: 0 auto 20px;
       display: block;
     }
-
-    .logout-btn:hover {
-      background: #c0392b;
-    }
-
+    .logout-btn:hover { background: #c0392b; }
     footer {
       text-align: center;
       font-size: 0.85rem;
       color: #777;
     }
-
     .leaderboard-link {
       position: absolute;
       top: 20px;
@@ -157,187 +101,117 @@
       cursor: pointer;
       transition: all 0.3s ease;
     }
-
     .leaderboard-link:hover {
       background: var(--primary);
       transform: scale(1.05);
     }
-
-    .leaderboard-link .icon {
-      width: 20px;
-      height: 20px;
+    .leaderboard-link .icon, .leaderboard-link span {
       color: var(--primary);
     }
-
-    .leaderboard-link span {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--primary);
-    }
-
-    .leaderboard-link:hover .icon,
-    .leaderboard-link:hover span {
+    .leaderboard-link:hover .icon, .leaderboard-link:hover span {
       color: #fff;
     }
-
-    @media (max-width: 480px) {
-      h2 { font-size: 1rem; }
-      .logout-btn { font-size: 0.9rem; padding: 8px 12px; }
-      .card h3 { font-size: 1rem; }
-      .card p { font-size: 0.85rem; }
-      .leaderboard-link {
-        top: 10px;
-        right: 10px;
-        padding: 6px 10px;
-        gap: 4px;
-      }
-      .leaderboard-link span {
-        font-size: 0.85rem;
-      }
+    #chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--primary);
+      color: white;
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 9999;
+      transition: transform 0.3s ease;
     }
-#chat-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: var(--primary);
-  color: white;
-  width: 50px;
-  height: 50px;
-  font-size: 1.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 9999;
-  transition: transform 0.3s ease;
-}
-
-#chat-toggle:hover {
-  transform: scale(1.1);
-}
-
-#chatbox.hidden {
-  display: none;
-}
-
-#chatbox {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  width: 300px;
-  max-height: 400px;
-  background: white;
-  border: 2px solid var(--primary);
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-  z-index: 9999;
-  font-size: 0.85rem;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  animation: fadeInUp 0.3s ease;
-}
-
-@keyframes fadeInUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-#chat-header {
-  background: var(--primary);
-  color: white;
-  padding: 10px;
-  text-align: center;
-  font-weight: bold;
-  border-bottom: 1px solid #ccc;
-}
-
-#chat-messages {
-  flex-grow: 1;
-  padding: 10px;
-  overflow-y: auto;
-  background: #fdfdfd;
-}
-
-#chat-input {
-  display: flex;
-  border-top: 1px solid #ddd;
-}
-
-#chat-input input {
-  flex: 1;
-  border: none;
-  padding: 8px;
-  font-size: 0.9rem;
-  outline: none;
-}
-
-#chat-input button {
-  background: var(--primary);
-  border: none;
-  color: white;
-  padding: 8px 12px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: background 0.3s ease;
-}
-
-#chat-input button:hover {
-  background: #c0392b;
-}
-
-#emojiPicker {
-  font-size: 1.2rem;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-}
-
-.chat-bubble {
-  max-width: 75%;
-  margin: 6px 0;
-  padding: 8px 12px;
-  border-radius: 12px;
-  font-size: 0.85rem;
-  position: relative;
-  display: inline-block;
-  word-wrap: break-word;
-  line-height: 1.4;
-}
-
-.chat-bubble.you {
-  background-color: #d1e7ff;
-  align-self: flex-end;
-  text-align: right;
-  margin-left: auto;
-  border-bottom-right-radius: 0;
-}
-
-.chat-bubble.other {
-  background-color: #f1f1f1;
-  align-self: flex-start;
-  text-align: left;
-  margin-right: auto;
-  border-bottom-left-radius: 0;
-}
-
-.chat-meta {
-  font-size: 0.7rem;
-  color: gray;
-  margin-top: 2px;
-  text-align: right;
-}
-
-@media (max-width: 480px) {
-  #chatbox {
-    right: 10px;
-    bottom: 70px;
-    width: 95%;
-  }
-}
-
+    #chat-toggle:hover { transform: scale(1.1); }
+    #chatbox.hidden { display: none; }
+    #chatbox {
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 300px;
+      max-height: 400px;
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      z-index: 9999;
+      font-size: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #chat-header {
+      background: var(--primary);
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+    }
+    #chat-messages {
+      flex-grow: 1;
+      padding: 10px;
+      overflow-y: auto;
+      background: #fdfdfd;
+    }
+    #chat-input {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+    #chat-input input {
+      flex: 1;
+      border: none;
+      padding: 8px;
+      font-size: 0.9rem;
+      outline: none;
+    }
+    #chat-input button {
+      background: var(--primary);
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #chat-input button:hover { background: #c0392b; }
+    .chat-bubble {
+      max-width: 75%;
+      margin: 6px 0;
+      padding: 8px 12px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      position: relative;
+      display: inline-block;
+      word-wrap: break-word;
+      line-height: 1.4;
+    }
+    .chat-bubble.you {
+      background-color: #d1e7ff;
+      align-self: flex-end;
+      text-align: right;
+      margin-left: auto;
+      border-bottom-right-radius: 0;
+    }
+    .chat-bubble.other {
+      background-color: #f1f1f1;
+      align-self: flex-start;
+      text-align: left;
+      margin-right: auto;
+      border-bottom-left-radius: 0;
+    }
+    .chat-meta {
+      font-size: 0.7rem;
+      color: gray;
+      margin-top: 2px;
+      text-align: right;
+    }
   </style>
 </head>
 <body>
@@ -345,7 +219,7 @@
     <img src="logo.png" alt="UCKGC Logo" class="logo" />
     <h2>UCKGC Bibble Games</h2>
     <div class="welcome">Welcome, <strong id="userName">Loading...</strong>!</div>
-    <div class="leaderboard-link" onclick="window.location.href='leaderboard.html'" title="View Leaderboard">
+    <div class="leaderboard-link" onclick="window.location.href='leaderboard.html'">
       <i data-lucide="bar-chart-3" class="icon"></i>
       <span>Leaderboard</span>
     </div>
@@ -357,41 +231,30 @@
       <h3>Bible Quiz</h3>
       <p>Test your knowledge of the Scriptures!</p>
     </div>
-
     <div class="card" onclick="window.location.href='versematch.html'">
       <div class="icon" data-lucide="link-2"></div>
       <h3>Verse Match</h3>
       <p>Match Bible verses with references.</p>
     </div>
-
     <div class="card" onclick="window.location.href='character-match.html'">
       <div class="icon" data-lucide="users"></div>
       <h3>Bible Character Match</h3>
       <p>Match Bible characters to the correct verses.</p>
     </div>
-
     <div class="card" onclick="window.location.href='biblepuzzle.html'">
       <div class="icon" data-lucide="type"></div>
       <h3>Bible Word Challenge</h3>
       <p>Guess the hidden Bible words using clues.</p>
     </div>
-
-    <div class="card" onclick="alert('Coming Soon: Verse Shuffle!')">
-      <div class="icon" data-lucide="shuffle"></div>
-      <h3>Verse Shuffle</h3>
-      <p>Arrange Bible verses in the correct order.</p>
-    </div>
-
-    <div class="card" onclick="alert('Coming Soon: Books Order!')">
-      <div class="icon" data-lucide="list-ordered"></div>
-      <h3>Books Order</h3>
-      <p>Put the Bible books in correct order.</p>
-    </div>
   </section>
 
- <div id="chat-toggle" onclick="toggleChatbox()">💬</div>
+  <div id="chat-toggle" onclick="toggleChatbox()">💬</div>
+
   <div id="chatbox" class="hidden">
-    <div id="chat-header">💬 Chat Room</div>
+    <div id="chat-header">
+      💬 Chat Room
+      <div id="typing-indicator" style="font-size: 0.7rem;"></div>
+    </div>
     <div id="chat-messages"></div>
     <div id="chat-input">
       <select id="emojiPicker" onchange="appendEmoji(this.value)">
@@ -404,81 +267,62 @@
         <option value="📖">📖</option>
         <option value="✝️">✝️</option>
       </select>
-      <input type="text" id="chatText" placeholder="Type a message..." />
-      <button>Send</button>
+      <input type="text" id="chatText" placeholder="Type a message..." oninput="notifyTyping()" />
+      <button onclick="sendMessage()">Send</button>
     </div>
-</div>
-
-
+  </div>
 
   <button class="logout-btn" onclick="logout()">Logout</button>
+  <footer>🎮 Developed by <strong>Noel Respicio</strong> © 2025</footer>
 
-  <footer>
-    🎮 Developed by <strong>Noel Respicio</strong> © 2025
-  </footer>
+  <audio id="notifySound" src="https://www.myinstants.com/media/sounds/mixkit-positive-interface-beep-221.wav" preload="auto"></audio>
 
-  <script>
-    lucide.createIcons();
-
-    async function logout() {
-      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-      const supabase = createClient(
-        'https://wlthlwxcmltwescezjlk.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-      );
-      await supabase.auth.signOut();
-      alert("👋 Logged out successfully!");
-      window.location.href = "index.html";
-    }
-  </script>
-<script>
-  lucide.createIcons();
-</script>
-
-<script type="module">
+  <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-    const supabase = createClient(
-      'https://wlthlwxcmltwescezjlk.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o'
-    );
-
+    const supabase = createClient('https://wlthlwxcmltwescezjlk.supabase.co', 'YOUR_PUBLIC_ANON_KEY');
     const { data: sessionData } = await supabase.auth.getSession();
     const session = sessionData.session;
     const user = session?.user;
 
-    if (!user) {
-      window.location.href = "index.html";
-    } else {
-      document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
-    }
+    if (!user) window.location.href = "index.html";
+    else document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
 
     const messagesBox = document.getElementById("chat-messages");
     const input = document.getElementById("chatText");
 
-    function toggleChatbox() {
+    window.toggleChatbox = () => {
       const chatbox = document.getElementById("chatbox");
       chatbox.classList.toggle("hidden");
-      if (!chatbox.classList.contains("hidden")) {
-        setTimeout(() => input.focus(), 100);
-      }
-    }
+      if (!chatbox.classList.contains("hidden")) setTimeout(() => input.focus(), 100);
+    };
 
-    window.toggleChatbox = toggleChatbox;
+    window.appendEmoji = emoji => {
+      if (!emoji) return;
+      input.value += emoji;
+      document.getElementById("emojiPicker").value = "";
+      input.focus();
+    };
+
+    window.notifyTyping = () => {
+      clearTimeout(window.typingTimeout);
+      document.getElementById('typing-indicator').textContent = "Someone is typing...";
+      window.typingTimeout = setTimeout(() => {
+        document.getElementById('typing-indicator').textContent = "";
+      }, 1500);
+    };
 
     function renderMessage(msg) {
       const isSelf = msg.user_id === user.id;
       const name = isSelf ? "You" : (msg.profiles?.full_name || "Unknown");
-      const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
+      const time = new Date(msg.created_at);
+      const timeStr = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const bubble = document.createElement("div");
       bubble.className = `chat-bubble ${isSelf ? 'you' : 'other'}`;
-      bubble.innerHTML = `
-        <div><strong>${name}</strong></div>
-        <div>${msg.message}</div>
-        <div class="chat-meta">${time}</div>
-      `;
+      bubble.title = time.toLocaleString();
+      const avatarDot = `<span style="width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:6px;background:${isSelf ? '#3498db' : '#aaa'}"></span>`;
+      bubble.innerHTML = `<div><strong>${avatarDot}${name}</strong></div><div>${msg.message}</div><div class="chat-meta">${timeStr}</div>`;
       messagesBox.appendChild(bubble);
+      messagesBox.scrollTop = messagesBox.scrollHeight;
     }
 
     async function loadMessages() {
@@ -488,68 +332,31 @@
         .order('created_at', { ascending: true });
 
       if (!error && data) {
-        messagesBox.innerHTML = data.length === 0 ? "<em>No messages yet. Be the first to chat!</em>" : "";
+        messagesBox.innerHTML = data.length === 0 ? "<em>No messages yet.</em>" : "";
         data.forEach(renderMessage);
-        messagesBox.scrollTop = messagesBox.scrollHeight;
       }
     }
 
-    async function sendMessage() {
+    window.sendMessage = async () => {
       const text = input.value.trim();
       if (!text) return;
-
-      await supabase.from('chat_messages').insert({
-        user_id: user.id,
-        message: text
-      });
-
+      await supabase.from('chat_messages').insert({ user_id: user.id, message: text });
       input.value = '';
-    }
+    };
 
-    document.querySelector("#chat-input button").addEventListener("click", sendMessage);
-    input.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") sendMessage();
-    });
-
-    supabase
-      .channel('chat-room')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'chat_messages'
-      }, payload => {
+    supabase.channel('chat-room')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'chat_messages' }, payload => {
         renderMessage(payload.new);
-        messagesBox.scrollTop = messagesBox.scrollHeight;
+        document.getElementById("notifySound").play();
       })
       .subscribe();
 
     loadMessages();
-
     window.logout = async function () {
       await supabase.auth.signOut();
       alert("👋 Logged out successfully!");
       window.location.href = "index.html";
     };
   </script>
-
-  <script>
-    window.appendEmoji = function (emoji) {
-      if (!emoji) return;
-      const input = document.getElementById("chatText");
-      input.value += emoji;
-      document.getElementById("emojiPicker").value = "";
-      input.focus();
-    };
-  </script>
-<script>
-  window.appendEmoji = function (emoji) {
-    if (!emoji) return;
-    const input = document.getElementById("chatText");
-    input.value += emoji;
-    document.getElementById("emojiPicker").value = "";
-    input.focus();
-  };
-</script>
-
 </body>
 </html>
