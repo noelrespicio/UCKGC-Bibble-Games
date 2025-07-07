@@ -367,7 +367,13 @@
     const input = document.getElementById("chatText");
 
     window.toggleChatbox = function () {
-      document.getElementById("chatbox").classList.toggle("hidden");
+      const chatbox = document.getElementById("chatbox");
+      chatbox.classList.toggle("hidden");
+      if (!chatbox.classList.contains("hidden")) {
+        setTimeout(() => {
+          messagesBox.scrollTop = messagesBox.scrollHeight;
+        }, 100);
+      }
     };
 
     const userMap = {};
