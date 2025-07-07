@@ -63,7 +63,9 @@
         visibility: hidden;
       }
     }
-
+.loader {
+  animation: fadeOut 1s 4s forwards;
+}
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(20px); }
       to { opacity: 1; transform: translateY(0); }
@@ -215,7 +217,7 @@
     // After loader fade-out, show main content
     setTimeout(() => {
       document.getElementById('mainContent').style.display = 'block';
-    }, 3000);
+    }, 5000);
   </script>
 
   <!-- Your Supabase Logic -->
