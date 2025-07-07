@@ -5,6 +5,220 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>UCKGC Bible Games</title>
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2e86de;
+      --primary-dark: #1b4f72;
+      --bg-light: #f0f9ff;
+      --text: #2c3e50;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(to right, #cbe4f9, #f0f9ff);
+      overflow: hidden;
+    }
+
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 9999;
+      animation: fadeOut 1s 3s forwards;
+    }
+
+    .loader h2 {
+      color: var(--primary-dark);
+      animation: slideIn 2s ease-in-out;
+    }
+
+    .verse {
+      margin-top: 20px;
+      font-size: 1rem;
+      color: #555;
+      text-align: center;
+      max-width: 80%;
+      line-height: 1.5;
+      animation: fadeIn 2.5s ease-in;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(-50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .container {
+      display: none;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 400px;
+      margin: 80px auto;
+      text-align: center;
+      animation: fadeIn 1.5s ease-in;
+    }
+
+    .logo {
+      width: 90px;
+      height: 90px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      color: var(--text);
+      margin-bottom: 20px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      min-width: 120px;
+      padding: 12px;
+      font-size: 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background: var(--primary-dark);
+    }
+
+    form {
+      background: #f9fafb;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin: 10px 0;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .pw-group {
+      position: relative;
+      margin: 12px 0;
+    }
+
+    .pw-group input {
+      padding-right: 18px;
+    }
+
+    .toggle-icon {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: #555;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    footer {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.4rem; }
+      .logo { width: 70px; height: 70px; }
+      button { font-size: 0.95rem; padding: 10px; }
+      input { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader with Verse -->
+  <div class="loader" id="loader">
+    <h2>🙏 Welcome to UCKGC Bible Games</h2>
+    <div class="verse" id="verseText"></div>
+  </div>
+
+  <div class="container" id="mainContent">
+    <header>
+      <img src="logo.png" alt="UCKGC Logo" class="logo" />
+      <h1>UCKGC Bible Games</h1>
+    </header>
+
+    <div class="buttons">
+      <button onclick="showRegister()">Register</button>
+      <button onclick="showLogin()">Login</button>
+    </div>
+
+    <div id="formContainer"></div>
+
+    <footer>
+      Developed by <strong>Respicio Noel</strong>
+    </footer>
+  </div>
+
+  <!-- JS logic -->
+  <script type="module">
+    const verses = [
+      "“I can do all things through Christ who strengthens me.” — Philippians 4:13",
+      "“Trust in the Lord with all your heart and lean not on your own understanding.” — Proverbs 3:5",
+      "“Be strong and courageous. Do not be afraid.” — Joshua 1:9",
+      "“The Lord is my shepherd; I shall not want.” — Psalm 23:1",
+      "“Let everything that has breath praise the Lord.” — Psalm 150:6"
+    ];
+
+    document.getElementById("verseText").textContent =
+      verses[Math.floor(Math.random() * verses.length)];
+
+    // After loader fade-out, show main content
+    setTimeout(() => {
+      document.getElementById('mainContent').style.display = 'block';
+    }, 3000);
+  </script>
+
+  <!-- Your Supabase Logic -->
   <script type="module">
     import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -141,151 +355,5 @@
       document.getElementById('loginForm').addEventListener('submit', loginUser);
     };
   </script>
-
-  <style>
-    :root {
-      --primary: #2e86de;
-      --primary-dark: #1b4f72;
-      --text: #2c3e50;
-    }
-
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(to right, #e0f2fe, #f0f9ff);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .container {
-      background: white;
-      border-radius: 16px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-      padding: 30px 20px;
-      width: 100%;
-      max-width: 400px;
-      text-align: center;
-    }
-
-    .logo {
-      width: 90px;
-      height: 90px;
-      margin-bottom: 10px;
-    }
-
-    h1 {
-      font-size: 1.8rem;
-      color: var(--text);
-      margin-bottom: 20px;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      flex: 1;
-      min-width: 120px;
-      padding: 12px;
-      font-size: 1rem;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s ease;
-    }
-
-    button:hover {
-      background: var(--primary-dark);
-    }
-
-    form {
-      background: #f9fafb;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      margin: 10px 0;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-
-    .pw-group {
-      position: relative;
-      margin: 12px 0;
-    }
-
-    .pw-group input {
-      padding-right: 18px;
-    }
-
-    .toggle-icon {
-      position: absolute;
-      top: 50%;
-      right: 12px;
-      transform: translateY(-50%);
-      font-size: 1.2rem;
-      color: #555;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    footer {
-      margin-top: 20px;
-      font-size: 0.85rem;
-      color: #888;
-    }
-
-    @media (max-width: 480px) {
-      h1 { font-size: 1.4rem; }
-      .logo { width: 70px; height: 70px; }
-      button { font-size: 0.95rem; padding: 10px; }
-      input { font-size: 0.95rem; }
-    }
-  </style>
-</head>
-<body>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8377874433999473"
-    crossorigin="anonymous"></script>
-  <ins class="adsbygoogle"
-    style="display:block"
-    data-ad-client="ca-pub-8377874433999473"
-    data-ad-slot="1756631268"
-    data-ad-format="auto"
-    data-full-width-responsive="true"></ins>
-  <script>
-    (adsbygoogle = window.adsbygoogle || []).push({});
-  </script>
-
-  <div class="container">
-    <header>
-      <img src="logo.png" alt="UCKGC Logo" class="logo" />
-      <h1>UCKGC Bible Games</h1>
-    </header>
-
-    <div class="buttons">
-      <button onclick="showRegister()">Register</button>
-      <button onclick="showLogin()">Login</button>
-    </div>
-
-    <div id="formContainer"></div>
-
-    <footer>
-      Developed by <strong>Respicio Noel</strong>
-    </footer>
-  </div>
 </body>
 </html>
