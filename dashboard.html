@@ -285,6 +285,72 @@
       color: #888;
       font-style: italic;
     }
+    #players-toggle {
+  position: fixed;
+  bottom: 90px;
+  right: 80px;
+  background: var(--primary);
+  color: white;
+  width: 50px;
+  height: 50px;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+  cursor: pointer;
+  z-index: 9999;
+}
+
+#playersModal {
+  position: fixed;
+  bottom: 150px;
+  right: 20px;
+  width: 260px;
+  background: white;
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  z-index: 9999;
+  padding: 15px;
+  max-height: 300px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+}
+
+#playersModal.hidden {
+  display: none;
+}
+
+#playersModal h4 {
+  margin-bottom: 10px;
+  color: var(--primary);
+  text-align: center;
+}
+
+#playersList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#playersList li {
+  padding: 5px 8px;
+  border-bottom: 1px solid #eee;
+}
+
+#playersModal button {
+  margin-top: 10px;
+  width: 100%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
   </style>
 </head>
 <body>
@@ -329,6 +395,14 @@
       <h3>Books Order</h3>
       <p>Put the Bible books in correct order.</p>
     </div>
+    <div id="players-toggle" onclick="togglePlayersModal()" title="View Players">👥</div>
+
+<div id="playersModal" class="hidden">
+  <h4>Players</h4>
+  <ul id="playersList"></ul>
+  <button onclick="togglePlayersModal()">Close</button>
+</div>
+
   </section>
   <div id="chat-toggle" onclick="toggleChatbox()">💬</div>
   <div id="chatbox" class="hidden">
@@ -492,6 +566,24 @@
       window.location.href = "index.html";
     };
   
+window.togglePlayersModal = function () {
+  document.getElementById("playersModal").classList.toggle("hidden");
+};
+
+async function loadPlayers() {
+  const { data, error } = await supabase.from('profiles').select('full_name');
+  const list = document.getElementById("playersList");
+  if (!error && data) {
+    list.innerHTML = '';
+    data.forEach(player => {
+      const li = document.createElement("li");
+      li.textContent = player.full_name || "Anonymous";
+      list.appendChild(li);
+    });
+  }
+}
+
+document.getElementById("players-toggle").addEventListener("click", loadPlayers);
 
   </script>
 </body>
