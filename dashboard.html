@@ -561,7 +561,7 @@
     await preloadUsers();
     await loadMessages();
 
-  window.logout = async function () {
+window.logout = async function () {
   const { data: sessionData } = await supabase.auth.getSession();
   const user = sessionData?.session?.user;
 
@@ -576,6 +576,7 @@
   alert("👋 Logged out successfully!");
   window.location.href = "index.html";
 };
+
 
 window.togglePlayersModal = function () {
   document.getElementById("playersModal").classList.toggle("hidden");
