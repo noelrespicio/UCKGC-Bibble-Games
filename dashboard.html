@@ -285,10 +285,10 @@
       color: #888;
       font-style: italic;
     }
-    #players-toggle {
+   #players-toggle {
   position: fixed;
   bottom: 90px;
-  right: 80px;
+  right: 40px; /* Adjust closer to edge */
   background: var(--primary);
   color: white;
   width: 50px;
@@ -303,10 +303,11 @@
   z-index: 9999;
 }
 
+/* Modal Box */
 #playersModal {
   position: fixed;
   bottom: 150px;
-  right: 20px;
+  right: 20px; /* More aligned to the side */
   width: 260px;
   background: white;
   border: 2px solid var(--primary);
@@ -319,6 +320,7 @@
   font-size: 0.9rem;
 }
 
+/* Hide modal by default */
 #playersModal.hidden {
   display: none;
 }
@@ -350,7 +352,6 @@
   border-radius: 8px;
   cursor: pointer;
 }
-
   </style>
 </head>
 <body>
