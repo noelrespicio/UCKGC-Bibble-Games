@@ -221,146 +221,154 @@
   </script>
 
   <!-- Your Supabase Logic -->
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-    const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
+  const SUPABASE_URL = 'https://wlthlwxcmltwescezjlk.supabase.co';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o';
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+  const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    const { data: sessionData } = await supabase.auth.getSession();
-    if (sessionData.session) window.location.href = "dashboard.html";
+  const { data: sessionData } = await supabase.auth.getSession();
+  if (sessionData.session) window.location.href = "dashboard.html";
 
-    window.registerUser = async function (e) {
-      e.preventDefault();
-      const fullName = document.getElementById('fullName').value.trim();
-      const email = document.getElementById('regEmail').value.trim();
-      const password = document.getElementById('regPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
+  // ✅ Register
+  window.registerUser = async function (e) {
+    e.preventDefault();
+    const fullName = document.getElementById('fullName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const password = document.getElementById('regPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
 
-      if (!fullName || !email || !password || !confirmPassword) {
-        alert("❗ All fields are required.");
-        return;
+    if (!fullName || !email || !password || !confirmPassword) {
+      alert("❗ All fields are required.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      alert("❗ Passwords do not match.");
+      return;
+    }
+
+    const { data: existingUser } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (existingUser) {
+      alert("📧 Email already registered. Try logging in.");
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName }
       }
+    });
 
-      if (password !== confirmPassword) {
-        alert("❗ Passwords do not match.");
-        return;
-      }
+    if (error) {
+      alert("❌ Registration failed: " + error.message);
+      return;
+    }
 
-      const { data: existingUser } = await supabase
+    const user = data.user;
+    if (user) {
+      await supabase
+        .from('profiles')
+        .insert([{ id: user.id, full_name: fullName, email }]);
+    }
+
+    alert("✅ Registration successful! You can now log in.");
+    showLogin();
+  };
+
+  // ✅ Login
+  window.loginUser = async function (e) {
+    e.preventDefault();
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+      alert("❗ Email and password are required.");
+      return;
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      const { data: exists } = await supabase
         .from('profiles')
         .select('email')
-        .eq('email', email)
-        .maybeSingle();
+        .eq('email', email);
 
-      if (existingUser) {
-        alert("📧 Email already registered. Try logging in.");
-        return;
+      if (!exists || exists.length === 0) {
+        alert("📧 Email not registered.");
+      } else {
+        alert("🔒 Wrong password. Try again.");
       }
+      return;
+    }
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: { full_name: fullName }
-        }
-      });
+    alert("✅ Login successful!");
 
-      if (error) {
-        alert("❌ Registration failed: " + error.message);
-        return;
-      }
+    // ✅ Set online
+    await supabase
+      .from('profiles')
+      .update({ is_online: true })
+      .eq('email', email);
 
-      const user = data.user;
-      if (user) {
-        await supabase
-          .from('profiles')
-          .insert([{ id: user.id, full_name: fullName, email }]);
-      }
+    window.location.href = "dashboard.html";
+  };
 
-      alert("✅ Registration successful! You can now log in.");
-    
+  // Toggle password visibility
+  window.togglePassword = function (inputId, iconId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(iconId);
+    const isHidden = input.type === 'password';
+    input.type = isHidden ? 'text' : 'password';
+    icon.textContent = isHidden ? '👁️' : '🙈';
+  };
 
-    window.loginUser = async function (e) {
-      e.preventDefault();
-      const email = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
+  // Show Register Form
+  window.showRegister = function () {
+    document.getElementById('formContainer').innerHTML = `
+      <form id="registerForm">
+        <h3>Create an Account</h3>
+        <input type="text" id="fullName" placeholder="Full Name" required />
+        <input type="email" id="regEmail" placeholder="Email" required />
+        <div class="pw-group">
+          <input type="password" id="regPassword" placeholder="Password" required />
+          <span class="toggle-icon" id="icon1" onclick="togglePassword('regPassword', 'icon1')">🙈</span>
+        </div>
+        <div class="pw-group">
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+          <span class="toggle-icon" id="icon2" onclick="togglePassword('confirmPassword', 'icon2')">🙈</span>
+        </div>
+        <button type="submit">Register</button>
+      </form>
+    `;
+    document.getElementById('registerForm').addEventListener('submit', registerUser);
+  };
 
-      if (!email || !password) {
-        alert("❗ Email and password are required.");
-        return;
-      }
+  // Show Login Form
+  window.showLogin = function () {
+    document.getElementById('formContainer').innerHTML = `
+      <form id="loginForm">
+        <h3>Login</h3>
+        <input type="email" id="loginEmail" placeholder="Email" required />
+        <div class="pw-group">
+          <input type="password" id="loginPassword" placeholder="Password" required />
+          <span class="toggle-icon" id="icon3" onclick="togglePassword('loginPassword', 'icon3')">🙈</span>
+        </div>
+        <button type="submit">Login</button>
+      </form>
+    `;
+    document.getElementById('loginForm').addEventListener('submit', loginUser);
+  };
+</script>
 
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-
-      if (error) {
-        const { data: exists } = await supabase
-          .from('profiles')
-          .select('email')
-          .eq('email', email);
-
-        if (!exists || exists.length === 0) {
-          alert("📧 Email not registered.");
-        } else {
-          alert("🔒 Wrong password. Try again.");
-        }
-        return;
-      }
-
-      alert("✅ Login successful!");
-        await supabase
-  .from('profiles')
-  .update({ is_online: true })
-  .eq('email', email);
-      showLogin();
-    };
-      window.location.href = "dashboard.html";
-    };
-
-    window.togglePassword = function (inputId, iconId) {
-      const input = document.getElementById(inputId);
-      const icon = document.getElementById(iconId);
-      const isHidden = input.type === 'password';
-      input.type = isHidden ? 'text' : 'password';
-      icon.textContent = isHidden ? '👁️' : '🙈';
-    };
-
-    window.showRegister = function () {
-      document.getElementById('formContainer').innerHTML = `
-        <form id="registerForm">
-          <h3>Create an Account</h3>
-          <input type="text" id="fullName" placeholder="Full Name" required />
-          <input type="email" id="regEmail" placeholder="Email" required />
-          <div class="pw-group">
-            <input type="password" id="regPassword" placeholder="Password" required />
-            <span class="toggle-icon" id="icon1" onclick="togglePassword('regPassword', 'icon1')">🙈</span>
-          </div>
-          <div class="pw-group">
-            <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
-            <span class="toggle-icon" id="icon2" onclick="togglePassword('confirmPassword', 'icon2')">🙈</span>
-          </div>
-          <button type="submit">Register</button>
-        </form>
-      `;
-      document.getElementById('registerForm').addEventListener('submit', registerUser);
-    };
-
-    window.showLogin = function () {
-      document.getElementById('formContainer').innerHTML = `
-        <form id="loginForm">
-          <h3>Login</h3>
-          <input type="email" id="loginEmail" placeholder="Email" required />
-          <div class="pw-group">
-            <input type="password" id="loginPassword" placeholder="Password" required />
-            <span class="toggle-icon" id="icon3" onclick="togglePassword('loginPassword', 'icon3')">🙈</span>
-          </div>
-          <button type="submit">Login</button>
-        </form>
-      `;
-      document.getElementById('loginForm').addEventListener('submit', loginUser);
-    };
-  </script>
 </body>
 </html>
