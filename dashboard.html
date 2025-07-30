@@ -576,19 +576,7 @@
   alert("👋 Logged out successfully!");
   window.location.href = "index.html";
 };
-window.addEventListener("beforeunload", async () => {
-  const { data: sessionData } = await supabase.auth.getSession();
-  const user = sessionData?.session?.user;
 
-  if (user) {
-    await supabase
-      .from('profiles')
-      .update({ is_online: false })
-      .eq('id', user.id);
-  }
-});
-
-  
 window.togglePlayersModal = function () {
   document.getElementById("playersModal").classList.toggle("hidden");
 };
