@@ -561,30 +561,52 @@
     await preloadUsers();
     await loadMessages();
 
-    window.logout = async function () {
-      await supabase.auth.signOut();
-      alert("👋 Logged out successfully!");
-      window.location.href = "index.html";
-    };
+   window.logout = async function () {
+  await supabase
+    .from('profiles')
+    .update({ is_online: false })
+    .eq('id', user.id);
+
+  await supabase.auth.signOut();
+  alert("👋 Logged out successfully!");
+  window.location.href = "index.html";
+};
+window.addEventListener('beforeunload', async () => {
+  await supabase
+    .from('profiles')
+    .update({ is_online: false })
+    .eq('id', user.id);
+});
+
   
 window.togglePlayersModal = function () {
   document.getElementById("playersModal").classList.toggle("hidden");
 };
 
 async function loadPlayers() {
-  const { data, error } = await supabase.from('profiles').select('full_name');
+  const { data, error } = await supabase.from('profiles').select('full_name, is_online');
   const list = document.getElementById("playersList");
+
   if (!error && data) {
     list.innerHTML = '';
     data.forEach(player => {
       const li = document.createElement("li");
-      li.textContent = player.full_name || "Anonymous";
+
+      const statusColor = player.is_online ? 'green' : 'gray';
+      const statusText = player.is_online ? 'Online' : 'Offline';
+
+      li.innerHTML = `
+        <span style="display:flex;justify-content:space-between;align-items:center">
+          <span>${player.full_name || "Anonymous"}</span>
+          <span style="font-size: 0.8rem; color: ${statusColor}; font-weight: bold;">${statusText}</span>
+        </span>
+      `;
+
       list.appendChild(li);
     });
   }
 }
 
-document.getElementById("players-toggle").addEventListener("click", loadPlayers);
 
   </script>
 </body>
