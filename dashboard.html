@@ -284,24 +284,7 @@
       font-size: 0.8rem;
       color: #888;
       font-style: italic;
-    }#players-toggle {
-  position: fixed;
-  bottom: 90px;
-  right: 20px;
-  background: var(--secondary);
-  color: white;
-  width: 50px;
-  height: 50px;
-  font-size: 1.5rem;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-  cursor: pointer;
-  z-index: 9999;
-}
-
+    }
   </style>
 </head>
 <body>
@@ -347,21 +330,6 @@
       <p>Put the Bible books in correct order.</p>
     </div>
   </section>
-<div id="players-toggle" onclick="showPlayers()" title="View Players">👥</div>
-  <div id="playersModal" class="hidden" style="
-  position: fixed;
-  bottom: 150px;
-  right: 20px;
-  width: 280px;
-  background: white;
-  border: 2px solid var(--primary);
-  border-radius: 12px;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-  z-index: 9999;
-  padding: 15px;
-  max-height: 300px;
-  overflow-y: auto;">
-</div>
   <div id="chat-toggle" onclick="toggleChatbox()">💬</div>
   <div id="chatbox" class="hidden">
     <div id="chat-header">💬 Chat Room</div>
@@ -524,33 +492,6 @@
       window.location.href = "index.html";
     };
   
-  window.showPlayers = async function () {
-  const modal = document.getElementById('playersModal');
-  const list = document.getElementById('playersList');
-  list.innerHTML = '<li>Loading...</li>';
-
-  const { data, error } = await supabase.from('profiles').select('full_name');
-
-  if (error || !data) {
-    list.innerHTML = '<li>Error loading players.</li>';
-    return;
-  }
-
-  list.innerHTML = '';
-  data.forEach(player => {
-    const li = document.createElement('li');
-    li.textContent = player.full_name;
-    li.style.padding = '6px 0';
-    li.style.borderBottom = '1px solid #eee';
-    list.appendChild(li);
-  });
-
-  modal.classList.remove('hidden');
-};
-
-window.closePlayersModal = function () {
-  document.getElementById('playersModal').classList.add('hidden');
-};
 
   </script>
 </body>
