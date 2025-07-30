@@ -281,6 +281,10 @@
       }
 
       alert("✅ Registration successful! You can now log in.");
+      await supabase
+  .from('profiles')
+  .update({ is_online: true })
+  .eq('email', email);
       showLogin();
     };
 
