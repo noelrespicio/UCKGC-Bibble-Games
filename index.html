@@ -281,12 +281,7 @@
       }
 
       alert("✅ Registration successful! You can now log in.");
-      await supabase
-  .from('profiles')
-  .update({ is_online: true })
-  .eq('email', email);
-      showLogin();
-    };
+    
 
     window.loginUser = async function (e) {
       e.preventDefault();
@@ -315,6 +310,12 @@
       }
 
       alert("✅ Login successful!");
+        await supabase
+  .from('profiles')
+  .update({ is_online: true })
+  .eq('email', email);
+      showLogin();
+    };
       window.location.href = "dashboard.html";
     };
 
