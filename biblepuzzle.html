@@ -8,55 +8,80 @@
     :root {
       --primary: #2e86de;
       --primary-dark: #1b4f72;
-      --bg: #f0f8ff;
+      --bg-light: #f0f8ff;
+      --glass-bg: rgba(255, 255, 255, 0.85);
     }
     body {
       font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
+      background: linear-gradient(to bottom, #a8dadc, #f0f8ff);
       margin: 0;
       padding: 20px;
       text-align: center;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .puzzle-box, .result-box {
-      background: #fff;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 24px;
-      border-radius: 16px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      max-width: 700px;
+      width: 100%;
+      margin: auto;
+      padding: 28px;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      animation: fadeIn 1s ease;
     }
     h2 {
-      color: var(--primary);
-      margin-bottom: 20px;
+      color: var(--primary-dark);
+      margin-bottom: 16px;
+      font-size: 2rem;
     }
     .puzzle-word {
-      font-size: 2rem;
-      letter-spacing: 8px;
+      font-size: 2.2rem;
+      letter-spacing: 12px;
       margin: 20px 0;
+      font-weight: bold;
+      color: var(--primary);
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
     .clues {
-      margin-bottom: 20px;
-      text-align: left;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
     }
     .clues p {
+      background: #fff;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
       font-style: italic;
-      color: #555;
-      margin: 6px 0;
+      color: #444;
+      transition: transform 0.2s;
+    }
+    .clues p:hover {
+      transform: scale(1.05);
     }
     .letter-input {
       font-size: 1.2rem;
-      padding: 8px 14px;
+      padding: 10px 16px;
       width: 80%;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-bottom: 16px;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      margin-bottom: 20px;
+      outline: none;
+      text-transform: uppercase;
+      text-align: center;
     }
     .submit-btn {
       margin: 4px;
-      padding: 10px 14px;
+      padding: 12px 18px;
       font-size: 1rem;
+      font-weight: bold;
       border: none;
-      border-radius: 6px;
+      border-radius: 12px;
       cursor: pointer;
       background: var(--primary);
       color: white;
@@ -64,41 +89,75 @@
     }
     .submit-btn:hover {
       background: var(--primary-dark);
+      transform: translateY(-2px);
     }
     .feedback {
       font-weight: bold;
       margin: 16px 0;
+      font-size: 1.2rem;
     }
-    .correct { color: green; }
-    .wrong { color: red; }
+    .correct {
+      color: green;
+      animation: glow 1s infinite alternate;
+    }
+    .wrong {
+      color: red;
+      animation: shake 0.4s;
+    }
     .hidden { display: none; }
     .try-again-link {
       display: inline-block;
       margin-top: 20px;
       font-weight: bold;
       text-decoration: none;
-      color: var(--primary);
-      background: none;
-      border: none;
+      color: white;
+      background: var(--primary);
+      padding: 10px 18px;
+      border-radius: 12px;
       cursor: pointer;
+      transition: 0.3s;
+    }
+    .try-again-link:hover {
+      background: var(--primary-dark);
     }
     ul { list-style: none; padding: 0; }
-    li { font-weight: bold; margin: 6px 0; }
-    @keyframes fall {
-      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    li {
+      font-weight: bold;
+      margin: 8px 0;
+      padding: 8px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    li:first-child { background: gold; color: #333; }
+    li:nth-child(2) { background: silver; color: #333; }
+    li:nth-child(3) { background: #cd7f32; color: #fff; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 5px green; }
+      to { text-shadow: 0 0 15px lime; }
+    }
+    @keyframes shake {
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
     }
   </style>
 </head>
 <body>
 
   <div class="puzzle-box" id="gameBox">
-    <h2>Bible Puzzle</h2>
+    <h2>📖 Bible Puzzle</h2>
     <div class="clues" id="clueText">Clues will appear here</div>
     <p class="puzzle-word" id="puzzleWord">Loading...</p>
     <input type="text" id="letterInput" class="letter-input" maxlength="20" placeholder="Enter your answer...">
     <br>
-    <button class="submit-btn" id="submitBtn">Submit</button>
+    <button class="submit-btn" id="submitBtn">Submit Answer</button>
     <p id="feedback" class="feedback hidden"></p>
     <br>
     <a href="dashboard.html">🔙 Back to Dashboard</a>
@@ -109,7 +168,7 @@
     <p id="finalScore"></p>
     <h3>🏆 Leaderboard</h3>
     <ul id="leaderboard"></ul>
-    <button class="try-again-link" id="retryFromResult">🔁 Try Again</button>
+    <button class="try-again-link" id="retryFromResult">🔁 Play Again</button>
     <br>
     <a href="dashboard.html">🔙 Back to Dashboard</a>
   </div>
@@ -123,7 +182,7 @@
 
     const supabase = createClient(
       "https://wlthlwxcmltwescezjlk.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o"
+      "YOUR_SUPABASE_KEY"
     );
 
     const { data: sessionData } = await supabase.auth.getSession();
@@ -195,7 +254,6 @@
       resultBox.classList.remove("hidden");
       finalScoreEl.textContent = `You solved ${score} puzzle${score > 1 ? "s" : ""}!`;
 
-      // leaderboard handling
       const { data: existing } = await supabase
         .from("biblepuzzle_leaderboard")
         .select("id, score")
@@ -221,8 +279,8 @@
         .order("score", { ascending: false });
 
       leaderboardEl.innerHTML = "";
-      topScores.slice(0, 5).forEach(row => {
-        leaderboardEl.innerHTML += `<li><strong>${row.name}</strong>: ${row.score}</li>`;
+      topScores.slice(0, 5).forEach((row, idx) => {
+        leaderboardEl.innerHTML += `<li> ${idx+1}. <strong>${row.name}</strong>: ${row.score}</li>`;
       });
     }
 
@@ -231,7 +289,7 @@
       if (guess === puzzle) {
         correctSound.play();
         score++;
-        feedbackEl.textContent = `🎉 Correct! The word was "${puzzle}"`;
+        feedbackEl.textContent = `✅ Correct! The word was "${puzzle}"`;
         feedbackEl.className = "feedback correct";
         feedbackEl.classList.remove("hidden");
         setTimeout(startGame, 2000);
