@@ -177,141 +177,161 @@
   <audio id="wrongSound" src="gameover.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="backroundmusic.mp3" autoplay loop preload="auto"></audio>
 
-  <script type="module">
-    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+ <script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
-    const supabase = createClient(
-      "https://wlthlwxcmltwescezjlk.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndsdGhsd3hjbWx0d2VzY2V6amxrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE0NDQ4MDcsImV4cCI6MjA2NzAyMDgwN30.tvUeTFVDdQomDHHV0JSpsXHP9IbQVkOhEvBpCglzI-o"
-    );
+  const supabase = createClient(
+    "https://wlthlwxcmltwescezjlk.supabase.co",
+    "YOUR_SUPABASE_KEY_HERE"
+  );
 
-    const { data: sessionData } = await supabase.auth.getSession();
-    const session = sessionData.session;
-    if (!session) window.location.href = "index.html";
+  const { data: sessionData } = await supabase.auth.getSession();
+  const session = sessionData.session;
+  if (!session) window.location.href = "index.html";
 
-    const user = session.user;
-    const userId = user.id;
-    const fullName = user.user_metadata.full_name || user.email;
+  const user = session.user;
+  const userId = user.id;
+  const fullName = user.user_metadata.full_name || user.email;
 
-    const bgMusic = document.getElementById("bgMusic");
-    bgMusic.volume = 0.3;
-    bgMusic.play().catch(() => {
-      document.body.addEventListener("click", () => bgMusic.play(), { once: true });
-    });
+  const bgMusic = document.getElementById("bgMusic");
+  bgMusic.volume = 0.3;
+  bgMusic.play().catch(() => {
+    document.body.addEventListener("click", () => bgMusic.play(), { once: true });
+  });
 
-    let puzzles = [];
-    let currentIndex = 0;
-    let score = 0;
-    let puzzle = "";
-    let hints = [];
+  let puzzles = [];
+  let currentIndex = 0;
+  let score = 0;
+  let puzzle = "";
+  let hints = [];
 
-    const puzzleWordEl = document.getElementById("puzzleWord");
-    const clueText = document.getElementById("clueText");
-    const inputEl = document.getElementById("letterInput");
-    const feedbackEl = document.getElementById("feedback");
-    const submitBtn = document.getElementById("submitBtn");
-    const resultBox = document.getElementById("resultBox");
-    const gameBox = document.getElementById("gameBox");
-    const finalScoreEl = document.getElementById("finalScore");
-    const leaderboardEl = document.getElementById("leaderboard");
-    const retryFromResult = document.getElementById("retryFromResult");
-    const correctSound = document.getElementById("correctSound");
-    const wrongSound = document.getElementById("wrongSound");
+  const puzzleWordEl = document.getElementById("puzzleWord");
+  const clueText = document.getElementById("clueText");
+  const inputEl = document.getElementById("letterInput");
+  const feedbackEl = document.getElementById("feedback");
+  const submitBtn = document.getElementById("submitBtn");
+  const resultBox = document.getElementById("resultBox");
+  const gameBox = document.getElementById("gameBox");
+  const finalScoreEl = document.getElementById("finalScore");
+  const leaderboardEl = document.getElementById("leaderboard");
+  const retryFromResult = document.getElementById("retryFromResult");
+  const correctSound = document.getElementById("correctSound");
+  const wrongSound = document.getElementById("wrongSound");
 
-    function shufflePuzzles() {
-      puzzles = [
-        { word: "NOAH", hints: ["Ark", "Flood", "Rainbow", "Dove"] },
-        { word: "MOSES", hints: ["Plagues", "Red Sea", "Pharaoh", "Commandments"] },
-        { word: "DAVID", hints: ["Shepherd", "Sling", "Goliath", "King"] },
-        { word: "JESUS", hints: ["Cross", "Disciples", "Resurrection", "Bethlehem"] },
-        { word: "JONAH", hints: ["Whale", "Nineveh", "Storm", "Prophet"] },
-        { word: "EDEN", hints: ["Garden", "Adam", "Eve", "Serpent"] },
-        { word: "PETER", hints: ["Disciple", "Denied Jesus", "Rock", "Fisherman"] },
-        { word: "PAUL", hints: ["Apostle", "Letters", "Missionary", "Conversion"] },
-        { word: "ESTHER", hints: ["Queen", "Haman", "Mordecai", "Courage"] },
-        { word: "JOB", hints: ["Suffering", "Faith", "Patience", "Restoration"] }
-      ].sort(() => 0.5 - Math.random());
-      currentIndex = 0;
+  function shufflePuzzles() {
+    puzzles = [
+      { word: "NOAH", hints: ["Ark", "Flood", "Rainbow", "Dove"] },
+      { word: "MOSES", hints: ["Plagues", "Red Sea", "Pharaoh", "Commandments"] },
+      { word: "DAVID", hints: ["Shepherd", "Sling", "Goliath", "King"] },
+      { word: "JESUS", hints: ["Cross", "Disciples", "Resurrection", "Bethlehem"] },
+      { word: "JONAH", hints: ["Whale", "Nineveh", "Storm", "Prophet"] },
+      { word: "EDEN", hints: ["Garden", "Adam", "Eve", "Serpent"] },
+      { word: "PETER", hints: ["Disciple", "Denied Jesus", "Rock", "Fisherman"] },
+      { word: "PAUL", hints: ["Apostle", "Letters", "Missionary", "Conversion"] },
+      { word: "ESTHER", hints: ["Queen", "Haman", "Mordecai", "Courage"] },
+      { word: "JOB", hints: ["Suffering", "Faith", "Patience", "Restoration"] }
+    ].sort(() => 0.5 - Math.random());
+    currentIndex = 0;
+  }
+
+  function startGame() {
+    if (currentIndex >= puzzles.length) {
+      endGame();
+      return;
     }
+    const current = puzzles[currentIndex++];
+    puzzle = current.word;
+    hints = current.hints;
+    puzzleWordEl.textContent = "_ ".repeat(puzzle.length);
+    clueText.innerHTML = hints.map(h => `<p>📖 ${h}</p>`).join("");
+    inputEl.value = "";
+    inputEl.focus();
+    feedbackEl.classList.add("hidden");
+  }
 
-    function startGame() {
-      if (currentIndex >= puzzles.length) {
-        endGame();
-        return;
-      }
-      const current = puzzles[currentIndex++];
-      puzzle = current.word;
-      hints = current.hints;
-      puzzleWordEl.textContent = "_ ".repeat(puzzle.length);
-      clueText.innerHTML = hints.map(h => `<p>📖 ${h}</p>`).join("");
-      inputEl.value = "";
-      inputEl.focus();
-      feedbackEl.classList.add("hidden");
+  // ✅ Update puzzle lines live as user types
+  inputEl.addEventListener("input", () => {
+    const guess = inputEl.value.toUpperCase();
+    let display = "";
+    for (let i = 0; i < puzzle.length; i++) {
+      display += guess[i] ? guess[i] + " " : "_ ";
     }
+    puzzleWordEl.textContent = display.trim();
+  });
 
-    async function endGame() {
-      gameBox.classList.add("hidden");
-      resultBox.classList.remove("hidden");
-      finalScoreEl.textContent = `You solved ${score} puzzle${score > 1 ? "s" : ""}!`;
+  async function endGame() {
+    gameBox.classList.add("hidden");
+    resultBox.classList.remove("hidden");
+    finalScoreEl.textContent = `You solved ${score} puzzle${score > 1 ? "s" : ""}!`;
 
-      const { data: existing } = await supabase
-        .from("biblepuzzle_leaderboard")
-        .select("id, score")
-        .eq("user_id", userId)
-        .maybeSingle();
+    const { data: existing } = await supabase
+      .from("biblepuzzle_leaderboard")
+      .select("id, score")
+      .eq("user_id", userId)
+      .maybeSingle();
 
-      if (existing) {
-        if (score > existing.score) {
-          await supabase
-            .from("biblepuzzle_leaderboard")
-            .update({ score })
-            .eq("id", existing.id);
-        }
-      } else {
+    if (existing) {
+      if (score > existing.score) {
         await supabase
           .from("biblepuzzle_leaderboard")
-          .insert([{ user_id: userId, name: fullName, score }]);
+          .update({ score })
+          .eq("id", existing.id);
       }
-
-      const { data: topScores } = await supabase
+    } else {
+      await supabase
         .from("biblepuzzle_leaderboard")
-        .select("name, score")
-        .order("score", { ascending: false });
-
-      leaderboardEl.innerHTML = "";
-      topScores.slice(0, 5).forEach((row, idx) => {
-        leaderboardEl.innerHTML += `<li> ${idx+1}. <strong>${row.name}</strong>: ${row.score}</li>`;
-      });
+        .insert([{ user_id: userId, name: fullName, score }]);
     }
 
-    submitBtn.onclick = () => {
-      const guess = inputEl.value.trim().toUpperCase();
-      if (guess === puzzle) {
-        correctSound.play();
-        score++;
-        feedbackEl.textContent = `✅ Correct! The word was "${puzzle}"`;
-        feedbackEl.className = "feedback correct";
-        feedbackEl.classList.remove("hidden");
-        setTimeout(startGame, 2000);
-      } else {
-        wrongSound.play();
-        feedbackEl.textContent = `❌ Wrong! Correct answer: ${puzzle}`;
-        feedbackEl.className = "feedback wrong";
-        feedbackEl.classList.remove("hidden");
-        setTimeout(endGame, 2000);
-      }
-    };
+    const { data: topScores } = await supabase
+      .from("biblepuzzle_leaderboard")
+      .select("name, score")
+      .order("score", { ascending: false });
 
-    retryFromResult.onclick = () => {
-      score = 0;
-      shufflePuzzles();
-      resultBox.classList.add("hidden");
-      gameBox.classList.remove("hidden");
-      startGame();
-    };
+    leaderboardEl.innerHTML = "";
+    topScores.slice(0, 5).forEach((row, idx) => {
+      leaderboardEl.innerHTML += `<li> ${idx+1}. <strong>${row.name}</strong>: ${row.score}</li>`;
+    });
+  }
 
+  submitBtn.onclick = () => {
+    const guess = inputEl.value.trim().toUpperCase();
+
+    // ✅ If empty, show warning
+    if (!guess) {
+      feedbackEl.textContent = "⚠️ Please enter a word!";
+      feedbackEl.className = "feedback wrong";
+      feedbackEl.classList.remove("hidden");
+      return;
+    }
+
+    if (guess === puzzle) {
+      correctSound.play();
+      score++;
+      feedbackEl.textContent = `✅ Correct! The word was "${puzzle}"`;
+      feedbackEl.className = "feedback correct";
+      feedbackEl.classList.remove("hidden");
+      setTimeout(startGame, 2000);
+    } else {
+      wrongSound.play();
+      feedbackEl.textContent = `❌ Wrong! Correct answer: ${puzzle}`;
+      feedbackEl.className = "feedback wrong";
+      feedbackEl.classList.remove("hidden");
+      setTimeout(endGame, 2000);
+    }
+  };
+
+  retryFromResult.onclick = () => {
+    score = 0;
     shufflePuzzles();
+    resultBox.classList.add("hidden");
+    gameBox.classList.remove("hidden");
     startGame();
-  </script>
+  };
+
+  shufflePuzzles();
+  startGame();
+</script>
+
 </body>
 </html>
